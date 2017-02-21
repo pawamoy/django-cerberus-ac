@@ -1,0 +1,46 @@
+# This file exists so you can easily regenerate your project.
+#
+# `cookiepatcher` is a convenient shim around `cookiecutter`
+# for regenerating projects (it will generate a .cookiecutterrc
+# automatically for any template). To use it:
+#
+#    pip install cookiepatcher
+#    cookiepatcher gh:ionelmc/cookiecutter-pylibrary project-path
+#
+# See:
+#    https://pypi.python.org/pypi/cookiecutter
+#
+# Alternatively, you can run:
+#
+#    cookiecutter --overwrite-if-exists --config-file=project-path/.cookiecutterrc gh:ionelmc/cookiecutter-pylibrary
+
+default_context:
+
+    appveyor:                        'no'
+    codacy:                          'yes'
+    codeclimate:                     'no'
+    codecov:                         'yes'
+    command_line_interface:          'no'
+    command_line_interface_bin_name: 'django-cerberus-ac'
+    coveralls:                       'no'
+    distribution_name:               'django-cerberus-ac'
+    django:                          'yes'
+    django_fake_model:               'yes'
+    django_versions:                 '1.8,1.9,1.10'
+    email:                           ' '
+    full_name:                       'Mihnea Gheorghiu'
+    github_username:                 'Deavelleye'
+    gitter:                          'yes'
+    landscape:                       'yes'
+    package_name:                    'cerberus_ac'
+    project_name:                    'Cerberus Access Control'
+    project_short_description:       'Django Ontology Based Access Control Module'
+    python_versions:                 '2.7,3.4,3.5,3.6,3.7-dev,pypy'
+    pyup:                            'yes'
+    release_date:                    '2017-02-21'
+    repo_name:                       'dj-CerberusAC'
+    requiresio:                      'no'
+    scrutinizer:                     'no'
+    travis:                          'yes'
+    version:                         '0.1.0'
+    website:                         ' '
