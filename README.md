@@ -1,3 +1,0 @@
-## Django-Cerberus Access Control
-
-
