@@ -2,8 +2,6 @@
 
 """Main test script."""
 
-
-
 from django.test import TestCase
 
 import cerberus_ac
@@ -16,7 +14,7 @@ class MainTestCase(TestCase):
         """Setup method."""
         pass
 
-    def test_main(self):
+    def test_importable(self):
         """Main test method."""
         assert cerberus_ac
 
