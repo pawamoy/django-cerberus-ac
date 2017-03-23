@@ -120,8 +120,8 @@ class RoleMixin(object):
             obj: the created RoleHierarchy object.
         """
         return RoleHierarchy.objects.create(
-            role_type_a=self.role_type(), role_id_a=self.role_id(),
-            role_type_b=role.role_type(), role_id_b=role.role_id())
+            role_type_a=role.role_type(), role_id_a=role.role_id(),
+            role_type_b=self.role_type(), role_id_b=self.role_id())
 
     def can(self, perm, resource):
         """
