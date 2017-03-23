@@ -14,8 +14,8 @@ django-cerberus-ac
 dj-CerberusAC
 cerberus_ac
 Deavelleye
-Cerberus
-Access
-Control
+cerberus
+access
+control
 Mihnea
 Gheorghiu
