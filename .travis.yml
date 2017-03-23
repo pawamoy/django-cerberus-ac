@@ -1,7 +1,7 @@
 sudo: false
 language: python
 branches:
-  only: [master]
+    only: [master, roles-2in1]
 cache:
   directories: [$HOME/.cache/pip]
 matrix:
