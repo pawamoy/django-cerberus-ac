@@ -19,6 +19,26 @@ from django.utils.translation import ugettext_lazy as _
 from . import AppSettings
 
 
+def resource_id(resource):
+    if hasattr(resource, 'resource_id'):
+        attr = resource.resource_id
+        if callable(attr):
+            return attr()
+        return attr
+    elif hasattr(resource, 'id'):
+        return resource.id
+    return None
+
+
+def resource_type(resource):
+    if hasattr(resource, 'resource_type'):
+        attr = getattr(resource, 'resource_type')
+        if callable(attr):
+            return attr()
+        return attr
+    return resource.__class__.__name__
+
+
 class RoleMixin(object):
     """
     Mixin for Role models / classes.
@@ -136,8 +156,8 @@ class RoleMixin(object):
         """
         return RolePrivilege.authorize(
             role_type=self.role_type(), role_id=self.role_id(), perm=perm,
-            resource_type=resource.resource_type(),
-            resource_id=resource.resource_id())
+            resource_type=resource_type(resource),
+            resource_id=resource_id(resource))
 
 
 class Role(models.Model, RoleMixin):
@@ -340,11 +360,11 @@ class RolePrivilege(models.Model):
 
         """
         try:
-            rule = RolePrivilege.objects.get(
+            privilege = RolePrivilege.objects.get(
                 role_type=role_type, role_id=role_id,
                 resource_type=resource_type, resource_id=resource_id,
                 access_type=perm)
-            return rule.authorized
+            return privilege.authorized
         except RolePrivilege.DoesNotExist:
             return None
 
@@ -393,12 +413,12 @@ class RolePrivilege(models.Model):
             resource_type (str): a string describing the type of resource.
             resource_id (int): the resource's ID.
             user (User): an instance of settings.AUTH_USER_MODEL.
-            log (bool): whether to record an entry in rules history.
+            log (bool): whether to record an entry in privileges history.
 
         Returns:
-            access instance: the created rule.
+            access instance: the created privilege.
         """
-        rule, created = RolePrivilege.objects.update_or_create(
+        privilege, created = RolePrivilege.objects.update_or_create(
             role_type=role_type,
             role_id=role_id,
             access_type=perm,
@@ -410,9 +430,9 @@ class RolePrivilege(models.Model):
             record = PrivilegeHistory(
                 user=user, action={True: PrivilegeHistory.CREATE}.get(
                     created, PrivilegeHistory.UPDATE))
-            record.update_from_rule(rule)
+            record.update_from_privilege(privilege)
 
-        return rule
+        return privilege
 
     @staticmethod
     def deny(role_type,
@@ -432,12 +452,12 @@ class RolePrivilege(models.Model):
             resource_type (str): a string describing the type of resource.
             resource_id (int): the resource's ID.
             user (User): an instance of settings.AUTH_USER_MODEL.
-            log (bool): whether to record an entry in rules history.
+            log (bool): whether to record an entry in privileges history.
 
         Returns:
-            access instance: the created rule.
+            access instance: the created privilege.
         """
-        rule, created = RolePrivilege.objects.update_or_create(
+        privilege, created = RolePrivilege.objects.update_or_create(
             role_type=role_type,
             role_id=role_id,
             access_type=perm,
@@ -449,9 +469,9 @@ class RolePrivilege(models.Model):
             record = PrivilegeHistory(
                 user=user, action={True: PrivilegeHistory.CREATE}.get(
                     created, PrivilegeHistory.UPDATE))
-            record.update_from_rule(rule)
+            record.update_from_privilege(privilege)
 
-        return rule
+        return privilege
 
     @staticmethod
     def forget(role_type,
@@ -462,7 +482,7 @@ class RolePrivilege(models.Model):
                user=None,
                log=True):
         """
-        Forget any rule present between role and resource.
+        Forget any privilege present between role and resource.
 
         Args:
             role_type (str): a string describing the type of role.
@@ -471,14 +491,15 @@ class RolePrivilege(models.Model):
             resource_type (str): a string describing the type of resource.
             resource_id (int): the resource's ID.
             user (User): an instance of settings.AUTH_USER_MODEL.
-            log (bool): whether to record an entry in rules history.
+            log (bool): whether to record an entry in privileges history.
 
         Returns:
-            int, dict: the number of rules deleted and a dictionary with the
-            number of deletions per object type (django's delete return).
+            int, dict:
+                the number of privileges deleted and a dictionary with the
+                number of deletions per object type (django's delete return).
         """
         try:
-            rule = RolePrivilege.objects.get(
+            privilege = RolePrivilege.objects.get(
                 role_type=role_type, role_id=role_id,
                 resource_type=resource_type, resource_id=resource_id,
                 access_type=perm)
@@ -486,9 +507,9 @@ class RolePrivilege(models.Model):
             if log:
                 PrivilegeHistory.objects.create(
                     user=user, action=PrivilegeHistory.DELETE,
-                    reference_id=rule.id)
+                    reference_id=privilege.id)
 
-            rule.delete()
+            privilege.delete()
             return True
         except RolePrivilege.DoesNotExist:
             return False
@@ -499,8 +520,6 @@ class RolePrivilege(models.Model):
 
 class PrivilegeHistory(models.Model):
     """Privilege history model."""
-
-    rule_type = 'generic'
 
     CREATE = 'c'
     # READ = 'r'  # makes no sense here
@@ -521,19 +540,20 @@ class PrivilegeHistory(models.Model):
         DELETE, _(ACTIONS_VERBOSE[DELETE]),
     )
 
-    reference_id = models.PositiveIntegerField(_('Rule reference ID'))
+    privilege_id = models.PositiveIntegerField(
+        _('Privilege reference ID'), null=True)
     reference = models.ForeignKey(
         RolePrivilege, on_delete=models.SET_NULL, null=True,
-        verbose_name=_('Rule reference'), related_name='history')
+        verbose_name=_('Privilege reference'), related_name='history')
     action = models.CharField(_('Action'), max_length=1, choices=ACTIONS)
     datetime = models.DateTimeField(_('Date and time'), auto_now_add=True)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
-        verbose_name=_('User'), related_name='rules_changes',
+        verbose_name=_('User'), related_name='privileges_changes',
         null=True)
 
-    actor_type = models.CharField(_('Actor type'), max_length=255, blank=True)
-    actor_id = models.PositiveIntegerField(_('Actor ID'), null=True)
+    role_type = models.CharField(_('Role type'), max_length=255, blank=True)
+    role_id = models.PositiveIntegerField(_('Role ID'), null=True)
 
     authorized = models.NullBooleanField(_('Authorization'), default=None)
     access_type = models.CharField(
@@ -543,13 +563,8 @@ class PrivilegeHistory(models.Model):
         _('Resource type'), max_length=255, blank=True)
     resource_id = models.PositiveIntegerField(_('Resource ID'), null=True)
 
-    class Meta:
-        """Meta class for Django."""
-
-        abstract = True
-
     def __str__(self):
-        return '[%s] user %s has %sd rule <%s>' % (
+        return '[%s] user %s has %sd privilege <%s>' % (
             self.datetime, self.user,
             PrivilegeHistory.ACTIONS_VERBOSE[str(self.action)],
             self.reference if self.reference else self.reference_id)
@@ -564,8 +579,8 @@ class PrivilegeHistory(models.Model):
         """
         self.reference = privilege
         self.reference_id = privilege.id
-        self.actor_type = privilege.actor_type
-        self.actor_id = privilege.actor_id
+        self.role_type = privilege.role_type
+        self.role_id = privilege.role_id
         self.authorized = privilege.authorized
         self.access_type = privilege.access_type
         self.resource_type = privilege.resource_type
@@ -593,8 +608,8 @@ class AccessHistory(models.Model):
         (EXPLICIT, _(RESPONSE_TYPE_VERBOSE[EXPLICIT]))
     )
 
-    role_type = models.CharField(_('Actor type'), max_length=255, blank=True)
-    role_id = models.PositiveIntegerField(_('Actor ID'), null=True)
+    role_type = models.CharField(_('Role type'), max_length=255, blank=True)
+    role_id = models.PositiveIntegerField(_('Role ID'), null=True)
 
     # We don't want to store false info, None says "we don't know"
     response = models.NullBooleanField(_('Response'), default=None)
@@ -612,24 +627,24 @@ class AccessHistory(models.Model):
 
     def __str__(self):
         inherited = ''
-        if self.actor_type and self.group_type and self.group_id:
-            if self.actor_id:
-                actor = '%s %s' % (self.actor_type, self.actor_id)
+        if self.role_type and self.inherited_type and self.inherited_id:
+            if self.role_id:
+                role = '%s %s' % (self.role_type, self.role_id)
             else:
-                actor = self.actor_type
+                role = self.role_type
             inherited = ' (inherited from %s %s)' % (
-                self.group_type, self.group_id)
-        elif self.group_type:
-            if self.group_id:
-                actor = '%s %s' % (self.group_type, self.group_id)
+                self.inherited_type, self.inherited_id)
+        elif self.inherited_type:
+            if self.inherited_id:
+                role = '%s %s' % (self.inherited_type, self.inherited_id)
             else:
-                actor = self.group_type
+                role = self.inherited_type
         else:
-            return 'invalid: no actor & no group: %s' % self.__dict__
+            return 'invalid: no role & no group: %s' % self.__dict__
 
         authorized = 'authorized' if self.response else 'unauthorized'
         string = '[%s] %s was %s %s to %s %s %s' % (
-            self.datetime, actor,
+            self.datetime, role,
             AccessHistory.RESPONSE_TYPE_VERBOSE[str(self.response_type)],
             authorized, self.access_type, self.resource_type, self.resource_id)
         if inherited:
