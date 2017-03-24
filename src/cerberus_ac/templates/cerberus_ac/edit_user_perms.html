@@ -1,0 +1,83 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static "cerberus_ac/css/bootstrap.min.css" %}" media="screen" />
+<script src="{% static "cerberus_ac/js/bootstrap.min.js" %}"></script>
+<script src="{% static "cerberus_ac/js/jquery-3.2.0.slim.min.js" %}"></script>
+<script>
+$('.expandable').click(function() {
+    $('.expandable').not(this).nextAll('tr').hide();
+    $(this).nextAll('tr').toggle();
+});
+</script>
+
+{% block title %}{% trans "Edit User Permissions" %} - CerberusAC{% endblock %}
+
+<div class="">
+    <div class="col-md-10">
+        <div class="table-responsive">
+            <table id="editpermstable"
+                   data-toggle="collapse"
+                   data-search="true"
+                   data-filter-control="true"
+                   data-show-export="true"
+                   data-click-to-select="true"
+                   data-toolbar="#toolbar"
+                   class="table table-hover ">
+                <thead>
+                    <tr>
+                        <th data-field="State" data-checkbox="true"></th>
+                        <th data-field="User" data-sortable="true">User</th>
+                        {% for r in resources %}
+                            <th data-field="{{ r }}" data-sortable="false"></th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                {% for m in members %}
+                    <tr data-toggle="collapse" data-target="#accordion{{ m.id }}" class="accordion-toggle">
+                        <td class="bs-checkbox "><input data-index="{{ m.id }}" name="btSelectItem" type="checkbox"></td>
+                        <td>User {{ m.id }}</td>
+                    </tr>
+                    <div id="accordion{{ m.id }}" class="collapse out"><tr><td colspan="2">
+                            ID : {{ m.id }}<br>
+                            Groups: {{ m.get_groups }}<br>
+                            Username : {{ m.username }}<br>
+                            Mail : {{ m.email }} <br>
+                            Active : {{ m.is_active }}<br>
+                            Last login: {{ m.last_login }}<br>
+                            Register date: {{ m.date_joined }}<br>
+                       </td>
+                        {% for r in resources %}
+                            <td>
+
+                            </td>
+                        {% endfor %}
+                    </tr>
+                    </div>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="9">{{sizes}}
+                            <div class="text-center">
+                                <ul class="pagination">
+                                    <li ng-class="{disabled: currentPage == 0}">
+                                        <a href="javascript:;" ng-click="prevPage()">« Prev</a>
+                                    </li>
+                                    <li ng-repeat="n in range(pagedItems.length)" ng-class="{active: n == currentPage}" ng-click="setPage()">
+                                        <a href="javascript:;" ng-bind="n + 1">1</a>
+                                    </li>
+                                    <li ng-class="{disabled: currentPage == pagedItems.length - 1}">
+                                        <a href="javascript:;" ng-click="nextPage()">Next »</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-2">
+
+    </div>
+</div>
