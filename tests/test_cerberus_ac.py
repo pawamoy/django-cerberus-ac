@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 
 """Main test script."""
-import pytest
+
 from django.test import TestCase, override_settings
 
+import pytest
 from django_fake_model import models as f
 
 from cerberus_ac import AppSettings
 from cerberus_ac.models import (
-    Role, RoleMixin, RolePrivilege, RoleHierarchy, AccessHistory,
-    PrivilegeHistory, get_resource_id, get_resource_type)
+    AccessHistory, PrivilegeHistory, Role, RoleHierarchy, RoleMixin,
+    RolePrivilege, get_resource_id, get_resource_type)
 
 
 class FakeUser(f.FakeModel, RoleMixin):
@@ -60,6 +61,7 @@ class MainTestCase(TestCase):
         self.resources = [FakeResource.objects.create() for _ in range(3)]
 
     def test_appsettings_instance(self):
+        """Instantiate and load an AppSettings instance."""
         appsettings = AppSettings()
         appsettings.load()
 
@@ -69,6 +71,7 @@ class MainTestCase(TestCase):
                        CERBERUS_LOG_PRIVILEGES={},
                        CERBERUS_LOG_HIERARCHY=None)
     def test_wrong_settings_trigger_exception(self):
+        """Check that settings with wrong values trigger exceptions."""
         with pytest.raises(ValueError):
             AppSettings.check_default_response()
         with pytest.raises(ValueError):
@@ -81,6 +84,7 @@ class MainTestCase(TestCase):
             AppSettings.check_log_hierarchy()
 
     def test_getting_resource_type_and_id(self):
+        """Test get_resource_type and get_resource_id methods."""
         class NoDatabaseResource(object):
             """Just an empty Python class."""
 
@@ -138,6 +142,7 @@ class MainTestCase(TestCase):
             self.groups[2].children(vertical=False))
 
     def test_role_hierarchy_history(self):
+        """Test role hierarchy history."""
         pass  # TODO: need implementation of HierarchyHistory first
 
     def set_role_privileges(self):
@@ -179,6 +184,7 @@ class MainTestCase(TestCase):
         # test clashing same-level permissions
 
     def test_role_privileges_history(self):
+        """Test role privileges history."""
         for i in (1, 2, 3):
             assert RolePrivilege.objects.get(
                 role_type='FakeUser',
@@ -197,6 +203,7 @@ class MainTestCase(TestCase):
                 resource_id=j)
 
     def test_str_method(self):
+        """Test printing methods of models."""
         self.test_role_privileges()
         for queryset in [
             Role.objects.all(),

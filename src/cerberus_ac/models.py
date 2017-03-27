@@ -20,6 +20,15 @@ from . import AppSettings
 
 
 def get_resource_id(resource):
+    """
+    Get a resource's ID.
+
+    Args:
+        resource (obj): a Python object.
+
+    Returns:
+        int: the resource's ID or None.
+    """
     if hasattr(resource, 'resource_id'):
         attr = resource.resource_id
         if callable(attr):
@@ -31,6 +40,15 @@ def get_resource_id(resource):
 
 
 def get_resource_type(resource):
+    """
+    Get a resource's type.
+
+    Args:
+        resource (obj): a Python object.
+
+    Returns:
+        str: the resource's type.
+    """
     if hasattr(resource, 'resource_type'):
         attr = resource.resource_type
         if callable(attr):
@@ -177,6 +195,8 @@ class Role(models.Model, RoleMixin):
     rid = models.PositiveIntegerField(null=True)
 
     class Meta:
+        """Meta class for Django."""
+
         unique_together = ('type', 'rid')
 
     def __str__(self):
@@ -222,7 +242,7 @@ class RoleHierarchy(models.Model):
     @staticmethod
     def above(role_type, role_id):
         """
-        Return parents (roles above) of given role_type, role_id.
+        Return immediate parents (roles above) of given role_type, role_id.
 
         Args:
             role_type (str): string describing the role type.
@@ -238,7 +258,7 @@ class RoleHierarchy(models.Model):
     @staticmethod
     def below(role_type, role_id):
         """
-        Return children (roles below) of given role_type, role_id.
+        Return immediate children (roles below) of given role_type, role_id.
 
         Args:
             role_type (str): string describing the role type.
@@ -253,6 +273,17 @@ class RoleHierarchy(models.Model):
 
     @staticmethod
     def all_above(role_type, role_id, vertical=False):
+        """
+        Return every parents (roles above) of given role_type, role_id.
+
+        Args:
+            role_type (str): string describing the role type.
+            role_id (int): unique ID of the role.
+            vertical (bool): whether to iterate depth-first or width-first.
+
+        Returns:
+            list: list of (role_type, role_id) parents.
+        """
         result = []
         if vertical:
             for r in RoleHierarchy.above(role_type, role_id):
@@ -267,6 +298,17 @@ class RoleHierarchy(models.Model):
 
     @staticmethod
     def all_below(role_type, role_id, vertical=False):
+        """
+        Return every children (roles below) of given role_type, role_id.
+
+        Args:
+            role_type (str): string describing the role type.
+            role_id (int): unique ID of the role.
+            vertical (bool): whether to iterate depth-first or width-first.
+
+        Returns:
+            list: list of (role_type, role_id) children.
+        """
         result = []
         if vertical:
             for r in RoleHierarchy.below(role_type, role_id):
@@ -344,7 +386,6 @@ class RolePrivilege(models.Model):
         Returns:
             bool: role has perm on resource (or not).
         """
-
         if skip_implicit is None:
             skip_implicit = AppSettings.get_skip_implicit()
 
@@ -375,27 +416,27 @@ class RolePrivilege(models.Model):
                     break
 
         # Else check role implicit perms
-        if attempt.response is None and not skip_implicit:
-            attempt.response = RolePrivilege.authorize_implicit(
-                role_type, role_id, perm, resource_type, resource_id)
-
-            if attempt.response is not None:
-                attempt.response_type = AccessHistory.IMPLICIT
-
-            # Else check inherited implicit perms
-            else:
-
-                # TODO: reiterate for each and every role above this one
-                for above_role_type, above_role_id in RoleHierarchy.all_above(role_type, role_id):  # noqa
-                    attempt.response = RolePrivilege.authorize_implicit(
-                        above_role_type, above_role_id, perm,
-                        resource_type, resource_id)
-
-                    if attempt.response is not None:
-                        attempt.response_type = AccessHistory.IMPLICIT
-                        attempt.inherited_type = above_role_type
-                        attempt.inherited_id = above_role_id
-                        break
+        # TODO: uncomment this when implicit mechanisms are implemented
+        # if attempt.response is None and not skip_implicit:
+        #     attempt.response = RolePrivilege.authorize_implicit(
+        #         role_type, role_id, perm, resource_type, resource_id)
+        #
+        #     if attempt.response is not None:
+        #         attempt.response_type = AccessHistory.IMPLICIT
+        #
+        #     # Else check inherited implicit perms
+        #     else:
+        #
+        #         for above_role_type, above_role_id in RoleHierarchy.all_above(role_type, role_id):  # noqa
+        #             attempt.response = RolePrivilege.authorize_implicit(
+        #                 above_role_type, above_role_id, perm,
+        #                 resource_type, resource_id)
+        #
+        #             if attempt.response is not None:
+        #                 attempt.response_type = AccessHistory.IMPLICIT
+        #                 attempt.inherited_type = above_role_type
+        #                 attempt.inherited_id = above_role_id
+        #                 break
 
         # Else give default response
         if attempt.response is None:
