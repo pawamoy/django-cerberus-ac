@@ -19,7 +19,7 @@ from django.utils.translation import ugettext_lazy as _
 from . import AppSettings
 
 
-def resource_id(resource):
+def get_resource_id(resource):
     if hasattr(resource, 'resource_id'):
         attr = resource.resource_id
         if callable(attr):
@@ -30,15 +30,17 @@ def resource_id(resource):
     return None
 
 
-def resource_type(resource):
+def get_resource_type(resource):
     if hasattr(resource, 'resource_type'):
-        attr = getattr(resource, 'resource_type')
+        attr = resource.resource_type
         if callable(attr):
             return attr()
         return attr
     return resource.__class__.__name__
 
 
+# TODO: use role_id in is_child_of, is_parent_of, join and receive
+# TODO: use other wording than child and parent
 class RoleMixin(object):
     """
     Mixin for Role models / classes.
@@ -79,8 +81,12 @@ class RoleMixin(object):
         except RoleHierarchy.DoesNotExist:
             return False
 
-    def parents(self):
+    # TODO: return Role objects and other models instances thanks to mapping?
+    def parents(self, vertical=None):
         """Return the parents of this role."""
+        if vertical is not None:
+            return RoleHierarchy.all_above(
+                self.role_type(), self.role_id(), vertical)
         return RoleHierarchy.above(self.role_type(), self.role_id())
 
     def is_parent_of(self, role, role_id=None):
@@ -105,8 +111,12 @@ class RoleMixin(object):
         except RoleHierarchy.DoesNotExist:
             return False
 
-    def children(self):
+    # TODO: return Role objects and other models instances thanks to mapping?
+    def children(self, vertical=None):
         """Return the children of this role."""
+        if vertical is not None:
+            return RoleHierarchy.all_below(
+                self.role_type(), self.role_id(), vertical)
         return RoleHierarchy.below(self.role_type(), self.role_id())
 
     def join(self, role, role_id=None):
@@ -156,27 +166,40 @@ class RoleMixin(object):
         """
         return RolePrivilege.authorize(
             role_type=self.role_type(), role_id=self.role_id(), perm=perm,
-            resource_type=resource_type(resource),
-            resource_id=resource_id(resource))
+            resource_type=get_resource_type(resource),
+            resource_id=get_resource_id(resource))
 
 
 class Role(models.Model, RoleMixin):
     """Concrete model for roles."""
 
     type = models.CharField(max_length=255)
+    rid = models.PositiveIntegerField(null=True)
+
+    class Meta:
+        unique_together = ('type', 'rid')
+
+    def __str__(self):
+        if self.rid:
+            return '%s %s' % (self.type, self.rid)
+        return self.type
 
     def role_type(self):
         """Override role_type method and return type attribute."""
         return self.type
+
+    def role_id(self):
+        """Override role_id method and return rid attribute."""
+        return self.rid
 
 
 class RoleHierarchy(models.Model):
     """Role hierarchy model."""
 
     role_type_a = models.CharField(max_length=255)
-    role_id_a = models.PositiveIntegerField()
+    role_id_a = models.PositiveIntegerField(null=True)
     role_type_b = models.CharField(max_length=255)
-    role_id_b = models.PositiveIntegerField()
+    role_id_b = models.PositiveIntegerField(null=True)
 
     class Meta:
         """Meta class for Django."""
@@ -186,7 +209,16 @@ class RoleHierarchy(models.Model):
             'role_type_b', 'role_id_b'
         )
 
-    # TODO: return Role objects and other models instances thanks to mapping?
+    def __str__(self):
+        a = self.role_type_a
+        if self.role_id_a:
+            a += ' %s' % self.role_id_a
+        b = self.role_type_b
+        if self.role_id_b:
+            b += ' %s' % self.role_id_b
+
+        return '%s is part of %s' % (a, b)
+
     @staticmethod
     def above(role_type, role_id):
         """
@@ -203,7 +235,6 @@ class RoleHierarchy(models.Model):
                 for rh in RoleHierarchy.objects.filter(
                 role_type_a=role_type, role_id_a=role_id)]
 
-    # TODO: return Role objects and other models instances thanks to mapping?
     @staticmethod
     def below(role_type, role_id):
         """
@@ -220,12 +251,40 @@ class RoleHierarchy(models.Model):
                 for rh in RoleHierarchy.objects.filter(
                 role_type_b=role_type, role_id_b=role_id)]
 
+    @staticmethod
+    def all_above(role_type, role_id, vertical=False):
+        result = []
+        if vertical:
+            for r in RoleHierarchy.above(role_type, role_id):
+                result.append(r)
+                result.extend(RoleHierarchy.all_above(r[0], r[1], vertical))
+        else:
+            line = RoleHierarchy.above(role_type, role_id)
+            result.extend(line)
+            for r in line:
+                result.extend(RoleHierarchy.all_above(r[0], r[1], vertical))
+        return result
+
+    @staticmethod
+    def all_below(role_type, role_id, vertical=False):
+        result = []
+        if vertical:
+            for r in RoleHierarchy.below(role_type, role_id):
+                result.append(r)
+                result.extend(RoleHierarchy.all_below(r[0], r[1], vertical))
+        else:
+            line = RoleHierarchy.below(role_type, role_id)
+            result.extend(line)
+            for r in line:
+                result.extend(RoleHierarchy.all_below(r[0], r[1], vertical))
+        return result
+
 
 class RolePrivilege(models.Model):
     """Role privilege model."""
 
     role_type = models.CharField(_('Role type'), max_length=255)
-    role_id = models.PositiveIntegerField(_('Role ID'))
+    role_id = models.PositiveIntegerField(_('Role ID'), null=True)
 
     authorized = models.BooleanField(
         _('Authorization'), default=AppSettings.get_default_response())
@@ -247,10 +306,10 @@ class RolePrivilege(models.Model):
         )
 
     def __str__(self):
-        return '%s %s %s %s for %s %s' % (
-            'allow' if self.authorized else 'deny', self.access_type,
-            self.resource_type, self.resource_id if self.resource_id else '',
-            self.role_type, self.role_id)
+        return '%s %s %s to %s %s %s' % (
+            'allow' if self.authorized else 'deny',
+            self.role_type, self.role_id, self.access_type,
+            self.resource_type, self.resource_id if self.resource_id else '')
 
     @staticmethod
     def authorize(role_type,
@@ -258,8 +317,8 @@ class RolePrivilege(models.Model):
                   perm,
                   resource_type,
                   resource_id,
-                  skip_implicit=False,
-                  log=True):
+                  skip_implicit=None,
+                  log=None):
         """
         Authorize access to a resource to a role.
 
@@ -285,6 +344,13 @@ class RolePrivilege(models.Model):
         Returns:
             bool: role has perm on resource (or not).
         """
+
+        if skip_implicit is None:
+            skip_implicit = AppSettings.get_skip_implicit()
+
+        if log is None:
+            log = AppSettings.get_log_access()
+
         attempt = AccessHistory(role_type=role_type, role_id=role_id,
                                 resource_type=resource_type,
                                 resource_id=resource_id, access_type=perm)
@@ -298,7 +364,7 @@ class RolePrivilege(models.Model):
         if attempt.response is None:
 
             # Else check inherited explicit perms
-            for above_role_type, above_role_id in RoleHierarchy.above(role_type, role_id):  # noqa
+            for above_role_type, above_role_id in RoleHierarchy.all_above(role_type, role_id):  # noqa
                 attempt.response = RolePrivilege.authorize_explicit(
                     above_role_type, above_role_id, perm,
                     resource_type, resource_id)
@@ -319,7 +385,8 @@ class RolePrivilege(models.Model):
             # Else check inherited implicit perms
             else:
 
-                for above_role_type, above_role_id in RoleHierarchy.above(role_type, role_id):  # noqa
+                # TODO: reiterate for each and every role above this one
+                for above_role_type, above_role_id in RoleHierarchy.all_above(role_type, role_id):  # noqa
                     attempt.response = RolePrivilege.authorize_implicit(
                         above_role_type, above_role_id, perm,
                         resource_type, resource_id)
@@ -627,20 +694,18 @@ class AccessHistory(models.Model):
 
     def __str__(self):
         inherited = ''
-        if self.role_type and self.inherited_type and self.inherited_id:
-            if self.role_id:
-                role = '%s %s' % (self.role_type, self.role_id)
-            else:
-                role = self.role_type
-            inherited = ' (inherited from %s %s)' % (
-                self.inherited_type, self.inherited_id)
-        elif self.inherited_type:
-            if self.inherited_id:
-                role = '%s %s' % (self.inherited_type, self.inherited_id)
-            else:
-                role = self.inherited_type
+
+        if self.role_id:
+            role = '%s %s' % (self.role_type, self.role_id)
         else:
-            return 'invalid: no role & no group: %s' % self.__dict__
+            role = self.role_type
+
+        if self.inherited_type:
+            if self.inherited_id:
+                inherited = ' (inherited from %s %s)' % (
+                    self.inherited_type, self.inherited_id)
+            else:
+                inherited = self.inherited_type
 
         authorized = 'authorized' if self.response else 'unauthorized'
         string = '[%s] %s was %s %s to %s %s %s' % (

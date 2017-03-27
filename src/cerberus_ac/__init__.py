@@ -7,7 +7,6 @@ from django.conf import settings
 __version__ = '0.1.0'
 
 
-# TODO: app settings for skip implicit and log default values
 class AppSettings(object):
     """
     Application settings class.
@@ -16,21 +15,28 @@ class AppSettings(object):
     ``load`` method to load every setting in an instance.
     """
 
-    def __init__(self):
-        """Init method."""
-        self.CERBERUS_DEFAULT_RESPONSE = None
-        self.CERBERUS_SKIP_IMPLICIT = None
+    DEFAULT_RESPONSE = False
+    SKIP_IMPLICIT = False
+    LOG_ACCESS = True
+    LOG_PRIVILEGES = True
+    LOG_HIERARCHY = True
 
     def load(self):
-        """Load every settings in self."""
-        self.CERBERUS_DEFAULT_RESPONSE = AppSettings.get_default_response()
-        self.CERBERUS_SKIP_IMPLICIT = AppSettings.get_skip_implicit()
+        """Load settings in self."""
+        self.DEFAULT_RESPONSE = AppSettings.get_default_response()
+        self.SKIP_IMPLICIT = AppSettings.get_skip_implicit()
+        self.LOG_ACCESS = AppSettings.get_log_access()
+        self.LOG_PRIVILEGES = AppSettings.get_log_privileges()
+        self.LOG_HIERARCHY = AppSettings.get_log_hierarchy()
 
     @staticmethod
     def check():
         """Run every check method for settings."""
         AppSettings.check_default_response()
         AppSettings.check_skip_implicit()
+        AppSettings.check_log_access()
+        AppSettings.check_log_privileges()
+        AppSettings.check_log_hierarchy()
 
     @staticmethod
     def check_default_response():
@@ -42,7 +48,8 @@ class AppSettings(object):
     @staticmethod
     def get_default_response():
         """Return default response setting."""
-        return getattr(settings, 'CERBERUS_DEFAULT_RESPONSE', False)
+        return getattr(settings, 'CERBERUS_DEFAULT_RESPONSE',
+                       AppSettings.DEFAULT_RESPONSE)
 
     @staticmethod
     def check_skip_implicit():
@@ -54,7 +61,8 @@ class AppSettings(object):
     @staticmethod
     def get_skip_implicit():
         """Return skip implicit setting."""
-        return getattr(settings, 'CERBERUS_SKIP_IMPLICIT', False)
+        return getattr(settings, 'CERBERUS_SKIP_IMPLICIT',
+                       AppSettings.SKIP_IMPLICIT)
 
     @staticmethod
     def check_log_access():
@@ -66,7 +74,34 @@ class AppSettings(object):
     @staticmethod
     def get_log_access():
         """Return log access setting."""
-        return getattr(settings, 'CERBERUS_LOG_ACCESS', True)
+        return getattr(settings, 'CERBERUS_LOG_ACCESS',
+                       AppSettings.LOG_ACCESS)
+
+    @staticmethod
+    def check_log_privileges():
+        """Check the value of given log privileges setting."""
+        log_privileges = AppSettings.get_log_privileges()
+        if not isinstance(log_privileges, bool):
+            raise ValueError('LOG_PRIVILEGES must be True or False')
+
+    @staticmethod
+    def get_log_privileges():
+        """Return log privileges setting."""
+        return getattr(settings, 'CERBERUS_LOG_PRIVILEGES',
+                       AppSettings.LOG_PRIVILEGES)
+
+    @staticmethod
+    def check_log_hierarchy():
+        """Check the value of given log hierarchy setting."""
+        log_hierarchy = AppSettings.get_log_hierarchy()
+        if not isinstance(log_hierarchy, bool):
+            raise ValueError('LOG_HIERARCHY must be True or False')
+
+    @staticmethod
+    def get_log_hierarchy():
+        """Return log hierarchy setting."""
+        return getattr(settings, 'CERBERUS_LOG_HIERARCHY',
+                       AppSettings.LOG_HIERARCHY)
 
 
 AppSettings.check()

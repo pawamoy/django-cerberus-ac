@@ -30,7 +30,12 @@ try:
             'cerberus_ac',
         ],
         SITE_ID=1,
-        MIDDLEWARE_CLASSES=()
+        MIDDLEWARE_CLASSES=(),
+        CERBERUS_DEFAULT_RESPONSE=False,
+        CERBERUS_SKIP_IMPLICIT=False,
+        CERBERUS_LOG_ACCESS=True,
+        CERBERUS_LOG_PRIVILEGES=True,
+        CERBERUS_LOG_HIERARCHY=True
     )
 
     try:
