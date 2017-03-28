@@ -1,33 +1,31 @@
 {% load static %}
-<link rel="stylesheet" type="text/css" href="{% static "cerberus_ac/css/bootstrap.min.css" %}" media="screen" />
+<script src="{% static "cerberus_ac/js/jquery-3.1.1.min.js" %}"></script>
 <script src="{% static "cerberus_ac/js/bootstrap.min.js" %}"></script>
-<script src="{% static "cerberus_ac/js/jquery-3.2.0.slim.min.js" %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static "cerberus_ac/css/bootstrap.min.css" %}" media="screen" />
+
 <script>
-$('.expandable').click(function() {
-    $('.expandable').not(this).nextAll('tr').hide();
-    $(this).nextAll('tr').toggle();
+$('.collapse').on('show.bs.collapse', function () {
+    $('.collapse.in').collapse('hide');
 });
 </script>
+
+<style>
+    .hiddenRow {
+        padding: 0 !important;
+    }
+</style>
 
 {% block title %}{% trans "Edit User Permissions" %} - CerberusAC{% endblock %}
 
 <div class="">
     <div class="col-md-10">
         <div class="table-responsive">
-            <table id="editpermstable"
-                   data-toggle="collapse"
-                   data-search="true"
-                   data-filter-control="true"
-                   data-show-export="true"
-                   data-click-to-select="true"
-                   data-toolbar="#toolbar"
-                   class="table table-hover ">
+            <table id="editpermstable" class="table table-hover table-condensed" style=""border-collapse:collapse;">
                 <thead>
                     <tr>
-                        <th data-field="State" data-checkbox="true"></th>
-                        <th data-field="User" data-sortable="true">User</th>
+                        <th>User</th>
                         {% for r in resources %}
-                            <th data-field="{{ r }}" data-sortable="false"></th>
+                            <th>{{ r }}</th>
                         {% endfor %}
                     </tr>
                 </thead>
@@ -47,8 +45,9 @@ $('.expandable').click(function() {
                             Register date: {{ m.date_joined }}<br>
                        </td>
                         {% for r in resources %}
-                            <td>
-
+                            <td class="text-center hiddenRow col-md2">
+                                <div class="col-md 1"></div>
+                                <div class="col-md 1"></div>
                             </td>
                         {% endfor %}
                     </tr>
