@@ -2,10 +2,17 @@
 
 r"""Cerberus Access Control package."""
 
+import importlib
+from django.conf import settings
+
 __version__ = '0.1.1'
 
 
-from django.conf import settings
+def _import(complete_path):
+    module_name = '.'.join(complete_path.split('.')[:-1])
+    module = importlib.import_module(name=module_name)
+    function_or_class = getattr(module, complete_path.split('.')[-1])
+    return function_or_class
 
 
 class AppSettings(object):
@@ -21,6 +28,8 @@ class AppSettings(object):
     LOG_ACCESS = True
     LOG_PRIVILEGES = True
     LOG_HIERARCHY = True
+    RESOURCES_LIST = []
+    ROLES_LIST = []
 
     def load(self):
         """Load settings in self."""
@@ -103,6 +112,46 @@ class AppSettings(object):
         """Return log hierarchy setting."""
         return getattr(settings, 'CERBERUS_LOG_HIERARCHY',
                        AppSettings.LOG_HIERARCHY)
+
+    @staticmethod
+    def check_resources_list():
+        """Check the value of given resources list setting."""
+        resources_list = AppSettings.get_log_hierarchy()
+        if (not isinstance(resources_list, list)
+                or not all([isinstance(o, str) for o in resources_list])):
+            raise ValueError('RESOURCES_LIST must be a list of strings')
+
+    @staticmethod
+    def get_resources_list():
+        """Return resources list setting."""
+        return getattr(settings, 'CERBERUS_RESOURCES_LIST',
+                       AppSettings.RESOURCES_LIST)
+
+    @staticmethod
+    def get_actual_resources_classes():
+        resources_list = AppSettings.get_resources_list()
+        actual_resources_classes = [_import(c) for c in resources_list]
+        return actual_resources_classes
+
+    @staticmethod
+    def check_roles_list():
+        """Check the value of given roles list setting."""
+        roles_list = AppSettings.get_log_hierarchy()
+        if (not isinstance(roles_list, list)
+                or not all([isinstance(o, str) for o in roles_list])):
+            raise ValueError('ROLES_LIST must be a list of strings')
+
+    @staticmethod
+    def get_roles_list():
+        """Return roles list setting."""
+        return getattr(settings, 'CERBERUS_ROLES_LIST',
+                       AppSettings.ROLES_LIST)
+
+    @staticmethod
+    def get_actual_roles_classes():
+        roles_list = AppSettings.get_roles_list()
+        actual_roles_classes = [_import(c) for c in roles_list]
+        return actual_roles_classes
 
 
 AppSettings.check()

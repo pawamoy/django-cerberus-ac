@@ -69,7 +69,9 @@ class MainTestCase(TestCase):
                        CERBERUS_SKIP_IMPLICIT=1,
                        CERBERUS_LOG_ACCESS=[],
                        CERBERUS_LOG_PRIVILEGES={},
-                       CERBERUS_LOG_HIERARCHY=None)
+                       CERBERUS_LOG_HIERARCHY=None,
+                       CERBERUS_ROLES_LIST={},
+                       CERBERUS_RESOURCES_LIST=[1, 2])
     def test_wrong_settings_trigger_exception(self):
         """Check that settings with wrong values trigger exceptions."""
         with pytest.raises(ValueError):
@@ -82,6 +84,14 @@ class MainTestCase(TestCase):
             AppSettings.check_log_privileges()
         with pytest.raises(ValueError):
             AppSettings.check_log_hierarchy()
+        with pytest.raises(ValueError):
+            AppSettings.check_roles_list()
+        with pytest.raises(ValueError):
+            AppSettings.check_resources_list()
+
+    @override_settings(CERBERUS_ROLES_LIST=['cerberus_ac.models.Role'])
+    def test_import_classes(self):
+        assert AppSettings.get_actual_roles_classes() == [Role]
 
     def test_getting_resource_type_and_id(self):
         """Test get_resource_type and get_resource_id methods."""
