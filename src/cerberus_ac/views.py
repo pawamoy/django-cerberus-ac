@@ -1,14 +1,18 @@
+# -*- coding: utf-8 -*-
+
 from django.shortcuts import render
 from suit_dashboard.views import DashboardView
 from suit_dashboard.layout import Grid, Row, Column, Box
 
 from . import AppSettings
 
-resources_list = AppSettings.get_actual_ressources_classes()
-role_classes = AppSettings.get_actual_role_classes()
+resources_list = AppSettings.get_actual_resources_classes()
+role_classes = AppSettings.get_actual_roles_classes()
+
 
 def edituserpermpost(request, user):
     if request.method == "POST":
+        pass
 
 
 class Edituserperm(DashboardView):
@@ -29,7 +33,6 @@ class Edituserperm(DashboardView):
 def editgrouppermpost(request, user):
     if request.method == "POST":
         pass
-
 
 
 class Editgroupperm(DashboardView):

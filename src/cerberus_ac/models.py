@@ -615,7 +615,7 @@ class RolePrivilege(models.Model):
             if log:
                 PrivilegeHistory.objects.create(
                     user=user, action=PrivilegeHistory.DELETE,
-                    reference_id=privilege.id)
+                    privilege_id=privilege.id)
 
             privilege.delete()
             return True
@@ -675,7 +675,7 @@ class PrivilegeHistory(models.Model):
         return '[%s] user %s has %sd privilege <%s>' % (
             self.datetime, self.user,
             PrivilegeHistory.ACTIONS_VERBOSE[str(self.action)],
-            self.reference if self.reference else self.reference_id)
+            self.reference if self.reference else self.privilege_id)
 
     def update_from_privilege(self, privilege, save=True):
         """
@@ -686,7 +686,7 @@ class PrivilegeHistory(models.Model):
             save (bool): whether to commit the changes to the database.
         """
         self.reference = privilege
-        self.reference_id = privilege.id
+        self.privilege_id = privilege.id
         self.role_type = privilege.role_type
         self.role_id = privilege.role_id
         self.authorized = privilege.authorized
