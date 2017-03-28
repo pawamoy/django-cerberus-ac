@@ -9,7 +9,6 @@ role_classes = AppSettings.get_actual_role_classes()
 
 def edituserpermpost(request, user):
     if request.method == "POST":
-        pass
 
 
 class Edituserperm(DashboardView):
