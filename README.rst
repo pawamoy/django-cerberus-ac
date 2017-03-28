@@ -61,6 +61,13 @@ Installation
 
     pip install django-cerberus-ac
 
+
+Usage
+=====
+
+In your main projects "__init__.py" , create 2 functions to pass the list of resources available and list of roles.
+
+
 Documentation
 =============
 
