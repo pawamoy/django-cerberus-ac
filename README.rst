@@ -18,11 +18,11 @@ Cerberus Access Control
     :target: https://travis-ci.org/Deavelleye/dj-CerberusAC/
     :alt: Travis-CI Build Status
 
-.. |codacygrade| image:: https://api.codacy.com/project/badge/Grade/REPLACE_WITH_PROJECT_ID
+.. |codacygrade| image:: https://api.codacy.com/project/badge/Grade/9317db72ae5b4616a12b962ae21fe169
     :target: https://www.codacy.com/app/Deavelleye/dj-CerberusAC/dashboard
     :alt: Codacy Code Quality Status
 
-.. |codacycoverage| image:: https://api.codacy.com/project/badge/Coverage/REPLACE_WITH_PROJECT_ID
+.. |codacycoverage| image:: https://api.codacy.com/project/badge/Coverage/9317db72ae5b4616a12b962ae21fe169
     :target: https://www.codacy.com/app/Deavelleye/dj-CerberusAC/dashboard
     :alt: Codacy Code Coverage
 
@@ -61,7 +61,6 @@ Installation
 
     pip install django-cerberus-ac
 
-
 Usage
 =====
 
@@ -73,7 +72,7 @@ Documentation
 
 `On ReadTheDocs`_
 
-.. _`On ReadTheDocs`: http://REPLACE_WITH_RTD_SLUG.readthedocs.io/
+.. _`On ReadTheDocs`: http://dj-cerberusac.readthedocs.io/
 
 Development
 ===========

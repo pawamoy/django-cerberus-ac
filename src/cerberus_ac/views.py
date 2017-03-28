@@ -7,12 +7,11 @@ from . import AppSettings
 resources_list = AppSettings.get_actual_ressources_classes()
 role_classes = AppSettings.get_actual_role_classes()
 
-def edituserpermpost(request, user):
+def edit_user_perm_post(request, user):
     if request.method == "POST":
         pass
 
-
-class Edituserperm(DashboardView):
+class EditUserPerm(DashboardView):
     role_instances = []
     for r in role_classes :
         role_instances.extend(r.objects.all())
@@ -27,13 +26,12 @@ class Edituserperm(DashboardView):
     )))
 
 
-def editgrouppermpost(request, user):
+def edit_group_perm_post(request, user):
     if request.method == "POST":
         pass
 
 
-
-class Editgroupperm(DashboardView):
+class EditGroupPerm(DashboardView):
     role_instances = []
     for r in role_classes:
         role_instances.extend(r.objects.all())
