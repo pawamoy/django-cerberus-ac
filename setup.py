@@ -28,7 +28,7 @@ def read(*names, **kwargs):
 
 setup(
     name='django-cerberus-ac',
-    version='0.1.0',
+    version='0.1.1',
     license='ISC',
     description='Django Ontology Based Access Control Module',
     long_description='%s\n%s' % (
@@ -37,7 +37,7 @@ setup(
         re.sub(':[a-z]+:`~?(.*?)`', r'``\1``', read('CHANGELOG.rst'))
     ),
     author='Mihnea Gheorghiu',
-    author_email=' ',
+    author_email='mikigi92@gmail.com',
     url='https://github.com/Deavelleye/dj-CerberusAC',
     packages=find_packages('src'),
     package_dir={'': 'src'},
@@ -53,8 +53,8 @@ setup(
         'Operating System :: POSIX',
         'Operating System :: Microsoft :: Windows',
         'Framework :: Django',
-        # 'Framework :: Django :: 1.8',
-        # 'Framework :: Django :: 1.9',
+        'Framework :: Django :: 1.8',
+        'Framework :: Django :: 1.9',
         # 'Framework :: Django :: 1.10',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
@@ -66,14 +66,6 @@ setup(
         'Topic :: Utilities',
     ],
     keywords=[
-        'dj-CerberusAC',
-    ],
-    install_requires=[
-        # eg: 'aspectlib==1.1.1', 'six>=1.7',
-    ],
-    extras_require={
-        # eg:
-        #   'rst': ['docutils>=0.11'],
-        #   ':python_version=="2.6"': ['argparse'],
-    },
+        'dj-CerberusAC','access control','ontology-based','least privilege','role based access control','django access control',
+    ]
 )

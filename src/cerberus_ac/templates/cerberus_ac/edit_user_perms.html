@@ -1,0 +1,82 @@
+{% load static %}
+<script src="{% static "cerberus_ac/js/jquery-3.1.1.min.js" %}"></script>
+<script src="{% static "cerberus_ac/js/bootstrap.min.js" %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static "cerberus_ac/css/bootstrap.min.css" %}" media="screen" />
+
+<script>
+$('.collapse').on('show.bs.collapse', function () {
+    $('.collapse.in').collapse('hide');
+});
+</script>
+
+<style>
+    .hiddenRow {
+        padding: 0 !important;
+    }
+</style>
+
+{% block title %}{% trans "Edit User Permissions" %} - CerberusAC{% endblock %}
+
+<div class="">
+    <div class="col-md-10">
+        <div class="table-responsive">
+            <table id="editpermstable" class="table table-hover table-condensed" style=""border-collapse:collapse;">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        {% for r in resources %}
+                            <th>{{ r }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                {% for m in members %}
+                    <tr data-toggle="collapse" data-target="#accordion{{ m.id }}" class="accordion-toggle">
+                        <td class="bs-checkbox "><input data-index="{{ m.id }}" name="btSelectItem" type="checkbox"></td>
+                        <td>User {{ m.id }}</td>
+                    </tr>
+                    <div id="accordion{{ m.id }}" class="collapse out"><tr><td colspan="2">
+                            ID : {{ m.id }}<br>
+                            Groups: {{ m.get_groups }}<br>
+                            Username : {{ m.username }}<br>
+                            Mail : {{ m.email }} <br>
+                            Active : {{ m.is_active }}<br>
+                            Last login: {{ m.last_login }}<br>
+                            Register date: {{ m.date_joined }}<br>
+                       </td>
+                        {% for r in resources %}
+                            <td class="text-center hiddenRow col-md2">
+                                <div class="col-md 1"></div>
+                                <div class="col-md 1"></div>
+                            </td>
+                        {% endfor %}
+                    </tr>
+                    </div>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="9">{{sizes}}
+                            <div class="text-center">
+                                <ul class="pagination">
+                                    <li ng-class="{disabled: currentPage == 0}">
+                                        <a href="javascript:;" ng-click="prevPage()">« Prev</a>
+                                    </li>
+                                    <li ng-repeat="n in range(pagedItems.length)" ng-class="{active: n == currentPage}" ng-click="setPage()">
+                                        <a href="javascript:;" ng-bind="n + 1">1</a>
+                                    </li>
+                                    <li ng-class="{disabled: currentPage == pagedItems.length - 1}">
+                                        <a href="javascript:;" ng-click="nextPage()">Next »</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-2">
+
+    </div>
+</div>
