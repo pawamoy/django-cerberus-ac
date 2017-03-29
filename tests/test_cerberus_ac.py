@@ -91,6 +91,7 @@ class MainTestCase(TestCase):
 
     @override_settings(CERBERUS_ROLES_LIST=['cerberus_ac.models.Role'])
     def test_import_classes(self):
+        """Test classes imported correctly."""
         assert AppSettings.get_actual_roles_classes() == [Role]
 
     def test_getting_resource_type_and_id(self):

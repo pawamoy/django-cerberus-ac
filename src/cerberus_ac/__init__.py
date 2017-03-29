@@ -129,6 +129,7 @@ class AppSettings(object):
 
     @staticmethod
     def get_actual_resources_classes():
+        """Return resources classes."""
         resources_list = AppSettings.get_resources_list()
         actual_resources_classes = [_import(c) for c in resources_list]
         return actual_resources_classes
@@ -149,6 +150,7 @@ class AppSettings(object):
 
     @staticmethod
     def get_actual_roles_classes():
+        """Return roles classes."""
         roles_list = AppSettings.get_roles_list()
         actual_roles_classes = [_import(c) for c in roles_list]
         return actual_roles_classes
