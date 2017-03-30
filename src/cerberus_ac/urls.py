@@ -18,7 +18,7 @@ def cerberus_urlpatterns(admin_view):
         url(r'^permissions/user/edit/$',
             admin_view(views.EditUserPerm.as_view()),
             name='edit_user_permissions'),
-        url(r'^permissions/user/edit/(?P<user>[0-9]+)/$',
+        url(r'^permissions/user/edit/(?P<user>\d+)/$',
             admin_view(views.edit_user_perm_post),
             name='edit_user_permissions_post'),
 
@@ -29,7 +29,7 @@ def cerberus_urlpatterns(admin_view):
         url(r'^permissions/group/edit/$',
             admin_view(views.EditGroupPerm.as_view()),
             name='edit_group_permissions'),
-        url(r'^permissions/group/edit/(?P<group>[0-9]+)/$',
+        url(r'^permissions/group/edit/(?P<group>\d+)/$',
             admin_view(views.edit_group_perm_post),
             name='edit_group_permissions_post'),
 

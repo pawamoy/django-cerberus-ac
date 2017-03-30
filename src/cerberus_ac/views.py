@@ -2,6 +2,8 @@
 
 """Views module."""
 
+from django.utils.translation import ugettext as _
+
 from suit_dashboard import Box, Column, DashboardView, Grid, Row
 
 from . import AppSettings
@@ -18,6 +20,13 @@ def edit_user_perm_post(request, user):
 
 class EditUserPerm(DashboardView):
     """Dashboard view to see user permissions."""
+    title = _('Edit User Permissions')
+    crumbs = (
+        {'name': _('Cerberus')},
+        {'name': _('Permissions')},
+        {'name': _('Users')},
+        {'name': _('Edit'), 'url': 'admin:edit_user_perm'}
+    )
 
     role_instances = []
     for r in role_classes:
@@ -29,8 +38,8 @@ class EditUserPerm(DashboardView):
 
     grid = Grid(Row(Column(
         Box(template='cerberus_ac/edit_user_perms.html',
-            context={'members': role_instances,
-                     'resources': resources_real_list})
+            context={'members': role_instances[:10:],
+                     'resources': resources_real_list[:10:]})
     )))
 
 

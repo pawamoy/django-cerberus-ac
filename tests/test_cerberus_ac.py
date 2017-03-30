@@ -126,31 +126,31 @@ class MainTestCase(TestCase):
 
     def set_role_hierarchy(self):
         """Set a role hierarchy."""
-        self.users[0].join(self.groups[0])
-        self.users[0].join(self.groups[1])
-        self.groups[1].receive(self.users[1])
-        self.roles[0].receive(self.users[0])
-        self.roles[1].receive(self.users[1])
-        self.roles[2].receive(self.users[2])
-        self.roles[2].join(self.groups[2])
+        self.users[0].inherit_from(self.groups[0])
+        self.users[0].inherit_from(self.groups[1])
+        self.groups[1].convey_to(self.users[1])
+        self.roles[0].convey_to(self.users[0])
+        self.roles[1].convey_to(self.users[1])
+        self.roles[2].convey_to(self.users[2])
+        self.roles[2].inherit_from(self.groups[2])
 
     def test_role_hierarchy(self):
         """Role hierarchy test method."""
-        assert self.users[0].is_child_of(self.groups[0])
-        assert self.users[0].is_child_of(self.groups[1])
-        assert not self.users[0].is_child_of(self.groups[2])
-        assert not self.groups[2].is_parent_of(self.groups[1])
-        assert set(self.groups[1].children()) == {
+        assert self.users[0].inherits_from(self.groups[0])
+        assert self.users[0].inherits_from(self.groups[1])
+        assert not self.users[0].inherits_from(self.groups[2])
+        assert not self.groups[2].conveys_to(self.groups[1])
+        assert set(self.groups[1].heirs()) == {
             ('FakeUser', 1), ('FakeUser', 2)}
-        assert self.roles[0].is_parent_of(self.users[0])
-        assert self.roles[1].is_parent_of(self.users[1])
-        assert self.roles[2].is_parent_of(self.users[2])
-        assert set(self.users[0].parents()) == {
+        assert self.roles[0].conveys_to(self.users[0])
+        assert self.roles[1].conveys_to(self.users[1])
+        assert self.roles[2].conveys_to(self.users[2])
+        assert set(self.users[0].conveyors()) == {
             ('FakeGroup', 1), ('FakeGroup', 2), ('security', None)}
-        assert set(self.users[2].parents(vertical=True)) == set(
-            self.users[2].parents(vertical=False))
-        assert set(self.groups[2].children(vertical=True)) == set(
-            self.groups[2].children(vertical=False))
+        assert set(self.users[2].conveyors(search=RoleHierarchy.DEPTH_FIRST)) == set(
+            self.users[2].conveyors(search=RoleHierarchy.BREADTH_FIRST))
+        assert set(self.groups[2].heirs(search=RoleHierarchy.DEPTH_FIRST)) == set(
+            self.groups[2].heirs(search=RoleHierarchy.BREADTH_FIRST))
 
     def test_role_hierarchy_history(self):
         """Test role hierarchy history."""

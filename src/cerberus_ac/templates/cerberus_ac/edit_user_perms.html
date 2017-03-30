@@ -1,8 +1,11 @@
 {% load static %}
 {% load i18n %}
-<script src="{% static "cerberus_ac/js/jquery-3.1.1.min.js" %}"></script>
-<script src="{% static "cerberus_ac/js/bootstrap.min.js" %}"></script>
-<link rel="stylesheet" type="text/css" href="{% static "cerberus_ac/css/bootstrap.min.css" %}" media="screen" />
+
+{% if not suit %}
+  <script src="{% static "cerberus_ac/js/jquery-3.1.1.min.js" %}"></script>
+  <script src="{% static "cerberus_ac/js/bootstrap.min.js" %}"></script>
+  <link rel="stylesheet" type="text/css" href="{% static "cerberus_ac/css/bootstrap.min.css" %}" media="screen" />
+{% endif %}
 
 <script>
 $('.collapse').on('show.bs.collapse', function () {
@@ -14,30 +17,48 @@ $('.collapse').on('show.bs.collapse', function () {
     .hiddenRow {
         padding: 0 !important;
     }
+
+    button.btn-check-success {
+      background: #95d394 -moz-linear-gradient(top, #b2ecb2, #92cd96);
+    }
+    button.btn-check-default {
+      background: #faffff -moz-linear-gradient(top, #faffff, #faffff);
+    }
+    button.btn-check-danger {
+      background: #d68489 -moz-linear-gradient(top, #e59998, #e88b7f);
+    }
+
+    button.active.btn-check-success {
+      background: #17e71a -moz-linear-gradient(top, #2ce42b, #23e927);
+    }
+    button.active.btn-check-default {
+      background: #ffffff -moz-linear-gradient(top, #ffffff, #ffffff);
+    }
+    button.active.btn-check-danger {
+      background: #e72f26 -moz-linear-gradient(top, #ee1f1e, #de1914);
+    }
 </style>
 
-{% block title %}{% trans "Edit User Permissions" %} - CerberusAC{% endblock %}
-
 <div class="">
-    <div class="col-md-10">
+    <div class="col-md-12">
         <div class="table-responsive">
             <table id="editprivtable" class="table table-hover table-condensed" style="border-collapse:collapse;">
                 <thead>
                     <tr>
                         <th>User</th>
-                        {% for r in resources %}
+                        {% for r in box.context.resources %}
                             <th>{{ r }}</th>
                         {% endfor %}
                     </tr>
                 </thead>
                 <tbody>
-                {% for m in members %}
-                    <form action="{% url "edit_user_permissions" m.id %}" method="POST">
+                {% for m in box.context.members %}
+                    <form action="{% url "admin:edit_user_permissions_post" user=m.id %}" method="POST">
                         <tr data-toggle="collapse" data-target=".userrow{{ m.id }}">
                             <td>{{ m.username }}</td>
                         </tr>
                         <tr>
-                            <td class="text-center hiddenRow">
+                            <td class="hiddenRow">
                                 <div id="userrow{{ m.id }}" class="collapse userrow{{ m.id }}">
                                     ID : {{ m.id }}<br>
                                     Groups: {{ m.get_groups }}<br>
@@ -48,38 +69,34 @@ $('.collapse').on('show.bs.collapse', function () {
                                     Register date: {{ m.date_joined }}<br>
                                 </div>
                             </td>
-                            {% for r in resources %}
-                                <td class="hiddenRow" colspan="2">
+                            {% for r in box.context.resources %}
+                                <td class="hiddenRow">
                                     <div class="row">
-                                        <div class="collapse userrow{{ m.id }}" colspan="1">
-                                            <div class="text-left">Allow</div>
-                                            <div class="checkbox">
-                                                <label><input id="ALLOWC{{ m.id }}{{ r.id }}" type="checkbox"/>CREATE</label>
-                                            </div>
-                                            <div class="checkbox">
-                                                <label><input id="ALLOWR{{ m.id }}{{ r.id }}" type="checkbox"/>READ</label>
-                                            </div>
-                                            <div class="checkbox">
-                                                <label><input id="ALLOWU{{ m.id }}{{ r.id }}" type="checkbox"/>UPDATE</label>
-                                            </div>
-                                            <div class="checkbox">
-                                                <label><input id="ALLOWD{{ m.id }}{{ r.id }}" type="checkbox"/>DELETE</label>
-                                            </div>
-                                        </div>
-                                        <div class="collapse userrow{{ m.id }} col-md-offset-6" colspan="1">
-                                            <div class="text-left">DENY</div>
-                                            <div class="checkbox">
-                                                <label><input id="DENYC{{ m.id }}{{ r.id }}" type="checkbox"/>CREATE</label>
-                                            </div>
-                                            <div class="checkbox">
-                                                <label><input id="DENYR{{ m.id }}{{ r.id }}" type="checkbox"/>READ</label>
-                                            </div>
-                                            <div class="checkbox">
-                                                <label><input id="DENYU{{ m.id }}{{ r.id }}" type="checkbox"/>UPDATE</label>
-                                            </div>
-                                            <div class="checkbox">
-                                                <label><input id="DENYD{{ m.id }}{{ r.id }}" type="checkbox"/>DELETE</label>
-                                            </div>
+                                        <div class="collapse userrow{{ m.id }}">
+                                          <div>Create
+                                            <div id="update_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
+                                                <button class="btn btn-check-success" id="allow_create_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                                <button class="btn btn-check-default" id="default_create_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                                <button class="btn btn-check-danger" id="deny_create_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                            </div></div>
+                                          <div>Read
+                                            <div id="read_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
+                                                <button class="btn btn-check-success" id="allow_read_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                                <button class="btn btn-check-default" id="default_read_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                                <button class="btn btn-check-danger" id="deny_read_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                            </div></div>
+                                          <div>Update
+                                            <div id="update_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
+                                                <button class="btn btn-check-success" id="allow_update_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                                <button class="btn btn-check-default" id="default_update_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                                <button class="btn btn-check-danger" id="deny_update_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                            </div></div>
+                                          <div>Delete
+                                            <div id="delete_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
+                                                <button class="btn btn-check-success" id="allow_delete_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                                <button class="btn btn-check-default" id="default_delete_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                                <button class="btn btn-check-danger" id="deny_delete_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                            </div></div>
                                         </div>
                                     </div>
                                 </td>
@@ -88,29 +105,26 @@ $('.collapse').on('show.bs.collapse', function () {
                     </form>
                 {% endfor %}
                 </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="9">{{sizes}}
-                            <div class="text-center">
-                                <ul class="pagination">
-                                    <li ng-class="{disabled: currentPage == 0}">
-                                        <a href="javascript:;" ng-click="prevPage()">« Prev</a>
-                                    </li>
-                                    <li ng-repeat="n in range(pagedItems.length)" ng-class="{active: n == currentPage}" ng-click="setPage()">
-                                        <a href="javascript:;" ng-bind="n + 1">1</a>
-                                    </li>
-                                    <li ng-class="{disabled: currentPage == pagedItems.length - 1}">
-                                        <a href="javascript:;" ng-click="nextPage()">Next »</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                </tfoot>
+{#                <tfoot>#}
+{#                    <tr>#}
+{#                        <td>{{ box.context.sizes }}#}
+{#                            <div class="text-center">#}
+{#                                <ul class="pagination">#}
+{#                                    <li ng-class="{disabled: currentPage == 0}">#}
+{#                                        <a href="javascript:;" ng-click="prevPage()">« Prev</a>#}
+{#                                    </li>#}
+{#                                    <li ng-repeat="n in range(pagedItems.length)" ng-class="{active: n == currentPage}" ng-click="setPage()">#}
+{#                                        <a href="javascript:;" ng-bind="n + 1">1</a>#}
+{#                                    </li>#}
+{#                                    <li ng-class="{disabled: currentPage == pagedItems.length - 1}">#}
+{#                                        <a href="javascript:;" ng-click="nextPage()">Next »</a>#}
+{#                                    </li>#}
+{#                                </ul>#}
+{#                            </div>#}
+{#                        </td>#}
+{#                    </tr>#}
+{#                </tfoot>#}
             </table>
         </div>
-    </div>
-    <div class="col-md-2">
-
     </div>
 </div>
