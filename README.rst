@@ -38,9 +38,9 @@ Cerberus Access Control
     :target: https://pypi.python.org/pypi/django-cerberus-ac/
     :alt: PyPI Wheel
 
-.. |gitter| image:: https://badges.gitter.im/Deavelleye/dj-CerberusAC.svg
-    :target: https://gitter.im/Deavelleye/dj-CerberusAC
-    :alt: Join the chat at https://gitter.im/Deavelleye/dj-CerberusAC
+.. |gitter| image:: https://badges.gitter.im/dj-CerberusAC/Lobby.svg
+    :target: https://gitter.im/dj-CerberusAC/Lobby
+    :alt: Join the chat at https://gitter.im/dj-CerberusAC/Lobby
 
 
 .. end-badges
@@ -64,7 +64,7 @@ Installation
 Usage
 =====
 
-In your main projects "__init__.py" , create 2 functions to pass the list of resources available and list of roles.
+In your main project's ``__init__.py`` , create 2 functions to pass the list of resources available and list of roles.
 
 
 Documentation
