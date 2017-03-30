@@ -642,10 +642,10 @@ class PrivilegeHistory(models.Model):
     }
 
     ACTIONS = (
-        CREATE, _(ACTIONS_VERBOSE[CREATE]),
-        # READ, _(ACTIONS_VERBOSE[READ]),
-        UPDATE, _(ACTIONS_VERBOSE[UPDATE]),
-        DELETE, _(ACTIONS_VERBOSE[DELETE]),
+        (CREATE, _(ACTIONS_VERBOSE[CREATE])),
+        # (READ, _(ACTIONS_VERBOSE[READ])),
+        (UPDATE, _(ACTIONS_VERBOSE[UPDATE])),
+        (DELETE, _(ACTIONS_VERBOSE[DELETE])),
     )
 
     privilege_id = models.PositiveIntegerField(
