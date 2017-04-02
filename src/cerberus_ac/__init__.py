@@ -30,6 +30,7 @@ class AppSettings(object):
     LOG_HIERARCHY = True
     RESOURCES_LIST = []
     ROLES_LIST = []
+    MAPPING = []
 
     def load(self):
         """Load settings in self."""
@@ -154,6 +155,21 @@ class AppSettings(object):
         roles_list = AppSettings.get_roles_list()
         actual_roles_classes = [_import(c) for c in roles_list]
         return actual_roles_classes
+
+    @staticmethod
+    def check_mapping():
+        """Check the value of given mapping setting."""
+        mapping = AppSettings.get_mapping()
+        if (not isinstance(mapping, list)
+                or not all([isinstance(o, tuple) and
+                            all([isinstance(oo, str) for oo in o])
+                            for o in mapping])):
+            raise ValueError('MAPPING must be a list of strings')
+
+    @staticmethod
+    def get_mapping():
+        """Return mapping setting."""
+        return getattr(settings, 'CERBERUS_MAPPING', AppSettings.MAPPING)
 
 
 AppSettings.check()
