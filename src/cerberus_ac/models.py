@@ -18,6 +18,80 @@ from django.utils.translation import ugettext_lazy as _
 
 from . import AppSettings
 
+app_settings = AppSettings()
+
+
+def get_role_type(role):
+    """
+    Get a role's type.
+
+    Args:
+        role (obj): a Python object.
+
+    Returns:
+        str: the role's type.
+    """
+    if hasattr(role, 'role_type'):
+        attr = role.role_type
+        if callable(attr):
+            return attr()
+        return attr
+    return app_settings.mapping.name_from_instance(role)
+
+
+def get_role_id(role):
+    """
+    Get a role's ID.
+
+    Args:
+        role (obj): a Python object.
+
+    Returns:
+        int: the role's ID or None.
+    """
+    if hasattr(role, 'role_id'):
+        attr = role.role_id
+        if callable(attr):
+            return attr()
+        return attr
+    elif hasattr(role, 'id'):
+        return role.id
+    return None
+
+
+def get_role_type_and_id(role, role_id=None):
+    """
+    Return both type and ID of a role.
+
+    Args:
+        role (obj): string or role instance.
+        role_id (int): integer ID or None.
+
+    Returns:
+        tuple: type and ID of role.
+    """
+    if isinstance(role, str):
+        return role, role_id
+    return get_role_type(role), get_role_id(role)
+
+
+def get_resource_type(resource):
+    """
+    Get a resource's type.
+
+    Args:
+        resource (obj): a Python object.
+
+    Returns:
+        str: the resource's type.
+    """
+    if hasattr(resource, 'resource_type'):
+        attr = resource.resource_type
+        if callable(attr):
+            return attr()
+        return attr
+    return app_settings.mapping.name_from_instance(resource)
+
 
 def get_resource_id(resource):
     """
@@ -39,22 +113,20 @@ def get_resource_id(resource):
     return None
 
 
-def get_resource_type(resource):
+def get_resource_type_and_id(resource, resource_id=None):
     """
-    Get a resource's type.
+    Return both type and ID of a resource.
 
     Args:
-        resource (obj): a Python object.
+        resource (obj): string or resource instance.
+        resource_id (int): integer ID or None.
 
     Returns:
-        str: the resource's type.
+        tuple: type and ID of resource.
     """
-    if hasattr(resource, 'resource_type'):
-        attr = resource.resource_type
-        if callable(attr):
-            return attr()
-        return attr
-    return resource.__class__.__name__
+    if isinstance(resource, str):
+        return resource, resource_id
+    return get_resource_type(resource), get_resource_id(resource)
 
 
 class RoleMixin(object):
@@ -67,7 +139,7 @@ class RoleMixin(object):
 
     def role_type(self):
         """Return the role type of this instance."""
-        return self.__class__.__name__
+        return app_settings.mapping.name_from_instance(self)
 
     def role_id(self):
         """Return the role ID of this instance."""
@@ -75,18 +147,14 @@ class RoleMixin(object):
             return self.id
         return None
 
-    def _get_role_type_and_id(self, role, role_id):
-        if isinstance(role, str):
-            return role, role_id
-        return role.role_type(), role.role_id()
-
-    # TODO: return Role objects and other models instances thanks to mapping?
     def heirs(self, search=None):
         """Return the children of this role."""
         if search is not None:
-            return RoleHierarchy.all_heirs(
-                self.role_type(), self.role_id(), search)
-        return RoleHierarchy.heirs(self.role_type(), self.role_id())
+            return [app_settings.mapping.instance_from_name_and_id(*h)
+                    for h in RoleHierarchy.all_heirs(
+                self.role_type(), self.role_id(), search)]
+        return [app_settings.mapping.instance_from_name_and_id(*h)
+                for h in RoleHierarchy.heirs(self.role_type(), self.role_id())]
 
     def inherits_from(self, role, role_id=None):
         """
@@ -99,7 +167,7 @@ class RoleMixin(object):
         Returns:
             bool: True or False
         """
-        role_type, role_id = self._get_role_type_and_id(role, role_id)
+        role_type, role_id = get_role_type_and_id(role, role_id)
         try:
             RoleHierarchy.objects.get(
                 role_type_a=self.role_type(), role_id_a=self.role_id(),
@@ -121,18 +189,19 @@ class RoleMixin(object):
         Returns:
             obj: the created RoleHierarchy object.
         """
-        role_type, role_id = self._get_role_type_and_id(role, role_id)
+        role_type, role_id = get_role_type_and_id(role, role_id)
         return RoleHierarchy.objects.create(
             role_type_a=self.role_type(), role_id_a=self.role_id(),
             role_type_b=role_type, role_id_b=role_id)
 
-    # TODO: return Role objects and other models instances thanks to mapping?
     def conveyors(self, search=None):
         """Return the roles conveying privileges to this role."""
         if search is not None:
-            return RoleHierarchy.all_conveyors(
-                self.role_type(), self.role_id(), search)
-        return RoleHierarchy.conveyors(self.role_type(), self.role_id())
+            return [app_settings.mapping.instance_from_name_and_id(*c)
+                    for c in RoleHierarchy.all_conveyors(
+                self.role_type(), self.role_id(), search)]
+        return [app_settings.mapping.instance_from_name_and_id(*c)
+                for c in RoleHierarchy.conveyors(self.role_type(), self.role_id())]  # noqa
 
     def conveys_to(self, role, role_id=None):
         """
@@ -145,7 +214,7 @@ class RoleMixin(object):
         Returns:
             bool: True or False
         """
-        role_type, role_id = self._get_role_type_and_id(role, role_id)
+        role_type, role_id = get_role_type_and_id(role, role_id)
         try:
             RoleHierarchy.objects.get(
                 role_type_a=role_type, role_id_a=role_id,
@@ -167,28 +236,35 @@ class RoleMixin(object):
         Returns:
             obj: the created RoleHierarchy object.
         """
-        role_type, role_id = self._get_role_type_and_id(role, role_id)
+        role_type, role_id = get_role_type_and_id(role, role_id)
         return RoleHierarchy.objects.create(
             role_type_a=role_type, role_id_a=role_id,
             role_type_b=self.role_type(), role_id_b=self.role_id())
 
-    def can(self, perm, resource):
+    def can(self, perm, resource, resource_id=None):
         """
         Check if this role has privilege ``perm`` on resource.
 
         Args:
             perm (str): string describing permission or privilege.
-            resource (obj): a resource instance.
+            resource (str/obj): a resource instance or a string describing it.
+            resource_id (int): only used when resource is a string.
 
         Returns:
             bool: True or False
         """
+        resource_type, resource_id = get_resource_type_and_id(resource, resource_id)  # noqa
         return RolePrivilege.authorize(
             role_type=self.role_type(), role_id=self.role_id(), perm=perm,
-            resource_type=get_resource_type(resource),
-            resource_id=get_resource_id(resource))
+            resource_type=resource_type, resource_id=resource_id)
 
 
+# TODO: write a ResourceMixin class? And the according Resource class?
+class ResourceMixin(object):
+    """Mixin for Resource models / classes."""
+
+
+# TODO: is this class useful? Should it just be a class, not a model?
 class Role(models.Model, RoleMixin):
     """Concrete model for roles."""
 

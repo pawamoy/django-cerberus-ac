@@ -8,8 +8,8 @@ from suit_dashboard import Box, Column, DashboardView, Grid, Row
 
 from . import AppSettings
 
-resources_list = AppSettings.get_actual_resources_classes()
-role_classes = AppSettings.get_actual_roles_classes()
+
+app_settings = AppSettings()
 
 
 class Index(DashboardView):
@@ -61,11 +61,11 @@ class EditUserPermissions(UserPermissions):
     crumbs = ({'name': _('Edit'), 'url': 'admin:edit_user_permissions'}, )
 
     role_instances = []
-    for r in role_classes:
+    for r in app_settings.mapping.role_classes():
         role_instances.extend(r.objects.all())
 
     resources_real_list = []
-    for res in resources_list:
+    for res in app_settings.mapping.resource_classes():
         resources_real_list.extend(res.objects.all())
 
     grid = Grid(Row(Column(
@@ -104,11 +104,11 @@ class EditGroupPermissions(GroupPermissions):
     crumbs = ({'name': _('Edit'), 'url': 'admin:edit_group_permissions'}, )
 
     role_instances = []
-    for r in role_classes:
+    for r in app_settings.mapping.role_classes():
         role_instances.extend(r.objects.all())
 
     resources_real_list = []
-    for res in resources_list:
+    for res in app_settings.mapping.resource_classes():
         resources_real_list.extend(res.objects.all())
 
     grid = Grid(Row(Column(

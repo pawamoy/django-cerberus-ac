@@ -10,8 +10,8 @@ __version__ = '0.1.2'
 
 def _import(complete_path):
     module_name = '.'.join(complete_path.split('.')[:-1])
-    module = importlib.import_module(name=module_name)
-    function_or_class = getattr(module, complete_path.split('.')[-1])
+    imported_module = importlib.import_module(name=module_name)
+    function_or_class = getattr(imported_module, complete_path.split('.')[-1])
     return function_or_class
 
 
@@ -28,17 +28,16 @@ class AppSettings(object):
     LOG_ACCESS = True
     LOG_PRIVILEGES = True
     LOG_HIERARCHY = True
-    RESOURCES_LIST = []
-    ROLES_LIST = []
-    MAPPING = []
+    MAPPING = {}
 
-    def load(self):
+    def __init__(self):
         """Load settings in self."""
-        self.DEFAULT_RESPONSE = AppSettings.get_default_response()
-        self.SKIP_IMPLICIT = AppSettings.get_skip_implicit()
-        self.LOG_ACCESS = AppSettings.get_log_access()
-        self.LOG_PRIVILEGES = AppSettings.get_log_privileges()
-        self.LOG_HIERARCHY = AppSettings.get_log_hierarchy()
+        self.default_response = AppSettings.get_default_response()
+        self.skip_implicit = AppSettings.get_skip_implicit()
+        self.log_access = AppSettings.get_log_access()
+        self.log_privileges = AppSettings.get_log_privileges()
+        self.log_hierarchy = AppSettings.get_log_hierarchy()
+        self.mapping = AppSettings.get_mapping()
 
     @staticmethod
     def check():
@@ -48,6 +47,7 @@ class AppSettings(object):
         AppSettings.check_log_access()
         AppSettings.check_log_privileges()
         AppSettings.check_log_hierarchy()
+        AppSettings.check_mapping()
 
     @staticmethod
     def check_default_response():
@@ -115,61 +115,115 @@ class AppSettings(object):
                        AppSettings.LOG_HIERARCHY)
 
     @staticmethod
-    def check_resources_list():
-        """Check the value of given resources list setting."""
-        resources_list = AppSettings.get_log_hierarchy()
-        if (not isinstance(resources_list, list)
-                or not all([isinstance(o, str) for o in resources_list])):
-            raise ValueError('RESOURCES_LIST must be a list of strings')
-
-    @staticmethod
-    def get_resources_list():
-        """Return resources list setting."""
-        return getattr(settings, 'CERBERUS_RESOURCES_LIST',
-                       AppSettings.RESOURCES_LIST)
-
-    @staticmethod
-    def get_actual_resources_classes():
-        """Return resources classes."""
-        resources_list = AppSettings.get_resources_list()
-        actual_resources_classes = [_import(c) for c in resources_list]
-        return actual_resources_classes
-
-    @staticmethod
-    def check_roles_list():
-        """Check the value of given roles list setting."""
-        roles_list = AppSettings.get_log_hierarchy()
-        if (not isinstance(roles_list, list)
-                or not all([isinstance(o, str) for o in roles_list])):
-            raise ValueError('ROLES_LIST must be a list of strings')
-
-    @staticmethod
-    def get_roles_list():
-        """Return roles list setting."""
-        return getattr(settings, 'CERBERUS_ROLES_LIST',
-                       AppSettings.ROLES_LIST)
-
-    @staticmethod
-    def get_actual_roles_classes():
-        """Return roles classes."""
-        roles_list = AppSettings.get_roles_list()
-        actual_roles_classes = [_import(c) for c in roles_list]
-        return actual_roles_classes
-
-    @staticmethod
     def check_mapping():
         """Check the value of given mapping setting."""
-        mapping = AppSettings.get_mapping()
-        if (not isinstance(mapping, list)
-                or not all([isinstance(o, tuple) and
-                            all([isinstance(oo, str) for oo in o])
-                            for o in mapping])):
-            raise ValueError('MAPPING must be a list of strings')
+        mapping = getattr(settings, 'CERBERUS_MAPPING', AppSettings.MAPPING)
+        if not isinstance(mapping, dict):
+            raise ValueError('MAPPING must be a dict')
+        for k, v in mapping.items():
+            if not isinstance(k, str):
+                raise ValueError('Keys in MAPPING dict must be str')
+            if not isinstance(v, dict):
+                raise ValueError('Values in MAPPING must be dict')
+            if set(v.keys()) != {'name', 'attr'}:
+                raise ValueError('Values in MAPPING must be dict '
+                                 'with name and attr keys')
+        l = list(mapping.values())
+        if len(set([x['name'] for x in l if l.count(x['name']) > 1])) > 0:
+            raise ValueError('Names in MAPPING values must be unique')
 
     @staticmethod
     def get_mapping():
         """Return mapping setting."""
-        return getattr(settings, 'CERBERUS_MAPPING', AppSettings.MAPPING)
+        return Mapping(getattr(
+            settings, 'CERBERUS_MAPPING', AppSettings.MAPPING))
+
+
+class Mapping(object):
+    """Mapping class to map roles/resources names to their classes."""
+
+    def __init__(self, mapping):
+        """
+        Initialization method.
+
+        Args:
+            mapping (dict): CERBERUS_MAPPING setting.
+        """
+        self.mapping = mapping
+
+    def class_from_name(self, name):
+        """
+        Return the class given the name of a role/resource.
+
+        Args:
+            name (str): the type of role/resource.
+
+        Returns:
+            class: the corresponding the role/resource class.
+        """
+        for k, v in self.mapping.items():
+            if v['name'] == name:
+                return _import(k)
+        return None
+
+    def instance_from_name_and_id(self, name, id):
+        """
+        Return an instance given a role/resource type and an ID.
+
+        Args:
+            name (str): the type of role/resource.
+            id (int): an integer or None.
+
+        Returns:
+            obj: the instance or a (name, id) tuple if not found.
+        """
+        cls = self.class_from_name(name)
+        if cls:
+            if hasattr(cls, 'objects') and id:
+                return cls.objects.get(id=id)
+            return cls, id
+        from .models import Role
+        try:
+            return Role.objects.get(type=name, rid=id)
+        except Role.DoesNotExist:
+            return name, id
+
+    def name_from_instance(self, obj):
+        """
+        Return the type of a role/resource given a Python object.
+
+        Args:
+            obj (obj): a Python object.
+
+        Returns:
+            str: the role/resource type.
+        """
+        for k, v in self.mapping.items():
+            # FIXME: use complete path, not just the end
+            if k.split('.')[-1] == obj.__class__.__name__:
+                return v['name']
+        return obj.__class__.__name__
+
+    def user_classes(self):
+        """Return the user-role classes."""
+        return [_import(k) for k, v in self.mapping.items()
+                if 'user' in v['attr'].split()]
+
+    def group_classes(self):
+        """Return the group-role classes."""
+        return [_import(k) for k, v in self.mapping.items()
+                if 'group' in v['attr'].split()]
+
+    def role_classes(self):
+        """Return the role classes."""
+        return [_import(k) for k, v in self.mapping.items()
+                if len({'user', 'group', 'role'} &
+                       set(v['attr'].split())) > 0]
+
+    def resource_classes(self):
+        """Return the resource classes."""
+        return [_import(k) for k, v in self.mapping.items()
+                if 'resource' in v['attr'].split()]
 
 
 AppSettings.check()
