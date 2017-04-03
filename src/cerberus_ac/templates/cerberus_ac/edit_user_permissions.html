@@ -23,6 +23,12 @@ $('.collapse').on('show.bs.collapse', function () {
         overflow-x: auto;
     }
 
+    .center{
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
     @media screen and (max-width: 767px) {
     .table-responsive {
         width: 100%;
@@ -127,7 +133,7 @@ $('.collapse').on('show.bs.collapse', function () {
     {% for m in box.context.members %}
         <form action="{% url "admin:edit_user_permissions_post" user=m.id %}" method="POST">
             <tr data-toggle="collapse" data-target=".userrow{{ m.id }}">
-                <td>{{ m.username }}</td>
+                <td class="center">{{ m.username }}</td>
                 {% for r in box.context.resources %}
                     <td></td>
                 {% endfor %}
