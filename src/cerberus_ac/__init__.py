@@ -5,7 +5,7 @@ r"""Cerberus Access Control package."""
 import importlib
 from django.conf import settings
 
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 
 
 def _import(complete_path):
