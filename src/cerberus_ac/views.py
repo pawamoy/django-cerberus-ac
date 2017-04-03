@@ -22,6 +22,14 @@ class Index(DashboardView):
         template='cerberus_ac/index.html'))))
 
 
+class MemberInfo(Index):
+    """View to see member info"""
+
+    title = _('Member Info - Cerberus AC')
+    crumbs = ({'name': _('Member Info'), 'url': 'admin:member_info'}, )
+    grid = Grid(Row(Column(Box(template='cerberus_ac/member_info.html'))))
+
+
 class Permissions(Index):
     """Menu for permissions."""
 

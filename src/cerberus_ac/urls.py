@@ -56,9 +56,9 @@ def cerberus_urlpatterns(admin_view_func=lambda x: x):
             name='edit_group_permissions_post'),
 
         # other views
-        # url(r'^member_info/$',
-        #     admin_view_func(views.MemberInfo.as_view()),
-        #     name='view_member_info'),
+         url(r'^member_info/$',
+             admin_view_func(views.MemberInfo.as_view()),
+             name='view_member_info'),
         # url(r'^logs/object_access/$',
         #     admin_view_func(views.ObjectAccess.as_view()),
         #     name='logs_access'),
