@@ -4,6 +4,8 @@
 
 from django.contrib import admin
 from django.contrib.admin.sites import AdminSite
+
+from cerberus_ac.views import EditUserPermissions
 from .models import *
 
 
@@ -21,6 +23,7 @@ data_admin_site = DataAdmin(name='DataAdmin')
 audit_admin_site = AuditAdmin(name='AuditAdmin')
 
 # Security Admin Pages
+    # Logs
 @security_admin_site.register(AccessHistory)
 class ObjectAccessHistoryAdmin(admin.ModelAdmin):
     pass
@@ -29,13 +32,11 @@ class ObjectAccessHistoryAdmin(admin.ModelAdmin):
 class PrivChangesHistoryAdmin(admin.ModelAdmin):
     pass
 
-@security_admin_site.register(PrivilegeHistory)
-class PrivChangesHistoryAdmin(admin.ModelAdmin):
+    # User Permissions
+@security_admin_site.register(RolePrivilege)
+class PermissionsAdmin(admin.ModelAdmin):
     pass
 
-@security_admin_site.register(PrivilegeHistory)
-class PrivChangesHistoryAdmin(admin.ModelAdmin):
-    pass
-
+# Data Admin Pages
 
 
