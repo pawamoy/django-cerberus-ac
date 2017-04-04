@@ -88,7 +88,7 @@ class EditUserPermissions(UserPermissions):
 def edit_user_perm_post(request, user):
     """Handler for user permissions POSTs."""
     if request.method == "POST":
-        pass
+        form = UserPermForm(request.POST)
 
 
 class GroupPermissions(Permissions):

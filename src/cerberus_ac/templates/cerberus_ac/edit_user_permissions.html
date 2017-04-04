@@ -134,23 +134,10 @@ $('.collapse').on('show.bs.collapse', function () {
         {% for m in box.context.members %}
             <form action="{% url "admin:edit_user_permissions_post" user=m.id %}" method="POST">
                 <tr data-toggle="collapse" data-target=".userrow{{ m.id }}">
-                    <td class="center">{{ m.username }}
-                        <div class="btn-group">
-                            <a class=" btn dropdown-toggle" data-toggle="action{{ m.id }}" href="#">Action
-                                <span class="caret"></span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a href="#">Save Changes</a>
-                                </li>
-                                <li>
-                                    <a href="#">Cancel Changes</a>
-                                </li>
-                                <li>
-                                    <a href="#">Set Default User Permissions</a>
-                                </li>
-                            </ul>
-                        </div>
+                    <td class="center">
+                        {{ m.username }}
+                        <input type="submit" value="Save" name="submit_{{ m.id }}"/>
+                        <input type="submit" value="Inherited" name="inherited_{{ m.id }}"/>
                     </td>
                     {% for r in box.context.resources %}
                         <td></td>

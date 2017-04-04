@@ -56,7 +56,7 @@ def get_role_id(role):
         return attr
     elif hasattr(role, 'id'):
         return role.id
-    return None
+    return None6
 
 
 def get_role_type_and_id(role, role_id=None):
@@ -778,66 +778,6 @@ class PrivilegeHistory(models.Model):
 
 
 class AccessHistory(models.Model):
-    """Access history model."""
-
-    DEFAULT = 'd'
-    IMPLICIT = 'i'
-    EXPLICIT = 'e'
-
-    RESPONSE_TYPE_VERBOSE = {
-        DEFAULT: 'by default',
-        IMPLICIT: 'implicitly',
-        EXPLICIT: 'explicitly'
-    }
-
-    RESPONSE_TYPE = (
-        (DEFAULT, _(RESPONSE_TYPE_VERBOSE[DEFAULT])),
-        (IMPLICIT, _(RESPONSE_TYPE_VERBOSE[IMPLICIT])),
-        (EXPLICIT, _(RESPONSE_TYPE_VERBOSE[EXPLICIT]))
-    )
-
-    role_type = models.CharField(_('Role type'), max_length=255, blank=True)
-    role_id = models.PositiveIntegerField(_('Role ID'), null=True)
-
-    # We don't want to store false info, None says "we don't know"
-    response = models.NullBooleanField(_('Response'), default=None)
-    response_type = models.CharField(
-        _('Response type'), max_length=1, choices=RESPONSE_TYPE)
-    access_type = models.CharField(_('Access'), max_length=255)
-
-    resource_type = models.CharField(_('Resource type'), max_length=255)
-    resource_id = models.PositiveIntegerField(_('Resource ID'), null=True)
-
-    datetime = models.DateTimeField(_('Date and time'), default=timezone.now)
-
-    inherited_type = models.CharField(_('Group type'), max_length=255, blank=True)  # noqa
-    inherited_id = models.PositiveIntegerField(_('Group ID'), null=True)
-
-    def __str__(self):
-        inherited = ''
-
-        if self.role_id:
-            role = '%s %s' % (self.role_type, self.role_id)
-        else:
-            role = self.role_type
-
-        if self.inherited_type:
-            if self.inherited_id:
-                inherited = ' (inherited from %s %s)' % (
-                    self.inherited_type, self.inherited_id)
-            else:
-                inherited = self.inherited_type
-
-        authorized = 'authorized' if self.response else 'unauthorized'
-        string = '[%s] %s was %s %s to %s %s %s' % (
-            self.datetime, role,
-            AccessHistory.RESPONSE_TYPE_VERBOSE[str(self.response_type)],
-            authorized, self.access_type, self.resource_type, self.resource_id)
-        if inherited:
-            return string + inherited
-        return string
-
-class SecurityAdmin(models.Model):
     """Access history model."""
 
     DEFAULT = 'd'
