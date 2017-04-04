@@ -30,6 +30,16 @@ class MemberInfo(Index):
     grid = Grid(Row(Column(Box(template='cerberus_ac/member_info.html'))))
 
 
+class Logs(Index):
+    """Cerberus Logs Menu."""
+
+    title = _('Logs - Cerberus AC')
+    crumbs = ({'name': _('Cerberus'), 'url': 'admin:cerberus_logs'},)
+    grid = Grid(Row(Column(Box(
+        title='Logs',
+        template='cerberus_ac/logs.html'))))
+
+
 class Permissions(Index):
     """Menu for permissions."""
 
@@ -144,11 +154,3 @@ class PermChanges(Logs):
         template='cerberus_ac/perms_changes_logs.html'))))
 
 
-class Logs(Index):
-    """Cerberus Logs Menu."""
-
-    title = _('Logs - Cerberus AC')
-    crumbs = ({'name': _('Cerberus'), 'url': 'admin:cerberus_logs'},)
-    grid = Grid(Row(Column(Box(
-        title='Logs',
-        template='cerberus_ac/logs.html'))))

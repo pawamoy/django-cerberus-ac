@@ -4,6 +4,8 @@
 
 from django.contrib import admin
 from django.contrib.admin.sites import AdminSite
+from .models import *
+
 
 class SecurityAdmin(AdminSite):
     pass
@@ -17,4 +19,23 @@ class AuditAdmin(AdminSite):
 security_admin_site = SecurityAdmin(name='SecurityAdmin')
 data_admin_site = DataAdmin(name='DataAdmin')
 audit_admin_site = AuditAdmin(name='AuditAdmin')
+
+# Security Admin Pages
+@security_admin_site.register(AccessHistory)
+class ObjectAccessHistoryAdmin(admin.ModelAdmin):
+    pass
+
+@security_admin_site.register(PrivilegeHistory)
+class PrivChangesHistoryAdmin(admin.ModelAdmin):
+    pass
+
+@security_admin_site.register(PrivilegeHistory)
+class PrivChangesHistoryAdmin(admin.ModelAdmin):
+    pass
+
+@security_admin_site.register(PrivilegeHistory)
+class PrivChangesHistoryAdmin(admin.ModelAdmin):
+    pass
+
+
 
