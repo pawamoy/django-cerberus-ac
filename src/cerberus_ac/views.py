@@ -122,3 +122,33 @@ def edit_group_perm_post(request, user):
     """Handler for group permissions POSTs."""
     if request.method == "POST":
         pass
+
+
+class ObjectAccess(Logs):
+    """Cerberus Object Access Logs"""
+
+    title = _('Object Access - Cerberus AC')
+    crumbs = ({'name': _('Cerberus'), 'url': 'admin:cerberus_obj_acc_logs'},)
+    grid = Grid(Row(Column(Box(
+        title='Object Access',
+        template='cerberus_ac/obj_access_logs.html'))))
+
+
+class PermChanges(Logs):
+    """Cerberus Permission changes Logs."""
+
+    title = _('Permission Changes - Cerberus AC')
+    crumbs = ({'name': _('Cerberus'), 'url': 'admin:cerberus_perm_changes_logs'},)
+    grid = Grid(Row(Column(Box(
+        title='Permission Changes',
+        template='cerberus_ac/perms_changes_logs.html'))))
+
+
+class Logs(Index):
+    """Cerberus Logs Menu."""
+
+    title = _('Logs - Cerberus AC')
+    crumbs = ({'name': _('Cerberus'), 'url': 'admin:cerberus_logs'},)
+    grid = Grid(Row(Column(Box(
+        title='Logs',
+        template='cerberus_ac/logs.html'))))

@@ -1,7 +1,7 @@
 {% load static %}
 {% load i18n %}
 
-{% if suit %}
+{% if not suit %}
   <script src="{% static "cerberus_ac/js/jquery-2.2.4.min.js" %}"></script>
   <script src="{% static "cerberus_ac/js/bootstrap.min.js" %}"></script>
   <link rel="stylesheet" type="text/css" href="{% static "cerberus_ac/css/bootstrap-combined.min.css" %}" media="screen" />
@@ -120,89 +120,108 @@ $('.collapse').on('show.bs.collapse', function () {
     }
 </style>
 
-<table id="editprivtable" class="table table-responsive table-hover table-condensed table-striped" style="border-collapse:collapse;">
-    <thead>
-        <tr>
-            <th>User</th>
-            {% for r in box.context.resources %}
-                <th>{{ r }}</th>
-            {% endfor %}
-        </tr>
-    </thead>
-    <tbody>
-    {% for m in box.context.members %}
-        <form action="{% url "admin:edit_user_permissions_post" user=m.id %}" method="POST">
-            <tr data-toggle="collapse" data-target=".userrow{{ m.id }}">
-                <td class="center">{{ m.username }}</td>
+<div class="table-responsive">
+    <table id="editprivtable" class="table table-hover table-condensed table-striped" style="border-collapse:collapse;">
+        <thead>
+            <tr>
+                <th>User</th>
                 {% for r in box.context.resources %}
-                    <td></td>
+                    <th>{{ r }}</th>
                 {% endfor %}
             </tr>
-            <tr>
-                <td class="hiddenRow">
-                    <div id="userrow{{ m.id }}" class="collapse userrow{{ m.id }}">
-                        ID : {{ m.id }}<br>
-                        Groups: {{ m.get_groups }}<br>
-                        Username : {{ m.username }}<br>
-                        Mail : {{ m.email }} <br>
-                        Active : {{ m.is_active }}<br>
-                        Last login: {{ m.last_login }}<br>
-                        Register date: {{ m.date_joined }}<br>
-                    </div>
-                </td>
-                {% for r in box.context.resources %}
-                    <td class="hiddenRow">
-                        <div class="row">
-                            <div class="collapse userrow{{ m.id }}">
-                              <div>Create
-                                <div id="update_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
-                                    <button class="btn btn-check-success" id="allow_create_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                    <button class="btn btn-check-default" id="default_create_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                    <button class="btn btn-check-danger" id="deny_create_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                </div></div>
-                              <div>Read
-                                <div id="read_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
-                                    <button class="btn btn-check-success" id="allow_read_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                    <button class="btn btn-check-default" id="default_read_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                    <button class="btn btn-check-danger" id="deny_read_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                </div></div>
-                              <div>Update
-                                <div id="update_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
-                                    <button class="btn btn-check-success" id="allow_update_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                    <button class="btn btn-check-default" id="default_update_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                    <button class="btn btn-check-danger" id="deny_update_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                </div></div>
-                              <div>Delete
-                                <div id="delete_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
-                                    <button class="btn btn-check-success" id="allow_delete_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                    <button class="btn btn-check-default" id="default_delete_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                    <button class="btn btn-check-danger" id="deny_delete_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                </div></div>
-                            </div>
+        </thead>
+        <tbody>
+        {% for m in box.context.members %}
+            <form action="{% url "admin:edit_user_permissions_post" user=m.id %}" method="POST">
+                <tr data-toggle="collapse" data-target=".userrow{{ m.id }}">
+                    <td class="center">{{ m.username }}
+                        <div class="btn-group">
+                            <a class=" btn dropdown-toggle" data-toggle="action{{ m.id }}" href="#">Action
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="#">Save Changes</a>
+                                </li>
+                                <li>
+                                    <a href="#">Cancel Changes</a>
+                                </li>
+                                <li>
+                                    <a href="#">Set Default User Permissions</a>
+                                </li>
+                            </ul>
                         </div>
                     </td>
-                {% endfor %}
+                    {% for r in box.context.resources %}
+                        <td></td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td class="hiddenRow">
+                        <div id="userrow{{ m.id }}" class="collapse userrow{{ m.id }}">
+                            ID : {{ m.id }}<br>
+                            Groups: {{ m.get_groups }}<br>
+                            Username : {{ m.username }}<br>
+                            Mail : {{ m.email }} <br>
+                            Active : {{ m.is_active }}<br>
+                            Last login: {{ m.last_login }}<br>
+                            Register date: {{ m.date_joined }}<br>
+                        </div>
+                    </td>
+                    {% for r in box.context.resources %}
+                        <td class="hiddenRow">
+                            <div class="row">
+                                <div class="collapse userrow{{ m.id }}" style="text-align: right">
+                                  <div>Create
+                                    <div id="update_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
+                                        <button class="btn btn-check-success" id="allow_create_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                        <button class="btn btn-check-default" id="default_create_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                        <button class="btn btn-check-danger" id="deny_create_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                    </div></div>
+                                  <div>Read
+                                    <div id="read_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
+                                        <button class="btn btn-check-success" id="allow_read_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                        <button class="btn btn-check-default" id="default_read_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                        <button class="btn btn-check-danger" id="deny_read_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                    </div></div>
+                                  <div>Update
+                                    <div id="update_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
+                                        <button class="btn btn-check-success" id="allow_update_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                        <button class="btn btn-check-default" id="default_update_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                        <button class="btn btn-check-danger" id="deny_update_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                    </div></div>
+                                  <div>Delete
+                                    <div id="delete_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
+                                        <button class="btn btn-check-success" id="allow_delete_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                        <button class="btn btn-check-default" id="default_delete_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                        <button class="btn btn-check-danger" id="deny_delete_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                    </div></div>
+                                </div>
+                            </div>
+                        </td>
+                    {% endfor %}
+                </tr>
+            </form>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>{{ box.context.sizes }}
+                    <div class="text-center">
+                        <ul class="pagination">
+                            <li ng-class="{disabled: currentPage == 0}">
+                                <a href="javascript:;" ng-click="prevPage()">« Prev</a>
+                            </li>
+                            <li ng-repeat="n in range(pagedItems.length)" ng-class="{active: n == currentPage}" ng-click="setPage()">
+                                <a href="javascript:;" ng-bind="n + 1">1</a>
+                            </li>
+                            <li ng-class="{disabled: currentPage == pagedItems.length - 1}">
+                                <a href="javascript:;" ng-click="nextPage()">Next »</a>
+                            </li>
+                        </ul>
+                    </div>
+                </td>
             </tr>
-        </form>
-    {% endfor %}
-    </tbody>
-    <tfoot>
-        <tr>
-            <td>{{ box.context.sizes }}
-                <div class="text-center">
-                    <ul class="pagination">
-                        <li ng-class="{disabled: currentPage == 0}">
-                            <a href="javascript:;" ng-click="prevPage()">« Prev</a>
-                        </li>
-                        <li ng-repeat="n in range(pagedItems.length)" ng-class="{active: n == currentPage}" ng-click="setPage()">
-                            <a href="javascript:;" ng-bind="n + 1">1</a>
-                        </li>
-                        <li ng-class="{disabled: currentPage == pagedItems.length - 1}">
-                            <a href="javascript:;" ng-click="nextPage()">Next »</a>
-                        </li>
-                    </ul>
-                </div>
-            </td>
-        </tr>
-    </tfoot>
-</table>
+        </tfoot>
+    </table>
+</div>

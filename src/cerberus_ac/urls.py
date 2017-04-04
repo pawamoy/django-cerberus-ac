@@ -2,9 +2,10 @@
 
 """URLs module."""
 
-from django.conf.urls import url
+from django.conf.urls import url, patterns, include
 
 from . import views
+
 
 
 def cerberus_urlpatterns(admin_view_func=lambda x: x):
@@ -26,6 +27,10 @@ def cerberus_urlpatterns(admin_view_func=lambda x: x):
         url(r'^permissions/$',
             admin_view_func(views.Permissions.as_view()),
             name='permissions'),
+
+        url(r'logs/$',
+            admin_view_func(views.Logs.as_view()),
+            name='logs'),
 
         # user views
         url(r'^permissions/user/$',
@@ -59,12 +64,12 @@ def cerberus_urlpatterns(admin_view_func=lambda x: x):
         url(r'^member_info/$',
             admin_view_func(views.MemberInfo.as_view()),
             name='view_member_info'),
-        # url(r'^logs/object_access/$',
-        #     admin_view_func(views.ObjectAccess.as_view()),
-        #     name='logs_access'),
-        # url(r'^logs/permission_changes/$',
-        #     admin_view_func(views.PermChanges.as_view()),
-        #     name='perm_changes'),
+        url(r'^logs/object_access/$',
+             admin_view_func(views.ObjectAccess.as_view()),
+             name='logs_access'),
+         url(r'^logs/permission_changes/$',
+             admin_view_func(views.PermChanges.as_view()),
+             name='perm_changes'),
     ]
 
 urlpatterns = cerberus_urlpatterns()
