@@ -61,9 +61,9 @@ class MainTestCase(TestCase):
         self.resources = [FakeResource.objects.create() for _ in range(3)]
 
     def test_appsettings_instance(self):
-        """Instantiate and load an AppSettings instance."""
+        """Instantiate an AppSettings instance."""
         appsettings = AppSettings()
-        appsettings.load()
+        assert appsettings.mapping
 
     @override_settings(CERBERUS_DEFAULT_RESPONSE='a',
                        CERBERUS_SKIP_IMPLICIT=1,
@@ -84,15 +84,10 @@ class MainTestCase(TestCase):
             AppSettings.check_log_privileges()
         with pytest.raises(ValueError):
             AppSettings.check_log_hierarchy()
-        with pytest.raises(ValueError):
-            AppSettings.check_roles_list()
-        with pytest.raises(ValueError):
-            AppSettings.check_resources_list()
 
-    @override_settings(CERBERUS_ROLES_LIST=['cerberus_ac.models.Role'])
     def test_import_classes(self):
         """Test classes imported correctly."""
-        assert AppSettings.get_actual_roles_classes() == [Role]
+        assert set(AppSettings.get_mapping().role_classes()) == {Role, FakeUser, FakeGroup}  # noqa
 
     def test_getting_resource_type_and_id(self):
         """Test get_resource_type and get_resource_id methods."""
@@ -141,15 +136,17 @@ class MainTestCase(TestCase):
         assert not self.users[0].inherits_from(self.groups[2])
         assert not self.groups[2].conveys_to(self.groups[1])
         assert set(self.groups[1].heirs()) == {
-            ('FakeUser', 1), ('FakeUser', 2)}
+            self.users[0], self.users[1]}
         assert self.roles[0].conveys_to(self.users[0])
         assert self.roles[1].conveys_to(self.users[1])
         assert self.roles[2].conveys_to(self.users[2])
         assert set(self.users[0].conveyors()) == {
-            ('FakeGroup', 1), ('FakeGroup', 2), ('security', None)}
-        assert set(self.users[2].conveyors(search=RoleHierarchy.DEPTH_FIRST)) == set(
+            self.groups[0], self.groups[1], self.roles[0]}
+        assert set(
+            self.users[2].conveyors(search=RoleHierarchy.DEPTH_FIRST)) == set(
             self.users[2].conveyors(search=RoleHierarchy.BREADTH_FIRST))
-        assert set(self.groups[2].heirs(search=RoleHierarchy.DEPTH_FIRST)) == set(
+        assert set(
+            self.groups[2].heirs(search=RoleHierarchy.DEPTH_FIRST)) == set(
             self.groups[2].heirs(search=RoleHierarchy.BREADTH_FIRST))
 
     def test_role_hierarchy_history(self):
