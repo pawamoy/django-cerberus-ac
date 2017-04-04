@@ -25,8 +25,6 @@ $('.collapse').on('show.bs.collapse', function () {
 
     .center{
         text-align: center;
-        margin-left: auto;
-        margin-right: auto;
     }
 
     @media screen and (max-width: 767px) {
@@ -134,7 +132,7 @@ $('.collapse').on('show.bs.collapse', function () {
         {% for m in box.context.members %}
             <form action="{% url "admin:edit_user_permissions_post" user=m.id %}" method="POST">
                 <tr data-toggle="collapse" data-target=".userrow{{ m.id }}">
-                    <td class="center">
+                    <td style="text-align: right">
                         {{ m.username }}
                         <input type="submit" value="Save" name="submit_{{ m.id }}"/>
                         <input type="submit" value="Inherited" name="inherited_{{ m.id }}"/>
