@@ -98,7 +98,7 @@ class EditUserPermissions(UserPermissions):
     def get_user_list_json(self, request):
         role_instances = []
         for r in app_settings.mapping.role_classes():
-            role_instances.extend(r.objects.all().values('id','username'))
+            role_instances.extend(r.objects.all().values('id', 'username'))
 
         user_list_json = json.dumps([{'id': role.id, 'name': role.username} for role in role_instances])
 
