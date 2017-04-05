@@ -269,7 +269,7 @@ class Role(models.Model, RoleMixin):
     """Concrete model for roles."""
 
     type = models.CharField(max_length=255)
-    rid = models.PositiveIntegerField(null=True)
+    rid = models.PositiveIntegerField(default=0)
 
     class Meta:
         """Meta class for Django."""
@@ -297,9 +297,9 @@ class RoleHierarchy(models.Model):
     DEPTH_FIRST = 1
 
     role_type_a = models.CharField(max_length=255)
-    role_id_a = models.PositiveIntegerField(null=True)
+    role_id_a = models.PositiveIntegerField(default=0)
     role_type_b = models.CharField(max_length=255)
-    role_id_b = models.PositiveIntegerField(null=True)
+    role_id_b = models.PositiveIntegerField(default=0)
 
     class Meta:
         """Meta class for Django."""
@@ -406,14 +406,14 @@ class RolePrivilege(models.Model):
     """Role privilege model."""
 
     role_type = models.CharField(_('Role type'), max_length=255)
-    role_id = models.PositiveIntegerField(_('Role ID'), null=True)
+    role_id = models.PositiveIntegerField(_('Role ID'), default=0)
 
     authorized = models.BooleanField(
-        _('Authorization'), default=AppSettings.get_default_response())
+        _('Allow/Deny'), default=AppSettings.get_default_response())
     access_type = models.CharField(_('Access type'), max_length=255)
 
     resource_type = models.CharField(_('Resource type'), max_length=255)
-    resource_id = models.PositiveIntegerField(_('Resource ID'), null=True)
+    resource_id = models.PositiveIntegerField(_('Resource ID'), default=0)
 
     creation_date = models.DateTimeField(_('Created'), auto_now_add=True)
     modification_date = models.DateTimeField(_('Last modified'), auto_now=True)
@@ -429,8 +429,8 @@ class RolePrivilege(models.Model):
 
     def __str__(self):
         return '%s %s %s to %s %s %s' % (
-            'allow' if self.authorized else 'deny',
-            self.role_type, self.role_id, self.access_type,
+            'allow' if self.authorized else 'deny', self.role_type,
+            self.role_id if self.role_id else '', self.access_type,
             self.resource_type, self.resource_id if self.resource_id else '')
 
     @staticmethod
@@ -741,7 +741,7 @@ class PrivilegeHistory(models.Model):
         null=True)
 
     role_type = models.CharField(_('Role type'), max_length=255, blank=True)
-    role_id = models.PositiveIntegerField(_('Role ID'), null=True)
+    role_id = models.PositiveIntegerField(_('Role ID'), blank=True, null=True)
 
     authorized = models.NullBooleanField(_('Authorization'), default=None)
     access_type = models.CharField(
@@ -749,7 +749,7 @@ class PrivilegeHistory(models.Model):
 
     resource_type = models.CharField(
         _('Resource type'), max_length=255, blank=True)
-    resource_id = models.PositiveIntegerField(_('Resource ID'), null=True)
+    resource_id = models.PositiveIntegerField(_('Resource ID'), blank=True, null=True)
 
     def __str__(self):
         return '[%s] user %s has %sd privilege <%s>' % (
@@ -797,7 +797,7 @@ class AccessHistory(models.Model):
     )
 
     role_type = models.CharField(_('Role type'), max_length=255, blank=True)
-    role_id = models.PositiveIntegerField(_('Role ID'), null=True)
+    role_id = models.PositiveIntegerField(_('Role ID'), blank=True, null=True)
 
     # We don't want to store false info, None says "we don't know"
     response = models.NullBooleanField(_('Response'), default=None)
@@ -806,12 +806,12 @@ class AccessHistory(models.Model):
     access_type = models.CharField(_('Access'), max_length=255)
 
     resource_type = models.CharField(_('Resource type'), max_length=255)
-    resource_id = models.PositiveIntegerField(_('Resource ID'), null=True)
+    resource_id = models.PositiveIntegerField(_('Resource ID'), blank=True, null=True)
 
     datetime = models.DateTimeField(_('Date and time'), default=timezone.now)
 
-    inherited_type = models.CharField(_('Group type'), max_length=255, blank=True)  # noqa
-    inherited_id = models.PositiveIntegerField(_('Group ID'), null=True)
+    conveyor_type = models.CharField(_('Conveyor type'), max_length=255, blank=True)  # noqa
+    conveyor_id = models.PositiveIntegerField(_('Conveyor ID'), blank=True, null=True)
 
     def __str__(self):
         inherited = ''

@@ -118,17 +118,19 @@ class AppSettings(object):
     def check_mapping():
         """Check the value of given mapping setting."""
         mapping = getattr(settings, 'CERBERUS_MAPPING', AppSettings.MAPPING)
-        if not isinstance(mapping, dict):
-            raise ValueError('MAPPING must be a dict')
-        for k, v in mapping.items():
+        if not isinstance(mapping, tuple):
+            raise ValueError('MAPPING must be a tuple')
+        if not all(isinstance(o, tuple) for o in mapping):
+            raise ValueError('MAPPING must be a tuple of (key, value) tuples')
+        for k, v in mapping:
             if not isinstance(k, str):
-                raise ValueError('Keys in MAPPING dict must be str')
+                raise ValueError('Keys in MAPPING must be str')
             if not isinstance(v, dict):
                 raise ValueError('Values in MAPPING must be dict')
             if set(v.keys()) != {'name', 'attr'}:
                 raise ValueError('Values in MAPPING must be dict '
                                  'with name and attr keys')
-        l = list(mapping.values())
+        l = [o[1] for o in mapping]
         if len(set([x['name'] for x in l if l.count(x['name']) > 1])) > 0:
             raise ValueError('Names in MAPPING values must be unique')
 
@@ -161,7 +163,7 @@ class Mapping(object):
         Returns:
             class: the corresponding the role/resource class.
         """
-        for k, v in self.mapping.items():
+        for k, v in self.mapping:
             if v['name'] == name:
                 return _import(k)
         return None
@@ -198,7 +200,7 @@ class Mapping(object):
         Returns:
             str: the role/resource type.
         """
-        for k, v in self.mapping.items():
+        for k, v in self.mapping:
             # FIXME: use complete path, not just the end
             if k.split('.')[-1] == obj.__class__.__name__:
                 return v['name']
@@ -206,23 +208,34 @@ class Mapping(object):
 
     def user_classes(self):
         """Return the user-role classes."""
-        return [_import(k) for k, v in self.mapping.items()
+        return [_import(k) for k, v in self.mapping
                 if 'user' in v['attr'].split()]
 
     def group_classes(self):
         """Return the group-role classes."""
-        return [_import(k) for k, v in self.mapping.items()
+        return [_import(k) for k, v in self.mapping
                 if 'group' in v['attr'].split()]
 
-    def role_classes(self):
-        """Return the role classes."""
-        return [_import(k) for k, v in self.mapping.items()
+    def role_types(self):
+        """Return the role types."""
+        return [v['name'] for k, v in self.mapping
                 if len({'user', 'group', 'role'} &
                        set(v['attr'].split())) > 0]
 
+    def role_classes(self):
+        """Return the role classes."""
+        return [_import(k) for k, v in self.mapping
+                if len({'user', 'group', 'role'} &
+                       set(v['attr'].split())) > 0]
+
+    def resource_types(self):
+        """Return the resource types."""
+        return [v['name'] for k, v in self.mapping
+                if 'resource' in v['attr'].split()]
+
     def resource_classes(self):
         """Return the resource classes."""
-        return [_import(k) for k, v in self.mapping.items()
+        return [_import(k) for k, v in self.mapping
                 if 'resource' in v['attr'].split()]
 
 

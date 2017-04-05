@@ -45,9 +45,40 @@ class Logs(Index):
 class Permissions(Index):
     """Menu for permissions."""
 
+    context = {'role_types': [{
+        'verbose': app_settings.mapping.class_from_name(t)._meta.verbose_name,
+        'slug': t} for t in app_settings.mapping.role_types()
+    ], 'resource_types': [{
+        'verbose': app_settings.mapping.class_from_name(t)._meta.verbose_name,
+        'slug': t} for t in app_settings.mapping.resource_types()
+    ]}
+
     title = _('Permissions - Cerberus AC')
     crumbs = ({'name': _('Permissions'), 'url': 'admin:permissions'}, )
-    grid = Grid(Row(Column(Box(template='cerberus_ac/permissions.html'))))
+    grid = Grid(Row(Column(Box(template='cerberus_ac/permissions.html',
+                               context=context))))
+
+
+class ViewPrivileges(Permissions):
+    """View to see user permissions."""
+
+    title = _('View Privileges - Cerberus AC')
+
+    def get(self, request, *args, **kwargs):
+        self.crumbs = ({'name': _('View'), 'url': 'admin:view_privileges'}, )
+        self.grid = Grid(Row(Column(Box(template='cerberus_ac/view_privileges.html'))))  # noqa
+        return super(ViewPrivileges, self).get(request, *args, **kwargs)
+
+
+class EditPrivileges(Permissions):
+    """View to edit user permissions."""
+
+    title = _('Edit Privileges - Cerberus AC')
+
+    def get(self, request, *args, **kwargs):
+        self.crumbs = ({'name': _('Edit'), 'url': 'admin:edit_privileges'}, )
+        self.grid = Grid(Row(Column(Box(template='cerberus_ac/edit_privileges.html'))))  # noqa
+        return super(EditPrivileges, self).get(request, *args, **kwargs)
 
 
 class UserPermissions(Permissions):
@@ -110,7 +141,6 @@ class EditUserPermissions(UserPermissions):
 
         return res_list
 
-
     def get(self, request, *args, **kwargs):
         self.grid = Grid(Row(Column(
             Box(template='cerberus_ac/edit_user_permissions.html',
@@ -121,7 +151,7 @@ class EditUserPermissions(UserPermissions):
         return super(EditUserPermissions, self).get(request, *args, **kwargs)
 
 
-def edit_user_perm_post(request, user):
+def edit_user_perm_post(request, user, ):
     """Handler for user permissions POSTs."""
     if request.method == "POST":
         form = UserPermForm(request.POST)

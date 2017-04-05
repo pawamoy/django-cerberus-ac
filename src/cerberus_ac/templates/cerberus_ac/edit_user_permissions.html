@@ -163,25 +163,25 @@ $('.collapse').on('show.bs.collapse', function () {
                         <td class="hiddenRow span2" >
                             <div class="row">
                                 <div class="collapse userrow{{ m.id }}" style="text-align: right">
-                                  <div>Create
+                                  <div>{% trans "Create" %}
                                     <div id="update_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
                                         <button class="btn btn-check-success" id="allow_create_{{ m.id }}_{{ r.id }}" type="button"></button>
                                         <button class="btn btn-check-default" id="default_create_{{ m.id }}_{{ r.id }}" type="button"></button>
                                         <button class="btn btn-check-danger" id="deny_create_{{ m.id }}_{{ r.id }}" type="button"></button>
                                     </div></div>
-                                  <div>Read
+                                  <div>{% trans "Read" %}
                                     <div id="read_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
                                         <button class="btn btn-check-success" id="allow_read_{{ m.id }}_{{ r.id }}" type="button"></button>
                                         <button class="btn btn-check-default" id="default_read_{{ m.id }}_{{ r.id }}" type="button"></button>
                                         <button class="btn btn-check-danger" id="deny_read_{{ m.id }}_{{ r.id }}" type="button"></button>
                                     </div></div>
-                                  <div>Update
+                                  <div>{% trans "Update" %}
                                     <div id="update_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
                                         <button class="btn btn-check-success" id="allow_update_{{ m.id }}_{{ r.id }}" type="button"></button>
                                         <button class="btn btn-check-default" id="default_update_{{ m.id }}_{{ r.id }}" type="button"></button>
                                         <button class="btn btn-check-danger" id="deny_update_{{ m.id }}_{{ r.id }}" type="button"></button>
                                     </div></div>
-                                  <div>Delete
+                                  <div>{% trans "Delete" %}
                                     <div id="delete_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
                                         <button class="btn btn-check-success" id="allow_delete_{{ m.id }}_{{ r.id }}" type="button"></button>
                                         <button class="btn btn-check-default" id="default_delete_{{ m.id }}_{{ r.id }}" type="button"></button>
