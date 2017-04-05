@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
 
 """Views module."""
+from django.shortcuts import render
 
 from django.utils.translation import ugettext as _
 
 from suit_dashboard import Box, Column, DashboardView, Grid, Row
+
+from django.contrib.auth.models import User
+
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from . import AppSettings
 
@@ -70,26 +75,57 @@ class EditUserPermissions(UserPermissions):
     title = _('Edit User Permissions - Cerberus AC')
     crumbs = ({'name': _('Edit'), 'url': 'admin:edit_user_permissions'}, )
 
-    role_instances = []
-    for r in app_settings.mapping.role_classes():
-        role_instances.extend(r.objects.all())
+    def get_user_list(self, request):
+        role_instances = []
+        for r in app_settings.mapping.role_classes():
+            role_instances.extend(r.objects.all())
 
-    resources_real_list = []
-    for res in app_settings.mapping.resource_classes():
-        resources_real_list.extend(res.objects.all())
+        paginator = Paginator(role_instances, 50)
 
-    grid = Grid(Row(Column(
-        Box(template='cerberus_ac/edit_user_permissions.html',
-            context={'members': role_instances[:10:],
-                     'resources': resources_real_list[:10:]})
-    )))
+        page = request.GET.get('page_role')
+        try:
+            user_list = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            user_list = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            user_list = paginator.page(paginator.num_pages)
+
+        return user_list
+
+    def get_res_list(self, request):
+        resources_real_list = []
+        for res in app_settings.mapping.resource_classes():
+            resources_real_list.extend(res.objects.all())
+
+        paginator = Paginator(resources_real_list, 10)
+
+        page = request.GET.get('page_res')
+        try:
+            res_list = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            res_list = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            res_list = paginator.page(paginator.num_pages)
+
+        return res_list
+
+
+    def get(self, request, *args, **kwargs):
+        grid = Grid(Row(Column(
+            Box(template='cerberus_ac/edit_user_permissions.html',
+                context={'members': self.get_user_list(request),
+                         'resources': self.get_res_list(request)})
+        )))
 
 
 def edit_user_perm_post(request, user):
     """Handler for user permissions POSTs."""
     if request.method == "POST":
         form = UserPermForm(request.POST)
-
 
 class GroupPermissions(Permissions):
     """Menu for group permissions."""
@@ -152,5 +188,3 @@ class PermChanges(Logs):
     grid = Grid(Row(Column(Box(
         title='Permission Changes',
         template='cerberus_ac/perms_changes_logs.html'))))
-
-

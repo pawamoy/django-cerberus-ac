@@ -190,23 +190,21 @@ $('.collapse').on('show.bs.collapse', function () {
         {% endfor %}
         </tbody>
         <tfoot>
-            <tr>
-                <td>{{ box.context.sizes }}
-                    <div class="text-center">
-                        <ul class="pagination">
-                            <li ng-class="{disabled: currentPage == 0}">
-                                <a href="javascript:;" ng-click="prevPage()">« Prev</a>
-                            </li>
-                            <li ng-repeat="n in range(pagedItems.length)" ng-class="{active: n == currentPage}" ng-click="setPage()">
-                                <a href="javascript:;" ng-bind="n + 1">1</a>
-                            </li>
-                            <li ng-class="{disabled: currentPage == pagedItems.length - 1}">
-                                <a href="javascript:;" ng-click="nextPage()">Next »</a>
-                            </li>
-                        </ul>
-                    </div>
-                </td>
-            </tr>
+            <div class="pagination">
+                <span class="step-links">
+                    {% if users.has_previous %}
+                        <a href="?page={{ users.previous_page_number }}">previous</a>
+                    {% endif %}
+
+                    <span class="current">
+                        Page {{ users.number }} of {{ users.paginator.num_pages }}.
+                    </span>
+
+                    {% if users.has_next %}
+                        <a href="?page={{ users.next_page_number }}">next</a>
+                    {% endif %}
+                </span>
+            </div>
         </tfoot>
     </table>
 </div>
