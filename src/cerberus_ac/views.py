@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 
 """Views module."""
-from django.shortcuts import render
 
 from django.utils.translation import ugettext as _
 
 from suit_dashboard import Box, Column, DashboardView, Grid, Row
-
-from django.contrib.auth.models import User
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
@@ -128,6 +125,7 @@ def edit_user_perm_post(request, user):
     """Handler for user permissions POSTs."""
     if request.method == "POST":
         form = UserPermForm(request.POST)
+
 
 class GroupPermissions(Permissions):
     """Menu for group permissions."""
