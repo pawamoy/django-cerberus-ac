@@ -107,7 +107,7 @@ class EditUserPermissions(UserPermissions):
     def get_res_list(self, request):
         resources_real_list = []
         for res in app_settings.mapping.resource_classes():
-            resources_real_list.extend(res.objects.all())
+            resources_real_list.extend(res.objects.all().values(''))
 
         return resources_real_list
 
