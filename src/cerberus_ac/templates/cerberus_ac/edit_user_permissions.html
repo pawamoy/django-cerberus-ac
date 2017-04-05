@@ -7,7 +7,17 @@
   <link rel="stylesheet" type="text/css" href="{% static "cerberus_ac/css/bootstrap-combined.min.css" %}" media="screen" />
 {% endif %}
 
+<link rel="stylesheet" type="text/css" href="DataTables/datatables.min.css"/>
+<script type="text/javascript" src="DataTables/datatables.min.js"></script>
+
 <script>
+$(document).ready( function () {
+    $('#editprivtable').DataTable({
+        paging: true,
+        scrollY: 400
+    });
+} );
+
 $('.collapse').on('show.bs.collapse', function () {
     $('.collapse.in').collapse('hide');
 });
@@ -191,7 +201,7 @@ $('.collapse').on('show.bs.collapse', function () {
     <div class="pagination">
         <span class="step-links">
             {% if box.context.members.has_previous %}
-                <a href="?page={{ box.context.members.previous_page_number }}">Previous</a>
+                <a href="?page_role={{ box.context.members.previous_page_number }}">Previous</a>
             {% endif %}
 
             <span class="current">
@@ -199,7 +209,7 @@ $('.collapse').on('show.bs.collapse', function () {
             </span>
 
             {% if box.context.members.has_next %}
-                <a href="?page={{ box.context.members.next_page_number }}">Next</a>
+                <a href="?page_role={{ box.context.members.next_page_number }}">Next</a>
             {% endif %}
         </span>
     </div>
