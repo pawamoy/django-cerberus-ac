@@ -8,6 +8,8 @@ from suit_dashboard import Box, Column, DashboardView, Grid, Row
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
+import json
+
 from . import AppSettings
 
 
@@ -77,38 +79,46 @@ class EditUserPermissions(UserPermissions):
         for r in app_settings.mapping.role_classes():
             role_instances.extend(r.objects.all())
 
-        paginator = Paginator(role_instances, 50)
+        # paginator = Paginator(role_instances, 50)
+        #
+        # page = request.GET.get('page_role')
+        # try:
+        #     user_list = paginator.page(page)
+        # except PageNotAnInteger:
+        #     # If page is not an integer, deliver first page.
+        #     user_list = paginator.page(1)
+        # except EmptyPage:
+        #     # If page is out of range (e.g. 9999), deliver last page of results.
+        #     user_list = paginator.page(paginator.num_pages)
+        #
+        # user_list_json = json.dumps(user_list)
 
-        page = request.GET.get('page_role')
-        try:
-            user_list = paginator.page(page)
-        except PageNotAnInteger:
-            # If page is not an integer, deliver first page.
-            user_list = paginator.page(1)
-        except EmptyPage:
-            # If page is out of range (e.g. 9999), deliver last page of results.
-            user_list = paginator.page(paginator.num_pages)
+        return role_instances
 
-        return user_list
+    def get_user_list_json(self, request):
+        role_instances = []
+        for r in app_settings.mapping.role_classes():
+            role_instances.extend(r.objects.all())
+
+        user_list_json = json.dumps([{'id': role.id, 'name': role.username} for role in role_instances])
+
+        return user_list_json
 
     def get_res_list(self, request):
         resources_real_list = []
         for res in app_settings.mapping.resource_classes():
-            resources_real_list.extend(res.objects.all())
+            resources_real_list.extend(res.objects.all().values(''))
 
-        paginator = Paginator(resources_real_list, 10)
+        return resources_real_list
 
-        page = request.GET.get('page_res')
-        try:
-            res_list = paginator.page(page)
-        except PageNotAnInteger:
-            # If page is not an integer, deliver first page.
-            res_list = paginator.page(1)
-        except EmptyPage:
-            # If page is out of range (e.g. 9999), deliver last page of results.
-            res_list = paginator.page(paginator.num_pages)
+    def get_res_list_json(self, request):
+        resources_real_list = []
+        for res in app_settings.mapping.resource_classes():
+            resources_real_list.extend(res.objects.all().values(''))
 
-        return res_list
+        res_list_json = json.dumps([{'id': res.id, 'name': res} for res in resources_real_list])
+
+        return res_list_json
 
 
     def get(self, request, *args, **kwargs):
