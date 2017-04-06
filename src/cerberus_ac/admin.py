@@ -4,9 +4,8 @@
 
 from django.contrib import admin
 
-from cerberus_ac.views import EditUserPermissions
 from .models import (
-    RoleHierarchy, RolePrivilege, Role, AccessHistory, PrivilegeHistory)
+    AccessHistory, PrivilegeHistory, Role, RoleHierarchy, RolePrivilege)
 
 
 # class SecurityAdmin(AdminSite):
@@ -32,23 +31,23 @@ from .models import (
 
 
 class RoleAdmin(admin.ModelAdmin):
-    pass
+    """Role admin class."""
 
 
 class RolePrivilegeAdmin(admin.ModelAdmin):
-    pass
+    """Role privilege admin class."""
 
 
 class RoleHierarchyAdmin(admin.ModelAdmin):
-    pass
+    """Role hierarchy admin class."""
 
 
 class AccessHistoryAdmin(admin.ModelAdmin):
-    pass
+    """Acces history admin class."""
 
 
 class PrivilegeHistoryAdmin(admin.ModelAdmin):
-    pass
+    """Privilege history admin class."""
 
 
 # class HierarchyHistoryAdmin(admin.ModelAdmin):

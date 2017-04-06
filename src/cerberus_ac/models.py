@@ -56,7 +56,7 @@ def get_role_id(role):
         return attr
     elif hasattr(role, 'id'):
         return role.id
-    return None6
+    return None
 
 
 def get_role_type_and_id(role, role_id=None):
@@ -749,7 +749,7 @@ class PrivilegeHistory(models.Model):
 
     resource_type = models.CharField(
         _('Resource type'), max_length=255, blank=True)
-    resource_id = models.PositiveIntegerField(_('Resource ID'), blank=True, null=True)
+    resource_id = models.PositiveIntegerField(_('Resource ID'), blank=True, null=True)  # noqa
 
     def __str__(self):
         return '[%s] user %s has %sd privilege <%s>' % (
@@ -806,12 +806,12 @@ class AccessHistory(models.Model):
     access_type = models.CharField(_('Access'), max_length=255)
 
     resource_type = models.CharField(_('Resource type'), max_length=255)
-    resource_id = models.PositiveIntegerField(_('Resource ID'), blank=True, null=True)
+    resource_id = models.PositiveIntegerField(_('Resource ID'), blank=True, null=True)  # noqa
 
     datetime = models.DateTimeField(_('Date and time'), default=timezone.now)
 
     conveyor_type = models.CharField(_('Conveyor type'), max_length=255, blank=True)  # noqa
-    conveyor_id = models.PositiveIntegerField(_('Conveyor ID'), blank=True, null=True)
+    conveyor_id = models.PositiveIntegerField(_('Conveyor ID'), blank=True, null=True)  # noqa
 
     def __str__(self):
         inherited = ''

@@ -1,0 +1,25 @@
+{% load static %}
+{% load i18n %}
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>User</th>
+      {% for resource in box.context.resources %}
+        <th>{{ resource }}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for role in box.context.roles %}
+      <tr>
+        <td>
+          {{ role }}
+        </td>
+        {% for resource in box.context.resources %}
+          <td></td>
+        {% endfor %}
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
