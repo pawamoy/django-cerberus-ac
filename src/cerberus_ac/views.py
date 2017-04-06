@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """Views module."""
+import json
+
 from django.core import serializers
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
@@ -129,9 +131,9 @@ class EditUserPermissions(UserPermissions):
         for r in app_settings.mapping.role_classes():
             role_instances.extend(r.objects.all().values('id', 'username'))
 
-        user_list_json = serializers.serialize('json', r.objects.all(), fields=('id', 'username'))
+        #user_list_json = serializers.serialize('json', r.objects.all(), fields=('id', 'username'))
 
-        # user_list_json = json.dumps([{'id': role.id, 'name': role.username} for role in role_instances])
+        user_list_json = json.dumps([{'id': role.id, 'name': role.username} for role in role_instances])
 
         return HttpResponse(user_list_json, content_type='application/json')
 
@@ -147,9 +149,9 @@ class EditUserPermissions(UserPermissions):
         for res in app_settings.mapping.resource_classes():
             resources_real_list.extend(res.objects.all().values('id', ''))
 
-        res_list_json = serializers.serialize('json', res.objects.all(), fields=('id', ''))
+        #res_list_json = serializers.serialize('json', res.objects.all(), fields=('id', ''))
 
-        # json.dumps([{'id': res.id, 'name': res} for res in resources_real_list])
+        res_list_json = json.dumps([{'id': res.id, 'name': res} for res in resources_real_list])
 
         return HttpResponse(res_list_json, content_type='application/json')
 
@@ -195,19 +197,22 @@ class EditGroupPermissions(GroupPermissions):
     title = _('Edit Group Permissions - Cerberus AC')
     crumbs = ({'name': _('Edit'), 'url': 'admin:edit_group_permissions'}, )
 
-    role_instances = []
-    for r in app_settings.mapping.role_classes():
-        role_instances.extend(r.objects.all())
+    def get(self, request, *args, **kwargs):
+        role_instances = []
+        for r in app_settings.mapping.role_classes():
+            role_instances.extend(r.objects.all())
 
-    resources_real_list = []
-    for res in app_settings.mapping.resource_classes():
-        resources_real_list.extend(res.objects.all())
+        resources_real_list = []
+        for res in app_settings.mapping.resource_classes():
+            resources_real_list.extend(res.objects.all())
 
-    grid = Grid(Row(Column(
-        Box(template='cerberus_ac/edit_group_permissionss.html',
-            context={'members': role_instances,
-                     'resources': resources_real_list})
-    )))
+        self.grid = Grid(Row(Column(
+            Box(template='cerberus_ac/edit_group_permissionss.html',
+                context={'members': role_instances,
+                         'resources': resources_real_list})
+        )))
+
+        return super(EditGroupPermissions, self).get(request, *args, **kwargs)
 
 
 def edit_group_perm_post(request, user):
