@@ -133,11 +133,58 @@ $('.collapse').on('show.bs.collapse', function () {
                             </div>
                         </div>
                     </td>
-                {% endfor %}
-            </tr>
-        </form>
-    {% endfor %}
-    </tbody>
-    <tfoot>
-    </tfoot>
-</table>
+                    {% for r in box.context.resources %}
+                        <td class="hiddenRow span2" >
+                            <div class="row">
+                                <div class="collapse userrow{{ m.id }}" style="text-align: right">
+                                  <div>{% trans "Create" %}
+                                    <div id="update_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
+                                        <button class="btn btn-check-success" id="allow_create_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                        <button class="btn btn-check-default" id="default_create_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                        <button class="btn btn-check-danger" id="deny_create_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                    </div></div>
+                                  <div>{% trans "Read" %}
+                                    <div id="read_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
+                                        <button class="btn btn-check-success" id="allow_read_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                        <button class="btn btn-check-default" id="default_read_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                        <button class="btn btn-check-danger" id="deny_read_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                    </div></div>
+                                  <div>{% trans "Update" %}
+                                    <div id="update_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
+                                        <button class="btn btn-check-success" id="allow_update_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                        <button class="btn btn-check-default" id="default_update_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                        <button class="btn btn-check-danger" id="deny_update_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                    </div></div>
+                                  <div>{% trans "Delete" %}
+                                    <div id="delete_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
+                                        <button class="btn btn-check-success" id="allow_delete_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                        <button class="btn btn-check-default" id="default_delete_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                        <button class="btn btn-check-danger" id="deny_delete_{{ m.id }}_{{ r.id }}" type="button"></button>
+                                    </div></div>
+                                </div>
+                            </div>
+                        </td>
+                    {% endfor %}
+                </tr>
+            </form>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+        </tfoot>
+    </table>
+    <div class="pagination">
+        <span class="step-links">
+            {% if box.context.members.has_previous %}
+                <a href="?page_role={{ box.context.members.previous_page_number }}">Previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ box.context.members.number }} of {{ box.context.members.paginator.num_pages }}.
+            </span>
+
+            {% if box.context.members.has_next %}
+                <a href="?page_role={{ box.context.members.next_page_number }}">Next</a>
+            {% endif %}
+        </span>
+    </div>
+</div>

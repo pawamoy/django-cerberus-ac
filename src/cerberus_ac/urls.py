@@ -2,10 +2,9 @@
 
 """URLs module."""
 
-from django.conf.urls import url, include
+from django.conf.urls import url
 
 from . import views
-
 
 
 def cerberus_urlpatterns(admin_view_func=lambda x: x):
@@ -31,6 +30,14 @@ def cerberus_urlpatterns(admin_view_func=lambda x: x):
         url(r'logs/$',
             admin_view_func(views.Logs.as_view()),
             name='logs'),
+
+        # role views
+        url(r'^privileges/view/(?P<role_type>\w+)/(?P<resource_type>\w+)/$',
+            admin_view_func(views.ViewPrivileges.as_view()),
+            name='view_privileges'),
+        url(r'^privileges/edit/(?P<role_type>\w+)/(?P<resource_type>\w+)/$',
+            admin_view_func(views.EditPrivileges.as_view()),
+            name='edit_privileges'),
 
         # user views
         url(r'^permissions/user/$',
@@ -65,11 +72,12 @@ def cerberus_urlpatterns(admin_view_func=lambda x: x):
             admin_view_func(views.MemberInfo.as_view()),
             name='view_member_info'),
         url(r'^logs/object_access/$',
-             admin_view_func(views.ObjectAccess.as_view()),
-             name='logs_access'),
-         url(r'^logs/permission_changes/$',
-             admin_view_func(views.PermChanges.as_view()),
-             name='perm_changes'),
+            admin_view_func(views.ObjectAccess.as_view()),
+            name='logs_access'),
+        url(r'^logs/permission_changes/$',
+            admin_view_func(views.PermChanges.as_view()),
+            name='perm_changes'),
     ]
+
 
 urlpatterns = cerberus_urlpatterns()
