@@ -20,7 +20,7 @@ class Index(DashboardView):
     """Cerberus menu."""
 
     title = _('Index - Cerberus AC')
-    crumbs = ({'name': _('Cerberus'), 'url': 'admin:cerberus_index'}, )
+    crumbs = ({'name': _('Cerberus'), 'url': 'admin:cerberus_index'},)
     grid = Grid(Row(Column(Box(
         title='Cerberus Access Control',
         template='cerberus_ac/index.html'))))
@@ -30,7 +30,7 @@ class MemberInfo(Index):
     """View to see member info."""
 
     title = _('Member Info - Cerberus AC')
-    crumbs = ({'name': _('Member Info'), 'url': 'admin:member_info'}, )
+    crumbs = ({'name': _('Member Info'), 'url': 'admin:member_info'},)
     grid = Grid(Row(Column(Box(template='cerberus_ac/member_info.html'))))
 
 
@@ -56,7 +56,7 @@ class Permissions(Index):
     ]}
 
     title = _('Permissions - Cerberus AC')
-    crumbs = ({'name': _('Permissions'), 'url': 'admin:permissions'}, )
+    crumbs = ({'name': _('Permissions'), 'url': 'admin:permissions'},)
     grid = Grid(Row(Column(Box(template='cerberus_ac/permissions.html',
                                context=context))))
 
@@ -67,7 +67,7 @@ class ViewPrivileges(Permissions):
     title = _('View Privileges - Cerberus AC')
 
     def get(self, request, *args, **kwargs):
-        self.crumbs = ({'name': _('View'), 'url': 'admin:view_privileges'}, )
+        self.crumbs = ({'name': _('View'), 'url': 'admin:view_privileges'},)
         self.grid = Grid(Row(Column(Box(template='cerberus_ac/view_privileges.html'))))  # noqa
         return super(ViewPrivileges, self).get(request, *args, **kwargs)
 
@@ -78,7 +78,7 @@ class EditPrivileges(Permissions):
     title = _('Edit Privileges - Cerberus AC')
 
     def get(self, request, *args, **kwargs):
-        self.crumbs = ({'name': _('Edit'), 'url': 'admin:edit_privileges'}, )
+        self.crumbs = ({'name': _('Edit'), 'url': 'admin:edit_privileges'},)
         self.grid = Grid(Row(Column(Box(template='cerberus_ac/edit_privileges.html'))))  # noqa
         return super(EditPrivileges, self).get(request, *args, **kwargs)
 
@@ -87,7 +87,7 @@ class UserPermissions(Permissions):
     """Menu for user permissions."""
 
     title = _('User Permissions - Cerberus AC')
-    crumbs = ({'name': _('User'), 'url': 'admin:user_permissions'}, )
+    crumbs = ({'name': _('User'), 'url': 'admin:user_permissions'},)
     grid = Grid(Row(Column(Box(template='cerberus_ac/user_permissions.html'))))
 
 
@@ -95,7 +95,7 @@ class ViewUserPermissions(UserPermissions):
     """View to see user permissions."""
 
     title = _('View User Permissions - Cerberus AC')
-    crumbs = ({'name': _('View'), 'url': 'admin:view_user_permissions'}, )
+    crumbs = ({'name': _('View'), 'url': 'admin:view_user_permissions'},)
     grid = Grid(Row(Column(Box(template='cerberus_ac/view_user_permissions.html'))))  # noqa
 
 
@@ -103,7 +103,7 @@ class EditUserPermissions(UserPermissions):
     """View to edit user permissions."""
 
     title = _('Edit User Permissions - Cerberus AC')
-    crumbs = ({'name': _('Edit'), 'url': 'admin:edit_user_permissions'}, )
+    crumbs = ({'name': _('Edit'), 'url': 'admin:edit_user_permissions'},)
 
     def get_user_list(self, request):
         role_instances = []
@@ -126,34 +126,12 @@ class EditUserPermissions(UserPermissions):
 
         return role_instances
 
-    def get_user_list_json(self, request):
-        role_instances = []
-        for r in app_settings.mapping.role_classes():
-            role_instances.extend(r.objects.all().values('id', 'username'))
-
-        #user_list_json = serializers.serialize('json', r.objects.all(), fields=('id', 'username'))
-
-        user_list_json = json.dumps([{'id': role.id, 'name': role.username} for role in role_instances])
-
-        return HttpResponse(user_list_json, content_type='application/json')
-
     def get_res_list(self, request):
         resources_real_list = []
         for res in app_settings.mapping.resource_classes():
             resources_real_list.extend(res.objects.all())
 
         return resources_real_list
-
-    def get_res_list_json(self, request):
-        resources_real_list = []
-        for res in app_settings.mapping.resource_classes():
-            resources_real_list.extend(res.objects.all().values('id', ''))
-
-        #res_list_json = serializers.serialize('json', res.objects.all(), fields=('id', ''))
-
-        res_list_json = json.dumps([{'id': res.id, 'name': res} for res in resources_real_list])
-
-        return HttpResponse(res_list_json, content_type='application/json')
 
     def get(self, request, *args, **kwargs):
         self.grid = Grid(Row(Column(
@@ -164,9 +142,29 @@ class EditUserPermissions(UserPermissions):
                          'resources_json': self.get_res_list_json(request)})
         )))
 
-
-
         return super(EditUserPermissions, self).get(request, *args, **kwargs)
+
+
+def get_res_list_json(self, request):
+    res_list_json = json.dumps([{'name': str(res)} for res in resources_real_list])
+
+    return res_list_json
+
+
+def get_user_list_json(self, request):
+    user_list_json = json.dumps([{'name': str(role)} for role in role_instances])
+
+    return user_list_json
+
+
+def jsoninfo(request):
+    role_instances = []
+    for r in app_settings.mapping.role_classes():
+        role_instances.extend(r.objects.all())
+
+    resources_real_list = []
+    for res in app_settings.mapping.resource_classes():
+        resources_real_list.extend(res.objects.all())
 
 
 def edit_user_perm_post(request, user, ):
@@ -179,7 +177,7 @@ class GroupPermissions(Permissions):
     """Menu for group permissions."""
 
     title = _('Group Permissions - Cerberus AC')
-    crumbs = ({'name': _('Group'), 'url': 'admin:group_permissions'}, )
+    crumbs = ({'name': _('Group'), 'url': 'admin:group_permissions'},)
     grid = Grid(Row(Column(Box(template='cerberus_ac/group_permissions.html'))))  # noqa
 
 
@@ -187,7 +185,7 @@ class ViewGroupPermissions(GroupPermissions):
     """View to see user permissions."""
 
     title = _('View Group Permissions - Cerberus AC')
-    crumbs = ({'name': _('View'), 'url': 'admin:view_group_permissions'}, )
+    crumbs = ({'name': _('View'), 'url': 'admin:view_group_permissions'},)
     grid = Grid(Row(Column(Box(template='cerberus_ac/view_group_permissions.html'))))  # noqa
 
 
@@ -195,7 +193,7 @@ class EditGroupPermissions(GroupPermissions):
     """View to edit group permissions."""
 
     title = _('Edit Group Permissions - Cerberus AC')
-    crumbs = ({'name': _('Edit'), 'url': 'admin:edit_group_permissions'}, )
+    crumbs = ({'name': _('Edit'), 'url': 'admin:edit_group_permissions'},)
 
     def get(self, request, *args, **kwargs):
         role_instances = []
@@ -239,3 +237,4 @@ class PermChanges(Logs):
     grid = Grid(Row(Column(Box(
         title='Permission Changes',
         template='cerberus_ac/perms_changes_logs.html'))))
+

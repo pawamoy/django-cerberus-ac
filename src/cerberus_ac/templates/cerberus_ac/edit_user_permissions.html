@@ -14,8 +14,11 @@ $(document).ready( function () {
         processing: true,
         autoWidth: true,
         deferRender: true,
+        fixedColumns: {
+            leftColumns: 1
+        },
         ajax: {
-            url: "{% url 'edit_user_permissions' %}"
+            url: "{% url 'admin:edit_user_permissions_json' %}"
         }
     });
 } );
@@ -83,7 +86,7 @@ $('.collapse').on('show.bs.collapse', function () {
         </tr>
     </thead>
     <tbody>
-    {% for m in box.context.members %}
+    <!--{% for m in box.context.members %}-->
         <form action="{% url "admin:edit_user_permissions_post" user=m.id %}" method="POST">
             <tr data-toggle="collapse" data-target=".userrow{{ m.id }}">
                 <td style="text-align: right" class="span5">
@@ -91,9 +94,9 @@ $('.collapse').on('show.bs.collapse', function () {
                     <input type="submit" value="Save" name="submit_{{ m.id }}"/>
                     <input type="submit" value="Inherited" name="inherited_{{ m.id }}"/>
                 </td>
-                {% for r in box.context.resources %}
-                    <td class="span2"></td>
-                {% endfor %}
+                <!--{% for r in box.context.resources %}-->
+                    <td></td>
+                <!--{% endfor %}-->
             </tr>
             <tr>
                 <td class="hiddenRow">
@@ -107,29 +110,29 @@ $('.collapse').on('show.bs.collapse', function () {
                         Register date: {{ m.date_joined }}<br>
                     </div>
                 </td>
-                {% for r in box.context.resources %}
-                    <td class="hiddenRow span2" >
+                <!--{% for r in box.context.resources %}-->
+                    <td class="hiddenRow " >
                         <div class="row">
                             <div class="collapse userrow{{ m.id }}" style="text-align: right">
-                              <div>Create
+                              <div>{% trans "Create" %}
                                 <div id="update_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
                                     <button class="btn btn-check-success" id="allow_create_{{ m.id }}_{{ r.id }}" type="button"></button>
                                     <button class="btn btn-check-default" id="default_create_{{ m.id }}_{{ r.id }}" type="button"></button>
                                     <button class="btn btn-check-danger" id="deny_create_{{ m.id }}_{{ r.id }}" type="button"></button>
                                 </div></div>
-                              <div>Read
+                              <div>{% trans "Read" %}
                                 <div id="read_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
                                     <button class="btn btn-check-success" id="allow_read_{{ m.id }}_{{ r.id }}" type="button"></button>
                                     <button class="btn btn-check-default" id="default_read_{{ m.id }}_{{ r.id }}" type="button"></button>
                                     <button class="btn btn-check-danger" id="deny_read_{{ m.id }}_{{ r.id }}" type="button"></button>
                                 </div></div>
-                              <div>Update
+                              <div>{% trans "Update" %}
                                 <div id="update_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
                                     <button class="btn btn-check-success" id="allow_update_{{ m.id }}_{{ r.id }}" type="button"></button>
                                     <button class="btn btn-check-default" id="default_update_{{ m.id }}_{{ r.id }}" type="button"></button>
                                     <button class="btn btn-check-danger" id="deny_update_{{ m.id }}_{{ r.id }}" type="button"></button>
                                 </div></div>
-                              <div>Delete
+                              <div>{% trans "Delete" %}
                                 <div id="delete_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
                                     <button class="btn btn-check-success" id="allow_delete_{{ m.id }}_{{ r.id }}" type="button"></button>
                                     <button class="btn btn-check-default" id="default_delete_{{ m.id }}_{{ r.id }}" type="button"></button>
@@ -138,58 +141,11 @@ $('.collapse').on('show.bs.collapse', function () {
                             </div>
                         </div>
                     </td>
-                    {% for r in box.context.resources %}
-                        <td class="hiddenRow span2" >
-                            <div class="row">
-                                <div class="collapse userrow{{ m.id }}" style="text-align: right">
-                                  <div>{% trans "Create" %}
-                                    <div id="update_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
-                                        <button class="btn btn-check-success" id="allow_create_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                        <button class="btn btn-check-default" id="default_create_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                        <button class="btn btn-check-danger" id="deny_create_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                    </div></div>
-                                  <div>{% trans "Read" %}
-                                    <div id="read_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
-                                        <button class="btn btn-check-success" id="allow_read_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                        <button class="btn btn-check-default" id="default_read_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                        <button class="btn btn-check-danger" id="deny_read_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                    </div></div>
-                                  <div>{% trans "Update" %}
-                                    <div id="update_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
-                                        <button class="btn btn-check-success" id="allow_update_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                        <button class="btn btn-check-default" id="default_update_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                        <button class="btn btn-check-danger" id="deny_update_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                    </div></div>
-                                  <div>{% trans "Delete" %}
-                                    <div id="delete_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
-                                        <button class="btn btn-check-success" id="allow_delete_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                        <button class="btn btn-check-default" id="default_delete_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                        <button class="btn btn-check-danger" id="deny_delete_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                    </div></div>
-                                </div>
-                            </div>
-                        </td>
-                    {% endfor %}
+                <!--{% endfor %}-->
                 </tr>
             </form>
-        {% endfor %}
+        <!--{% endfor %}-->
         </tbody>
-        <tfoot>
+    <tfoot>
         </tfoot>
-    </table>
-    <div class="pagination">
-        <span class="step-links">
-            {% if box.context.members.has_previous %}
-                <a href="?page_role={{ box.context.members.previous_page_number }}">Previous</a>
-            {% endif %}
-
-            <span class="current">
-                Page {{ box.context.members.number }} of {{ box.context.members.paginator.num_pages }}.
-            </span>
-
-            {% if box.context.members.has_next %}
-                <a href="?page_role={{ box.context.members.next_page_number }}">Next</a>
-            {% endif %}
-        </span>
-    </div>
-</div>
+</table>
