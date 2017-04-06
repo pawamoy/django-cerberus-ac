@@ -158,10 +158,16 @@ class EditPrivileges(Privileges):
         return resources_real_list
 
     def get(self, request, *args, **kwargs):
+        role_type = kwargs.pop('role_type')
+        resource_type = kwargs.pop('resource_type')
+        role_class = app_settings.mapping.class_from_name(role_type)
+        resource_class = app_settings.mapping.class_from_name(resource_type)
+        role_instances = role_class.objects.all()
+        resource_instances = resource_class.objects.all()
         self.grid = Grid(Row(Column(
             Box(template='cerberus_ac/edit_user_privileges.html',
-                context={'members': self.get_user_list(request),
-                         'resources': self.get_res_list(request)})
+                context={'members': role_instances,
+                         'resources': resource_instances})
         )))
 
         return super(EditPrivileges, self).get(request, *args, **kwargs)
