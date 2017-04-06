@@ -14,8 +14,16 @@ $(document).ready( function () {
         processing: true,
         autoWidth: true,
         deferRender: true,
+        fixedColumns: {
+            leftColumns: 1
+        },
         ajax: {
-            url: "{% url 'edit_user_permissions' %}"
+            url: "{% url 'admin:edit_user_permissions_json' %}",
+            type: "POST",
+            dataFilter: function(data) {
+                var json = jQuery.parseJSON(data);
+                return JSON.stringify(json)
+            }
         }
     });
 } );
@@ -83,7 +91,7 @@ $('.collapse').on('show.bs.collapse', function () {
         </tr>
     </thead>
     <tbody>
-    {% for m in box.context.members %}
+    <!--{% for m in box.context.members %}-->
         <form action="{% url "admin:edit_user_permissions_post" user=m.id %}" method="POST">
             <tr data-toggle="collapse" data-target=".userrow{{ m.id }}">
                 <td style="text-align: right" class="span5">
@@ -91,9 +99,9 @@ $('.collapse').on('show.bs.collapse', function () {
                     <input type="submit" value="Save" name="submit_{{ m.id }}"/>
                     <input type="submit" value="Inherited" name="inherited_{{ m.id }}"/>
                 </td>
-                {% for r in box.context.resources %}
-                    <td class="span2"></td>
-                {% endfor %}
+                <!--{% for r in box.context.resources %}-->
+                    <td></td>
+                <!--{% endfor %}-->
             </tr>
             <tr>
                 <td class="hiddenRow">
@@ -107,8 +115,8 @@ $('.collapse').on('show.bs.collapse', function () {
                         Register date: {{ m.date_joined }}<br>
                     </div>
                 </td>
-                {% for r in box.context.resources %}
-                    <td class="hiddenRow span2" >
+                <!--{% for r in box.context.resources %}-->
+                    <td class="hiddenRow " >
                         <div class="row">
                             <div class="collapse userrow{{ m.id }}" style="text-align: right">
                               <div>{% trans "Create" %}
@@ -138,11 +146,12 @@ $('.collapse').on('show.bs.collapse', function () {
                             </div>
                         </div>
                     </td>
-                {% endfor %}
-            </tr>
-        </form>
-    {% endfor %}
-    </tbody>
+
+                <!--{% endfor %}-->
+                </tr>
+            </form>
+        <!--{% endfor %}-->
+        </tbody>
     <tfoot>
-    </tfoot>
+        </tfoot>
 </table>
