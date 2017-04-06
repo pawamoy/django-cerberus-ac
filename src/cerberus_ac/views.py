@@ -1,17 +1,15 @@
 # -*- coding: utf-8 -*-
 
 """Views module."""
-
+from django.core import serializers
+from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 
 from suit_dashboard import Box, Column, DashboardView, Grid, Row
 
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
-import json
-
 from . import AppSettings
 
+from .models import *
 
 app_settings = AppSettings()
 
@@ -100,9 +98,11 @@ class EditUserPermissions(UserPermissions):
         for r in app_settings.mapping.role_classes():
             role_instances.extend(r.objects.all().values('id', 'username'))
 
-        user_list_json = json.dumps([{'id': role.id, 'name': role.username} for role in role_instances])
+        user_list_json = serializers.serialize('json', r.objects.all(), fields=('id', 'username'))
 
-        return user_list_json
+        # user_list_json = json.dumps([{'id': role.id, 'name': role.username} for role in role_instances])
+
+        return HttpResponse(user_list_json, content_type='application/json')
 
     def get_res_list(self, request):
         resources_real_list = []
@@ -116,9 +116,11 @@ class EditUserPermissions(UserPermissions):
         for res in app_settings.mapping.resource_classes():
             resources_real_list.extend(res.objects.all().values('id', ''))
 
-        res_list_json = json.dumps([{'id': res.id, 'name': res} for res in resources_real_list])
+        res_list_json = serializers.serialize('json', res.objects.all(), fields=('id', ''))
 
-        return res_list_json
+        # json.dumps([{'id': res.id, 'name': res} for res in resources_real_list])
+
+        return HttpResponse(res_list_json, content_type='application/json')
 
 
     def get(self, request, *args, **kwargs):

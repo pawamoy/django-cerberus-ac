@@ -4,17 +4,21 @@
 <link rel="stylesheet" type="text/css" href="{% static "cerberus_ac/datatables/datatables.min.css" %}"/>
 <script type="text/javascript" src="{% static "cerberus_ac/datatables/datatables.min.js" %}"></script>
 
-<script>
+<script type="text/javascript" language="javascript" class="init">
 
 $(document).ready( function () {
     $('#editprivtable').DataTable({
-        paging: true
+        paging: true,
+        "bServerSide": true,
+        "sAjaxSource": $(this).data('url'),
+        "bProcessing": true,
     });
 } );
 
 $('.collapse').on('show.bs.collapse', function () {
     $('.collapse.in').collapse('hide');
 });
+
 </script>
 
 <style>
