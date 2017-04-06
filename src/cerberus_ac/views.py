@@ -129,7 +129,7 @@ class EditUserPermissions(UserPermissions):
     def get_user_list_json(self, request):
         role_instances = []
         for r in app_settings.mapping.role_classes():
-            role_instances.extend(r.objects.all().values('id', 'username'))
+            role_instances.extend(r.objects.all())
 
         #user_list_json = serializers.serialize('json', r.objects.all(), fields=('id', 'username'))
 
@@ -147,7 +147,7 @@ class EditUserPermissions(UserPermissions):
     def get_res_list_json(self, request):
         resources_real_list = []
         for res in app_settings.mapping.resource_classes():
-            resources_real_list.extend(res.objects.all().values('id', ''))
+            resources_real_list.extend(res.objects.all())
 
         #res_list_json = serializers.serialize('json', res.objects.all(), fields=('id', ''))
 
