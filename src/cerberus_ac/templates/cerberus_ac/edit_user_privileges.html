@@ -14,9 +14,6 @@ $(document).ready( function () {
         processing: true,
         autoWidth: true,
         deferRender: true,
-        fixedColumns: {
-            leftColumns: 1
-        },
         ajax: {
             url: "{% url 'admin:edit_user_privileges_json' %}",
             type: "POST",
@@ -85,9 +82,9 @@ $('.collapse').on('show.bs.collapse', function () {
     <thead>
         <tr>
             <th>User</th>
-            {% for r in box.context.resources %}
-                <th>{{ r }}</th>
-            {% endfor %}
+{#            {% for r in box.context.resources %}#}
+{#                <th>{{ r }}</th>#}
+{#            {% endfor %}#}
         </tr>
     </thead>
     <tbody>
@@ -99,9 +96,9 @@ $('.collapse').on('show.bs.collapse', function () {
                     <input type="submit" value="Save" name="submit_{{ m.id }}"/>
                     <input type="submit" value="Inherited" name="inherited_{{ m.id }}"/>
                 </td>
-                <!--{% for r in box.context.resources %}-->
+{#                <!--{% for r in box.context.resources %}-->#}
                     <td></td>
-                <!--{% endfor %}-->
+{#                <!--{% endfor %}-->#}
             </tr>
             <tr>
                 <td class="hiddenRow">
@@ -115,39 +112,39 @@ $('.collapse').on('show.bs.collapse', function () {
                         Register date: {{ m.date_joined }}<br>
                     </div>
                 </td>
-                <!--{% for r in box.context.resources %}-->
-                    <td class="hiddenRow " >
-                        <div class="row">
-                            <div class="collapse userrow{{ m.id }}" style="text-align: right">
-                              <div>{% trans "Create" %}
-                                <div id="update_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
-                                    <button class="btn btn-check-success" id="allow_create_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                    <button class="btn btn-check-default" id="default_create_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                    <button class="btn btn-check-danger" id="deny_create_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                </div></div>
-                              <div>{% trans "Read" %}
-                                <div id="read_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
-                                    <button class="btn btn-check-success" id="allow_read_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                    <button class="btn btn-check-default" id="default_read_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                    <button class="btn btn-check-danger" id="deny_read_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                </div></div>
-                              <div>{% trans "Update" %}
-                                <div id="update_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
-                                    <button class="btn btn-check-success" id="allow_update_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                    <button class="btn btn-check-default" id="default_update_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                    <button class="btn btn-check-danger" id="deny_update_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                </div></div>
-                              <div>{% trans "Delete" %}
-                                <div id="delete_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">
-                                    <button class="btn btn-check-success" id="allow_delete_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                    <button class="btn btn-check-default" id="default_delete_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                    <button class="btn btn-check-danger" id="deny_delete_{{ m.id }}_{{ r.id }}" type="button"></button>
-                                </div></div>
-                            </div>
-                        </div>
-                    </td>
-
-                <!--{% endfor %}-->
+{#                <!--{% for r in box.context.resources %}-->#}
+{#                    <td class="hiddenRow " >#}
+{#                        <div class="row">#}
+{#                            <div class="collapse userrow{{ m.id }}" style="text-align: right">#}
+{#                              <div>{% trans "Create" %}#}
+{#                                <div id="update_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">#}
+{#                                    <button class="btn btn-check-success" id="allow_create_{{ m.id }}_{{ r.id }}" type="button"></button>#}
+{#                                    <button class="btn btn-check-default" id="default_create_{{ m.id }}_{{ r.id }}" type="button"></button>#}
+{#                                    <button class="btn btn-check-danger" id="deny_create_{{ m.id }}_{{ r.id }}" type="button"></button>#}
+{#                                </div></div>#}
+{#                              <div>{% trans "Read" %}#}
+{#                                <div id="read_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">#}
+{#                                    <button class="btn btn-check-success" id="allow_read_{{ m.id }}_{{ r.id }}" type="button"></button>#}
+{#                                    <button class="btn btn-check-default" id="default_read_{{ m.id }}_{{ r.id }}" type="button"></button>#}
+{#                                    <button class="btn btn-check-danger" id="deny_read_{{ m.id }}_{{ r.id }}" type="button"></button>#}
+{#                                </div></div>#}
+{#                              <div>{% trans "Update" %}#}
+{#                                <div id="update_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">#}
+{#                                    <button class="btn btn-check-success" id="allow_update_{{ m.id }}_{{ r.id }}" type="button"></button>#}
+{#                                    <button class="btn btn-check-default" id="default_update_{{ m.id }}_{{ r.id }}" type="button"></button>#}
+{#                                    <button class="btn btn-check-danger" id="deny_update_{{ m.id }}_{{ r.id }}" type="button"></button>#}
+{#                                </div></div>#}
+{#                              <div>{% trans "Delete" %}#}
+{#                                <div id="delete_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">#}
+{#                                    <button class="btn btn-check-success" id="allow_delete_{{ m.id }}_{{ r.id }}" type="button"></button>#}
+{#                                    <button class="btn btn-check-default" id="default_delete_{{ m.id }}_{{ r.id }}" type="button"></button>#}
+{#                                    <button class="btn btn-check-danger" id="deny_delete_{{ m.id }}_{{ r.id }}" type="button"></button>#}
+{#                                </div></div>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </td>#}
+{##}
+{#                <!--{% endfor %}-->#}
                 </tr>
             </form>
         <!--{% endfor %}-->
