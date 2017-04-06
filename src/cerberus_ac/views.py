@@ -191,19 +191,22 @@ class EditGroupPermissions(GroupPermissions):
     title = _('Edit Group Permissions - Cerberus AC')
     crumbs = ({'name': _('Edit'), 'url': 'admin:edit_group_permissions'}, )
 
-    role_instances = []
-    for r in app_settings.mapping.role_classes():
-        role_instances.extend(r.objects.all())
+    def get(self, request, *args, **kwargs):
+        role_instances = []
+        for r in app_settings.mapping.role_classes():
+            role_instances.extend(r.objects.all())
 
-    resources_real_list = []
-    for res in app_settings.mapping.resource_classes():
-        resources_real_list.extend(res.objects.all())
+        resources_real_list = []
+        for res in app_settings.mapping.resource_classes():
+            resources_real_list.extend(res.objects.all())
 
-    grid = Grid(Row(Column(
-        Box(template='cerberus_ac/edit_group_permissionss.html',
-            context={'members': role_instances,
-                     'resources': resources_real_list})
-    )))
+        self.grid = Grid(Row(Column(
+            Box(template='cerberus_ac/edit_group_permissionss.html',
+                context={'members': role_instances,
+                         'resources': resources_real_list})
+        )))
+
+        return super(EditGroupPermissions, self).get(request, *args, **kwargs)
 
 
 def edit_group_perm_post(request, user):
