@@ -77,6 +77,7 @@ def cerberus_urlpatterns(admin_view_func=lambda x: x):
         url(r'^logs/permission_changes/$',
             admin_view_func(views.PermChanges.as_view()),
             name='perm_changes'),
+
     ]
 
 

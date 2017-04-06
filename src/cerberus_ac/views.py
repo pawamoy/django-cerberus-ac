@@ -157,8 +157,12 @@ class EditUserPermissions(UserPermissions):
         self.grid = Grid(Row(Column(
             Box(template='cerberus_ac/edit_user_permissions.html',
                 context={'members': self.get_user_list(request),
-                         'resources': self.get_res_list(request)})
+                         'resources': self.get_res_list_json(request),
+                         'members_json': self.get_user_list_json(request),
+                         'resources_json': self.get_res_list_json(request)})
         )))
+
+
 
         return super(EditUserPermissions, self).get(request, *args, **kwargs)
 

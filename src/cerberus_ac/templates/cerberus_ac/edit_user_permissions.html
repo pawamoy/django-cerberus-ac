@@ -9,9 +9,14 @@
 $(document).ready( function () {
     $('#editprivtable').DataTable({
         paging: true,
-        "bServerSide": true,
-        "sAjaxSource": $(this).data('url'),
-        "bProcessing": true,
+        scrollX: true,
+        serverSide: true,
+        processing: true,
+        autoWidth: true,
+        deferRender: true,
+        ajax: {
+            url: "{% url 'edit_user_permissions' %}"
+        }
     });
 } );
 
@@ -68,7 +73,7 @@ $('.collapse').on('show.bs.collapse', function () {
     }
 </style>
 
-<table id="editprivtable" class="display table table-hover table-condensed table-striped" style="border-collapse:collapse;">
+<table id="editprivtable" class="display">
     <thead>
         <tr>
             <th>User</th>
