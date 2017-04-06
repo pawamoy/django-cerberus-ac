@@ -36,12 +36,16 @@ try:
         CERBERUS_LOG_ACCESS=True,
         CERBERUS_LOG_PRIVILEGES=True,
         CERBERUS_LOG_HIERARCHY=True,
-        CERBERUS_MAPPING={
-            'cerberus_ac.models.Role': {'name': 'role', 'attr': 'role'},
-            'test_cerberus_ac.FakeUser': {'name': 'FakeUser', 'attr': 'user resource'},  # noqa
-            'test_cerberus_ac.FakeGroup': {'name': 'FakeGroup', 'attr': 'group resource'},  # noqa
-            'test_cerberus_ac.FakeResource': {'name': 'FakeResource', 'attr': 'resource'},  # noqa
-        }
+        CERBERUS_MAPPING=(
+            ('cerberus_ac.models.Role',
+             {'name': 'role', 'attr': 'role'}),
+            ('test_cerberus_ac.FakeUser',
+             {'name': 'FakeUser', 'attr': 'user resource'}),
+            ('test_cerberus_ac.FakeGroup',
+             {'name': 'FakeGroup', 'attr': 'group resource'}),
+            ('test_cerberus_ac.FakeResource',
+             {'name': 'FakeResource', 'attr': 'resource'}),
+        )
     )
 
     try:

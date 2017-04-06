@@ -16,7 +16,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from . import AppSettings
+from .apps import AppSettings
 
 app_settings = AppSettings()
 
@@ -47,25 +47,25 @@ def get_role_id(role):
         role (obj): a Python object.
 
     Returns:
-        int: the role's ID or None.
+        str: the role's ID or None.
     """
     if hasattr(role, 'role_id'):
         attr = role.role_id
         if callable(attr):
-            return attr()
-        return attr
+            return str(attr())
+        return str(attr)
     elif hasattr(role, 'id'):
-        return role.id
-    return None
+        return str(role.id)
+    return ''
 
 
-def get_role_type_and_id(role, role_id=None):
+def get_role_type_and_id(role, role_id=''):
     """
     Return both type and ID of a role.
 
     Args:
         role (obj): string or role instance.
-        role_id (int): integer ID or None.
+        role_id (str): string ID or None.
 
     Returns:
         tuple: type and ID of role.
@@ -101,7 +101,7 @@ def get_resource_id(resource):
         resource (obj): a Python object.
 
     Returns:
-        int: the resource's ID or None.
+        str: the resource's ID or None.
     """
     if hasattr(resource, 'resource_id'):
         attr = resource.resource_id
@@ -113,13 +113,13 @@ def get_resource_id(resource):
     return None
 
 
-def get_resource_type_and_id(resource, resource_id=None):
+def get_resource_type_and_id(resource, resource_id=''):
     """
     Return both type and ID of a resource.
 
     Args:
         resource (obj): string or resource instance.
-        resource_id (int): integer ID or None.
+        resource_id (str): string ID or None.
 
     Returns:
         tuple: type and ID of resource.
@@ -156,13 +156,13 @@ class RoleMixin(object):
         return [app_settings.mapping.instance_from_name_and_id(*h)
                 for h in RoleHierarchy.heirs(self.role_type(), self.role_id())]
 
-    def inherits_from(self, role, role_id=None):
+    def inherits_from(self, role, role_id=''):
         """
         Check if this role inherits privileges from the given role.
 
         Args:
             role (str/role): a string describing the role, or a role instance.
-            role_id (int): only used when role is a string.
+            role_id (str): only used when role is a string.
 
         Returns:
             bool: True or False
@@ -176,7 +176,7 @@ class RoleMixin(object):
         except RoleHierarchy.DoesNotExist:
             return False
 
-    def inherit_from(self, role, role_id=None):
+    def inherit_from(self, role, role_id=''):
         """
         Set this role as child of the given role.
 
@@ -184,7 +184,7 @@ class RoleMixin(object):
 
         Args:
             role (str/role): a string describing the role, or a role instance.
-            role_id (int): only used when role is a string.
+            role_id (str): only used when role is a string.
 
         Returns:
             obj: the created RoleHierarchy object.
@@ -203,13 +203,13 @@ class RoleMixin(object):
         return [app_settings.mapping.instance_from_name_and_id(*c)
                 for c in RoleHierarchy.conveyors(self.role_type(), self.role_id())]  # noqa
 
-    def conveys_to(self, role, role_id=None):
+    def conveys_to(self, role, role_id=''):
         """
         Check if this role conveys privileges to the given role.
 
         Args:
             role (str/role): a string describing the role, or a role instance.
-            role_id (int): only used when role is a string.
+            role_id (str): only used when role is a string.
 
         Returns:
             bool: True or False
@@ -223,7 +223,7 @@ class RoleMixin(object):
         except RoleHierarchy.DoesNotExist:
             return False
 
-    def convey_to(self, role, role_id=None):
+    def convey_to(self, role, role_id=''):
         """
         Set this role as parent of the given role.
 
@@ -231,7 +231,7 @@ class RoleMixin(object):
 
         Args:
             role (str/role): a string describing the role, or a role instance.
-            role_id (int): only used when role is a string.
+            role_id (str): only used when role is a string.
 
         Returns:
             obj: the created RoleHierarchy object.
@@ -241,14 +241,14 @@ class RoleMixin(object):
             role_type_a=role_type, role_id_a=role_id,
             role_type_b=self.role_type(), role_id_b=self.role_id())
 
-    def can(self, perm, resource, resource_id=None):
+    def can(self, perm, resource, resource_id=''):
         """
         Check if this role has privilege ``perm`` on resource.
 
         Args:
             perm (str): string describing permission or privilege.
             resource (str/obj): a resource instance or a string describing it.
-            resource_id (int): only used when resource is a string.
+            resource_id (str): only used when resource is a string.
 
         Returns:
             bool: True or False
@@ -269,11 +269,13 @@ class Role(models.Model, RoleMixin):
     """Concrete model for roles."""
 
     type = models.CharField(max_length=255)
-    rid = models.PositiveIntegerField(default=0)
+    rid = models.CharField(max_length=255, blank=True)
 
     class Meta:
         """Meta class for Django."""
 
+        verbose_name = _('Role')
+        verbose_name_plural = _('Roles')
         unique_together = ('type', 'rid')
 
     def __str__(self):
@@ -297,13 +299,15 @@ class RoleHierarchy(models.Model):
     DEPTH_FIRST = 1
 
     role_type_a = models.CharField(max_length=255)
-    role_id_a = models.PositiveIntegerField(default=0)
+    role_id_a = models.CharField(max_length=255, blank=True)
     role_type_b = models.CharField(max_length=255)
-    role_id_b = models.PositiveIntegerField(default=0)
+    role_id_b = models.CharField(max_length=255, blank=True)
 
     class Meta:
         """Meta class for Django."""
 
+        verbose_name = _('Role hierarchy')
+        verbose_name_plural = _('Role hierarchy')
         unique_together = (
             'role_type_a', 'role_id_a',
             'role_type_b', 'role_id_b'
@@ -326,7 +330,7 @@ class RoleHierarchy(models.Model):
 
         Args:
             role_type (str): string describing the role type.
-            role_id (int): unique ID of the role.
+            role_id (str): unique ID of the role.
 
         Returns:
             list: list of (role_type, role_id) conveyors.
@@ -342,7 +346,7 @@ class RoleHierarchy(models.Model):
 
         Args:
             role_type (str): string describing the role type.
-            role_id (int): unique ID of the role.
+            role_id (str): unique ID of the role.
 
         Returns:
             list: list of (role_type, role_id) heirs.
@@ -358,7 +362,7 @@ class RoleHierarchy(models.Model):
 
         Args:
             role_type (str): string describing the role type.
-            role_id (int): unique ID of the role.
+            role_id (str): unique ID of the role.
             search (int): 0: breadth-first, 1: depth-first.
 
         Returns:
@@ -383,7 +387,7 @@ class RoleHierarchy(models.Model):
 
         Args:
             role_type (str): string describing the role type.
-            role_id (int): unique ID of the role.
+            role_id (str): unique ID of the role.
             search (int): 0: breadth-first, 1: depth-first.
 
         Returns:
@@ -406,14 +410,14 @@ class RolePrivilege(models.Model):
     """Role privilege model."""
 
     role_type = models.CharField(_('Role type'), max_length=255)
-    role_id = models.PositiveIntegerField(_('Role ID'), default=0)
+    role_id = models.CharField(_('Role ID'), max_length=255, blank=True)
 
     authorized = models.BooleanField(
         _('Allow/Deny'), default=AppSettings.get_default_response())
     access_type = models.CharField(_('Access type'), max_length=255)
 
     resource_type = models.CharField(_('Resource type'), max_length=255)
-    resource_id = models.PositiveIntegerField(_('Resource ID'), default=0)
+    resource_id = models.CharField(_('Resource ID'), max_length=255, blank=True)
 
     creation_date = models.DateTimeField(_('Created'), auto_now_add=True)
     modification_date = models.DateTimeField(_('Last modified'), auto_now=True)
@@ -421,6 +425,8 @@ class RolePrivilege(models.Model):
     class Meta:
         """Meta class for Django."""
 
+        verbose_name = _('Role privilege')
+        verbose_name_plural = _('Role privileges')
         unique_together = (
             'role_type', 'role_id',
             'access_type',
@@ -453,11 +459,11 @@ class RolePrivilege(models.Model):
 
         Args:
             role_type (str): the string describing the role.
-            role_id (int): the unique ID of the role.
+            role_id (str): the unique ID of the role.
             perm (Permission's constant): one of the permissions available
                 in Permission class.
             resource_type (str): the string describing the resource.
-            resource_id (int): the unique ID of the resource.
+            resource_id (str): the unique ID of the resource.
             log (bool): record an entry in access history model or not.
             skip_implicit (bool): whether to skip implicit authorization.
                 It will always be skipped if you set ACCESS_CONTROL_IMPLICIT
@@ -533,16 +539,16 @@ class RolePrivilege(models.Model):
                            role_id,
                            perm,
                            resource_type,
-                           resource_id=None):
+                           resource_id=''):
         """
         Run an explicit authorization check.
 
         Args:
             role_type (str): a string describing the type of role.
-            role_id (int): the role's ID.
+            role_id (str): the role's ID.
             perm (str): one of the permissions available in Permission class.
             resource_type (str): a string describing the type of resource.
-            resource_id (int): the resource's ID.
+            resource_id (str): the resource's ID.
 
         Returns:
 
@@ -562,7 +568,7 @@ class RolePrivilege(models.Model):
                            role_id,
                            perm,
                            resource_type,
-                           resource_id=None):
+                           resource_id=''):
         """
         Run an implicit authorization check.
 
@@ -571,10 +577,10 @@ class RolePrivilege(models.Model):
 
         Args:
             role_type (str): a string describing the type of role.
-            role_id (int): the role's ID.
+            role_id (str): the role's ID.
             perm (str): one of the permissions available in Permission class.
             resource_type (str): a string describing the type of resource.
-            resource_id (int): the resource's ID.
+            resource_id (str): the resource's ID.
 
         Returns:
             bool: denied(perm) or allowed(perm) found in implicit_perms().
@@ -588,7 +594,7 @@ class RolePrivilege(models.Model):
               role_id,
               perm,
               resource_type,
-              resource_id=None,
+              resource_id='',
               user=None,
               log=True):
         """
@@ -596,10 +602,10 @@ class RolePrivilege(models.Model):
 
         Args:
             role_type (str): a string describing the type of role.
-            role_id (int): the role's ID.
+            role_id (str): the role's ID.
             perm (str): one of the permissions available in Permission class.
             resource_type (str): a string describing the type of resource.
-            resource_id (int): the resource's ID.
+            resource_id (str): the resource's ID.
             user (User): an instance of settings.AUTH_USER_MODEL.
             log (bool): whether to record an entry in privileges history.
 
@@ -627,7 +633,7 @@ class RolePrivilege(models.Model):
              role_id,
              perm,
              resource_type,
-             resource_id=None,
+             resource_id='',
              user=None,
              log=True):
         """
@@ -635,10 +641,10 @@ class RolePrivilege(models.Model):
 
         Args:
             role_type (str): a string describing the type of role.
-            role_id (int): the role's ID.
+            role_id (str): the role's ID.
             perm (str): one of the permissions available in Permission class.
             resource_type (str): a string describing the type of resource.
-            resource_id (int): the resource's ID.
+            resource_id (str): the resource's ID.
             user (User): an instance of settings.AUTH_USER_MODEL.
             log (bool): whether to record an entry in privileges history.
 
@@ -666,7 +672,7 @@ class RolePrivilege(models.Model):
                role_id,
                perm,
                resource_type,
-               resource_id=None,
+               resource_id='',
                user=None,
                log=True):
         """
@@ -674,10 +680,10 @@ class RolePrivilege(models.Model):
 
         Args:
             role_type (str): a string describing the type of role.
-            role_id (int): the role's ID.
+            role_id (str): the role's ID.
             perm (str): one of the permissions available in Permission class.
             resource_type (str): a string describing the type of resource.
-            resource_id (int): the resource's ID.
+            resource_id (str): the resource's ID.
             user (User): an instance of settings.AUTH_USER_MODEL.
             log (bool): whether to record an entry in privileges history.
 
@@ -741,7 +747,7 @@ class PrivilegeHistory(models.Model):
         null=True)
 
     role_type = models.CharField(_('Role type'), max_length=255, blank=True)
-    role_id = models.PositiveIntegerField(_('Role ID'), blank=True, null=True)
+    role_id = models.CharField(_('Role ID'), max_length=255, blank=True)
 
     authorized = models.NullBooleanField(_('Authorization'), default=None)
     access_type = models.CharField(
@@ -749,7 +755,13 @@ class PrivilegeHistory(models.Model):
 
     resource_type = models.CharField(
         _('Resource type'), max_length=255, blank=True)
-    resource_id = models.PositiveIntegerField(_('Resource ID'), blank=True, null=True)  # noqa
+    resource_id = models.CharField(_('Resource ID'), max_length=255, blank=True)  # noqa
+
+    class Meta:
+        """Meta class for Django."""
+
+        verbose_name = _('Privilege history')
+        verbose_name_plural = _('Privilege history')
 
     def __str__(self):
         return '[%s] user %s has %sd privilege <%s>' % (
@@ -797,7 +809,7 @@ class AccessHistory(models.Model):
     )
 
     role_type = models.CharField(_('Role type'), max_length=255, blank=True)
-    role_id = models.PositiveIntegerField(_('Role ID'), blank=True, null=True)
+    role_id = models.CharField(_('Role ID'), max_length=255, blank=True)
 
     # We don't want to store false info, None says "we don't know"
     response = models.NullBooleanField(_('Response'), default=None)
@@ -806,12 +818,18 @@ class AccessHistory(models.Model):
     access_type = models.CharField(_('Access'), max_length=255)
 
     resource_type = models.CharField(_('Resource type'), max_length=255)
-    resource_id = models.PositiveIntegerField(_('Resource ID'), blank=True, null=True)  # noqa
+    resource_id = models.CharField(_('Resource ID'), max_length=255, blank=True)  # noqa
 
     datetime = models.DateTimeField(_('Date and time'), default=timezone.now)
 
     conveyor_type = models.CharField(_('Conveyor type'), max_length=255, blank=True)  # noqa
-    conveyor_id = models.PositiveIntegerField(_('Conveyor ID'), blank=True, null=True)  # noqa
+    conveyor_id = models.CharField(_('Conveyor ID'), max_length=255, blank=True)  # noqa
+
+    class Meta:
+        """Meta class for Django."""
+
+        verbose_name = _('Access history')
+        verbose_name_plural = _('Access history')
 
     def __str__(self):
         inherited = ''
@@ -821,12 +839,12 @@ class AccessHistory(models.Model):
         else:
             role = self.role_type
 
-        if self.inherited_type:
-            if self.inherited_id:
+        if self.conveyor_type:
+            if self.conveyor_id:
                 inherited = ' (inherited from %s %s)' % (
-                    self.inherited_type, self.inherited_id)
+                    self.conveyor_type, self.conveyor_id)
             else:
-                inherited = self.inherited_type
+                inherited = self.conveyor_type
 
         authorized = 'authorized' if self.response else 'unauthorized'
         string = '[%s] %s was %s %s to %s %s %s' % (

@@ -7,7 +7,7 @@ from django.test import TestCase, override_settings
 import pytest
 from django_fake_model import models as f
 
-from cerberus_ac import AppSettings
+from cerberus_ac.apps import AppSettings
 from cerberus_ac.models import (
     AccessHistory, PrivilegeHistory, Role, RoleHierarchy, RoleMixin,
     RolePrivilege, get_resource_id, get_resource_type)
@@ -155,17 +155,17 @@ class MainTestCase(TestCase):
 
     def set_role_privileges(self):
         """Set some role privileges."""
-        RolePrivilege.allow('FakeUser', 1, 'do stuff on', 'FakeResource', 1)
-        RolePrivilege.allow('FakeUser', 2, 'do stuff on', 'FakeResource', 2)
-        RolePrivilege.allow('FakeUser', 3, 'do stuff on', 'FakeResource', 3)
-        RolePrivilege.deny('FakeUser', 1, 'do stuff on', 'FakeResource', 2)
-        RolePrivilege.deny('FakeUser', 2, 'do stuff on', 'FakeResource', 3)
-        RolePrivilege.deny('FakeUser', 3, 'do stuff on', 'FakeResource', 1)
-        RolePrivilege.allow('FakeGroup', 3, 'read', 'FakeResource', 3)
-        RolePrivilege.allow('FakeGroup', 3, 'delete', 'FakeResource', 3)
-        RolePrivilege.forget('FakeGroup', 3, 'delete', 'FakeResource', 3)
-        RolePrivilege.forget('FakeGroup', 3, 'create', 'FakeResource', 3)
-        RolePrivilege.allow('data', None, 'update', 'FakeResource', 3)
+        RolePrivilege.allow('FakeUser', '1', 'do stuff on', 'FakeResource', '1')
+        RolePrivilege.allow('FakeUser', '2', 'do stuff on', 'FakeResource', '2')
+        RolePrivilege.allow('FakeUser', '3', 'do stuff on', 'FakeResource', '3')
+        RolePrivilege.deny('FakeUser', '1', 'do stuff on', 'FakeResource', '2')
+        RolePrivilege.deny('FakeUser', '2', 'do stuff on', 'FakeResource', '3')
+        RolePrivilege.deny('FakeUser', '3', 'do stuff on', 'FakeResource', '1')
+        RolePrivilege.allow('FakeGroup', '3', 'read', 'FakeResource', '3')
+        RolePrivilege.allow('FakeGroup', '3', 'delete', 'FakeResource', '3')
+        RolePrivilege.forget('FakeGroup', '3', 'delete', 'FakeResource', '3')
+        RolePrivilege.forget('FakeGroup', '3', 'create', 'FakeResource', '3')
+        RolePrivilege.allow('data', '', 'update', 'FakeResource', '3')
 
     def test_role_privileges(self):
         """Test the roles privileges."""
@@ -184,10 +184,10 @@ class MainTestCase(TestCase):
         # test indirect-2 explicit permission
         assert self.users[2].can('read', self.resources[2])
         # test direct overridden indirect-1 permission
-        RolePrivilege.deny('FakeUser', 3, 'update', 'FakeResource', 3)
+        RolePrivilege.deny('FakeUser', '3', 'update', 'FakeResource', '3')
         assert not self.users[2].can('update', self.resources[2])
         # test direct overridden indirect-2 permission
-        RolePrivilege.deny('data', None, 'read', 'FakeResource', 3)
+        RolePrivilege.deny('data', '', 'read', 'FakeResource', '3')
         assert not self.users[2].can('read', self.resources[2])
         # test clashing same-level permissions
 

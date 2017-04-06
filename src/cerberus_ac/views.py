@@ -3,15 +3,13 @@
 """Views module."""
 import json
 
-from django.core import serializers
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 
 from suit_dashboard import Box, Column, DashboardView, Grid, Row
 
-from . import AppSettings
-
+from .apps import AppSettings
 
 app_settings = AppSettings()
 
