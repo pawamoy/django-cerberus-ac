@@ -20,7 +20,7 @@ class Index(DashboardView):
     title = _('Index - Cerberus AC')
     crumbs = (
         {'name': _('Home'), 'url': 'admin:index'},
-        {'name': _('Cerberus'), 'url': 'admin:cerberus_index'},
+        {'name': _('Cerberus AC'), 'url': 'admin:cerberus_index'},
     )
     grid = Grid(Row(Column(Box(
         title='Cerberus Access Control',
