@@ -18,7 +18,12 @@ $(document).ready( function () {
             leftColumns: 1
         },
         ajax: {
-            url: "{% url 'admin:edit_user_permissions_json' %}"
+            url: "{% url 'admin:edit_user_permissions_json' %}",
+            type: "POST",
+            dataFilter: function(data) {
+                var json = jQuery.parseJSON(data);
+                return JSON.stringify(json)
+            }
         }
     });
 } );

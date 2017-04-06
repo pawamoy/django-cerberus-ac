@@ -31,8 +31,43 @@ class MemberInfo(Index):
 
     title = _('Member Info - Cerberus AC')
     crumbs = ({'name': _('Member Info'), 'url': 'admin:member_info'},)
-    grid = Grid(Row(Column(Box(template='cerberus_ac/member_info.html'))))
 
+    def get(self, request, *args, **kwargs):
+        member_id = kwargs.pop('member_id'),
+        member_type = kwargs.pop('member_type')
+
+        member = app_settings.mapping.instance_from_name_and_id(member_type, int(member_id))
+
+        grid = Grid(Row(Column(Box(template='cerberus_ac/member_info.html',
+                                   context={'member': member}))))
+
+        return super(MemberInfoList, self).get(request, *args, **kwargs)
+
+class MemberInfoList(Index):
+    """View to see the list of members."""
+
+    title = _('Member Info - Cerberus AC')
+    crumbs = ({'name': _('Member Info'), 'url': 'admin:member_info'},)
+
+    def get(self, request, *args, **kwargs):
+        role_instances = []
+        for r in app_settings.mapping.role_classes():
+            role_instances.extend(r.objects.all())
+
+        paginator = Paginator(role_instances, 50)
+
+        page = request.GET.get('page_user_list')
+        try:
+            user_list = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            user_list = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            user_list = paginator.page(paginator.num_pages)
+
+        self.grid = Grid(Row(Column(Box(template='cerberus_ac/member_info.html',
+                               context={'members': user_list}))))
 
 class Logs(Index):
     """Cerberus Logs Menu."""
@@ -137,24 +172,10 @@ class EditUserPermissions(UserPermissions):
         self.grid = Grid(Row(Column(
             Box(template='cerberus_ac/edit_user_permissions.html',
                 context={'members': self.get_user_list(request),
-                         'resources': self.get_res_list_json(request),
-                         'members_json': self.get_user_list_json(request),
-                         'resources_json': self.get_res_list_json(request)})
+                         'resources': self.get_res_list(request)})
         )))
 
         return super(EditUserPermissions, self).get(request, *args, **kwargs)
-
-
-def get_res_list_json(self, request):
-    res_list_json = json.dumps([{'name': str(res)} for res in resources_real_list])
-
-    return res_list_json
-
-
-def get_user_list_json(self, request):
-    user_list_json = json.dumps([{'name': str(role)} for role in role_instances])
-
-    return user_list_json
 
 
 def jsoninfo(request):
@@ -165,6 +186,10 @@ def jsoninfo(request):
     resources_real_list = []
     for res in app_settings.mapping.resource_classes():
         resources_real_list.extend(res.objects.all())
+
+    res_list_json = json.dumps([{'name': str(res)} for res in resources_real_list])
+
+    return HttpResponse(res_list_json, content_type="application/json")
 
 
 def edit_user_perm_post(request, user, ):
@@ -205,7 +230,7 @@ class EditGroupPermissions(GroupPermissions):
             resources_real_list.extend(res.objects.all())
 
         self.grid = Grid(Row(Column(
-            Box(template='cerberus_ac/edit_group_permissionss.html',
+            Box(template='cerberus_ac/edit_group_permissions.html',
                 context={'members': role_instances,
                          'resources': resources_real_list})
         )))
@@ -237,4 +262,3 @@ class PermChanges(Logs):
     grid = Grid(Row(Column(Box(
         title='Permission Changes',
         template='cerberus_ac/perms_changes_logs.html'))))
-
