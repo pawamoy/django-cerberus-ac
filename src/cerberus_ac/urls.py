@@ -5,6 +5,7 @@
 from django.conf.urls import url
 
 from . import views
+from .apps import AppSettings
 
 
 def cerberus_urlpatterns(admin_view_func=lambda x: x):
@@ -55,8 +56,7 @@ def cerberus_urlpatterns(admin_view_func=lambda x: x):
         url(r'^history/privileges/$',
             admin_view_func(views.PrivilegeHistory.as_view()),
             name='privilege_history'),
-
     ]
 
-
+app_name = AppSettings.get_namespace()
 urlpatterns = cerberus_urlpatterns()

@@ -161,11 +161,7 @@ class AppSettings(object):
     @staticmethod
     def get_namespace():
         """Return namespace setting."""
-        namespace = getattr(settings, 'CERBERUS_NAMESPACE',
-                            AppSettings.NAMESPACE)
-        if namespace and not namespace.endswith(':'):
-            namespace += ':'
-        return namespace
+        return getattr(settings, 'CERBERUS_NAMESPACE', AppSettings.NAMESPACE)
 
 
 class Mapping(object):
