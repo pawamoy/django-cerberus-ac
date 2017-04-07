@@ -37,6 +37,7 @@ class AppSettings(object):
     LOG_PRIVILEGES = True
     LOG_HIERARCHY = True
     MAPPING = {}
+    NAMESPACE = ''
 
     def __init__(self):
         """Load settings in self."""
@@ -46,6 +47,7 @@ class AppSettings(object):
         self.log_privileges = AppSettings.get_log_privileges()
         self.log_hierarchy = AppSettings.get_log_hierarchy()
         self.mapping = AppSettings.get_mapping()
+        self.namespace = AppSettings.get_namespace()
 
     @staticmethod
     def check():
@@ -56,6 +58,7 @@ class AppSettings(object):
         AppSettings.check_log_privileges()
         AppSettings.check_log_hierarchy()
         AppSettings.check_mapping()
+        AppSettings.check_namespace()
 
     @staticmethod
     def check_default_response():
@@ -147,6 +150,22 @@ class AppSettings(object):
         """Return mapping setting."""
         return Mapping(getattr(
             settings, 'CERBERUS_MAPPING', AppSettings.MAPPING))
+
+    @staticmethod
+    def check_namespace():
+        """Check the value of given namespace setting."""
+        namespace = AppSettings.get_namespace()
+        if not isinstance(namespace, str):
+            raise ValueError('NAMESPACE must be str')
+
+    @staticmethod
+    def get_namespace():
+        """Return namespace setting."""
+        namespace = getattr(settings, 'CERBERUS_NAMESPACE',
+                            AppSettings.NAMESPACE)
+        if namespace and not namespace.endswith(':'):
+            namespace += ':'
+        return namespace
 
 
 class Mapping(object):

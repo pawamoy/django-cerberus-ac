@@ -21,7 +21,7 @@ def cerberus_urlpatterns(admin_view_func=lambda x: x):
     """
     return [
         url(r'^$', admin_view_func(views.Index.as_view()),
-            name='cerberus_index'),
+            name='index'),
 
         url(r'^privileges/$',
             admin_view_func(views.Privileges.as_view()),
@@ -40,21 +40,21 @@ def cerberus_urlpatterns(admin_view_func=lambda x: x):
             name='edit_privileges'),
         url(r'^privileges/edit/json/$',
             admin_view_func(views.json_info),
-            name='edit_user_privileges_json'),
+            name='edit_privileges_json'),
         url(r'^privileges/edit/(?P<user>\d+)/$',
-            admin_view_func(views.edit_user_perm_post),
-            name='edit_user_privileges_post'),
+            admin_view_func(views.edit_perm_post),
+            name='edit_privileges_post'),
 
         # other views
         url(r'^member_info/(?P<member_type>\w+)/(?P<member_id>\d+)/$',
             admin_view_func(views.MemberInfo.as_view()),
             name='view_member_info'),
-        url(r'^logs/object_access/$',
-            admin_view_func(views.ObjectAccess.as_view()),
-            name='logs_access'),
-        url(r'^logs/permission_changes/$',
-            admin_view_func(views.PermChanges.as_view()),
-            name='perm_changes'),
+        url(r'^history/access/$',
+            admin_view_func(views.AccessHistory.as_view()),
+            name='access_history'),
+        url(r'^history/privileges/$',
+            admin_view_func(views.PrivilegeHistory.as_view()),
+            name='privilege_history'),
 
     ]
 

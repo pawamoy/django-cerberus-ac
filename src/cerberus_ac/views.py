@@ -20,37 +20,18 @@ class Index(DashboardView):
     title = _('Index - Cerberus AC')
     crumbs = (
         {'name': _('Home'), 'url': 'admin:index'},
-        {'name': _('Cerberus AC'), 'url': 'admin:cerberus_index'},
+        {'name': _('Cerberus AC'), 'url': 'admin:cerberus:index'},
     )
     grid = Grid(Row(Column(Box(
         title='Cerberus Access Control',
         template='cerberus_ac/index.html'))))
 
 
-class MemberInfo(Index):
-    """View to see member info."""
-
-    title = _('Member Info - Cerberus AC')
-    crumbs = ({'name': _('Member Info'), 'url': 'admin:member_info'},)
-
-    def get(self, request, *args, **kwargs):
-        member_id = kwargs.pop('member_id'),
-        member_type = kwargs.pop('member_type')
-
-        member = app_settings.mapping.instance_from_name_and_id(member_type, int(member_id))
-
-        self.grid = Grid(Row(Column(Box(
-            template='cerberus_ac/member_info.html',
-            context={'member': member}))))
-
-        return super(MemberInfo, self).get(request, *args, **kwargs)
-
-
-class MemberInfoList(Index):
+class MemberList(Index):
     """View to see the list of members."""
 
-    title = _('Member Info - Cerberus AC')
-    crumbs = ({'name': _('Member Info'), 'url': 'admin:member_info'},)
+    title = _('Member List - Cerberus AC')
+    crumbs = ({'name': _('Member List'), 'url': 'admin:cerberus:member_list'},)
 
     def get(self, request, *args, **kwargs):
         role_instances = []
@@ -73,11 +54,31 @@ class MemberInfoList(Index):
                                context={'members': user_list}))))
 
 
+class MemberInfo(MemberList):
+    """View to see member info."""
+
+    title = _('Member Info - Cerberus AC')
+    crumbs = ({'name': _('Member Info'), 'url': 'admin:cerberus:member_info'},)
+
+    def get(self, request, *args, **kwargs):
+        member_id = kwargs.pop('member_id')
+        member_type = kwargs.pop('member_type')
+
+        member = app_settings.mapping.instance_from_name_and_id(
+            member_type, int(member_id))
+
+        self.grid = Grid(Row(Column(Box(
+            template='cerberus_ac/member_info.html',
+            context={'member': member}))))
+
+        return super(MemberInfo, self).get(request, *args, **kwargs)
+
+
 class Logs(Index):
     """Cerberus Logs Menu."""
 
     title = _('Logs - Cerberus AC')
-    crumbs = ({'name': _('Cerberus'), 'url': 'admin:cerberus_logs'},)
+    crumbs = ({'name': _('Cerberus'), 'url': 'admin:cerberus:cerberus_logs'},)
     grid = Grid(Row(Column(Box(
         title='Logs',
         template='cerberus_ac/logs.html'))))
@@ -95,7 +96,7 @@ class Privileges(Index):
     ]}
 
     title = _('Privileges - Cerberus AC')
-    crumbs = ({'name': _('Privileges'), 'url': 'admin:privileges'},)
+    crumbs = ({'name': _('Privileges'), 'url': 'admin:cerberus:privileges'},)
     grid = Grid(Row(Column(Box(template='cerberus_ac/privileges.html',
                                context=context))))
 
@@ -104,7 +105,7 @@ class ViewPrivileges(Privileges):
     """View to see user privileges."""
 
     title = _('View Privileges - Cerberus AC')
-    crumbs = ({'name': _('View'), 'url': 'admin:view_privileges'}, )
+    crumbs = ({'name': _('View'), 'url': 'admin:cerberus:view_privileges'}, )
 
     def get(self, request, *args, **kwargs):
         role_type = kwargs.pop('role_type')
@@ -125,35 +126,21 @@ class EditPrivileges(Privileges):
     """View to edit user privileges."""
 
     title = _('Edit Privileges - Cerberus AC')
-    crumbs = ({'name': _('Edit'), 'url': 'admin:edit_privileges'}, )
+    crumbs = ({'name': _('Edit'), 'url': 'admin:cerberus:edit_privileges'}, )
 
-    def get_user_list(self, request):
-        role_instances = []
-        for r in app_settings.mapping.role_classes():
-            role_instances.extend(r.objects.all())
+    def get_paginated_data(self, instances, page):
+        paginator = Paginator(instances, 50)
 
-        # paginator = Paginator(role_instances, 50)
-        #
-        # page = request.GET.get('page_role')
-        # try:
-        #     user_list = paginator.page(page)
-        # except PageNotAnInteger:
-        #     # If page is not an integer, deliver first page.
-        #     user_list = paginator.page(1)
-        # except EmptyPage:
-        #     # If page is out of range (e.g. 9999), deliver last page of results.  # noqa
-        #     user_list = paginator.page(paginator.num_pages)
-        #
-        # user_list_json = json.dumps(user_list)
+        try:
+            paginated_data = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page
+            paginated_data = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results
+            paginated_data = paginator.page(paginator.num_pages)
 
-        return role_instances
-
-    def get_res_list(self, request):
-        resources_real_list = []
-        for res in app_settings.mapping.resource_classes():
-            resources_real_list.extend(res.objects.all())
-
-        return resources_real_list
+        return paginated_data
 
     def get(self, request, *args, **kwargs):
         role_type = kwargs.pop('role_type')
@@ -162,8 +149,14 @@ class EditPrivileges(Privileges):
         resource_class = app_settings.mapping.class_from_name(resource_type)
         role_instances = role_class.objects.all()
         resource_instances = resource_class.objects.all()
+
+        # role_instances = self.get_paginated_data(
+        #     role_instances, request.GET.get('page_role'))
+        # resource_instances = self.get_paginated_data(
+        #     resource_instances, request.GET.get('page_resource'))
+
         self.grid = Grid(Row(Column(
-            Box(template='cerberus_ac/edit_user_privileges.html',
+            Box(template='cerberus_ac/edit_privileges.html',
                 context={'members': role_instances,
                          'resources': resource_instances})
         )))
@@ -176,36 +169,37 @@ def json_info(request):
     for r in app_settings.mapping.role_classes():
         role_instances.extend(r.objects.all())
 
-    resources_real_list = []
+    resources_instances = []
     for res in app_settings.mapping.resource_classes():
-        resources_real_list.extend(res.objects.all())
+        resources_instances.extend(res.objects.all())
 
-    res_list_json = json.dumps([{'name': str(res)} for res in resources_real_list])
+    res_list_json = json.dumps(
+        [{'name': str(res)} for res in resources_instances])
 
     return HttpResponse(res_list_json, content_type="application/json")
 
 
-def edit_user_perm_post(request, user, ):
+def edit_perm_post(request, user):
     """Handler for user privileges POSTs."""
     if request.method == "POST":
         form = UserPermForm(request.POST)
 
 
-class ObjectAccess(Logs):
+class AccessHistory(Logs):
     """Cerberus Object Access Logs."""
 
     title = _('Object Access - Cerberus AC')
-    crumbs = ({'name': _('Cerberus'), 'url': 'admin:cerberus_obj_acc_logs'},)
+    crumbs = ({'name': _('Cerberus'), 'url': 'admin:cerberus:access_history'},)
     grid = Grid(Row(Column(Box(
         title='Object Access',
-        template='cerberus_ac/obj_access_logs.html'))))
+        template='cerberus_ac/access_history.html'))))
 
 
-class PermChanges(Logs):
+class PrivilegeHistory(Logs):
     """Cerberus Permission changes Logs."""
 
     title = _('Permission Changes - Cerberus AC')
-    crumbs = ({'name': _('Cerberus'), 'url': 'admin:cerberus_perm_changes_logs'},)  # noqa
+    crumbs = ({'name': _('Cerberus'), 'url': 'admin:cerberus:privilege_history'},)  # noqa
     grid = Grid(Row(Column(Box(
         title='Permission Changes',
-        template='cerberus_ac/perms_changes_logs.html'))))
+        template='cerberus_ac/privilege_history.html'))))

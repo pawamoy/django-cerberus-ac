@@ -135,7 +135,7 @@ $('.collapse').on('show.bs.collapse', function () {
         </thead>
         <tbody>
         {% for m in box.context.members %}
-            <form action="{% url "admin:edit_user_permissions_post" user=m.id %}" method="POST">
+            <form action="{% url "admin:cerberus:edit_user_permissions_post" user=m.id %}" method="POST">
                 <tr data-toggle="collapse" data-target=".userrow{{ m.id }}">
                     <td style="text-align: right" class="span5">
                         {{ m.username }}
