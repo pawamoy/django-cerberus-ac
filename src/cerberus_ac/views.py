@@ -10,6 +10,7 @@ from django.utils.translation import ugettext as _
 from suit_dashboard import Box, Column, DashboardView, Grid, Row
 
 from .apps import AppSettings
+from .models import RolePrivilege
 
 app_settings = AppSettings()
 
@@ -126,7 +127,7 @@ class EditPrivileges(Privileges):
     """View to edit user privileges."""
 
     title = _('Edit Privileges - Cerberus AC')
-    crumbs = ({'name': _('Edit'), 'url': 'admin:cerberus:edit_privileges'}, )
+    crumbs = ({'name': _('Edit')}, )
 
     def get_paginated_data(self, instances, page):
         paginator = Paginator(instances, 50)
@@ -156,25 +157,24 @@ class EditPrivileges(Privileges):
         #     resource_instances, request.GET.get('page_resource'))
 
         self.grid = Grid(Row(Column(
-            Box(template='cerberus_ac/edit_privileges.html',
-                context={'members': role_instances,
-                         'resources': resource_instances})
+            Box(template='cerberus_ac/edit_privileges_no_datatable.html',
+                context={'roles': role_instances,
+                         'resources': resource_instances,
+                         'role_type': role_type,
+                         'resource_type': resource_type})
         )))
 
         return super(EditPrivileges, self).get(request, *args, **kwargs)
 
 
-def json_info(request):
-    role_instances = []
-    for r in app_settings.mapping.role_classes():
-        role_instances.extend(r.objects.all())
-
-    resources_instances = []
-    for res in app_settings.mapping.resource_classes():
-        resources_instances.extend(res.objects.all())
+def json_info(request, role_type, resource_type):
+    role_class = app_settings.mapping.class_from_name(role_type)
+    resource_class = app_settings.mapping.class_from_name(resource_type)
+    role_instances = role_class.objects.all()
+    resource_instances = resource_class.objects.all()
 
     res_list_json = json.dumps(
-        [{'name': str(res)} for res in resources_instances])
+        [{'name': str(res)} for res in resource_instances])
 
     return HttpResponse(res_list_json, content_type="application/json")
 
@@ -203,3 +203,19 @@ class PrivilegeHistory(Logs):
     grid = Grid(Row(Column(Box(
         title='Permission Changes',
         template='cerberus_ac/privilege_history.html'))))
+
+
+def edit_privileges_ajax(request,
+                         role_type,
+                         resource_type,
+                         role_id,
+                         resource_id,
+                         privilege,
+                         type):
+    if type in ('allow', 'deny', 'forget'):
+        func = getattr(RolePrivilege, type)
+        return bool(func(role_type, role_id, privilege,
+                         resource_type, resource_id, request.user))
+
+    return False
+

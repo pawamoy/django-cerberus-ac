@@ -699,9 +699,9 @@ class RolePrivilege(models.Model):
                 access_type=perm)
 
             if log:
-                PrivilegeHistory.objects.create(
-                    user=user, action=PrivilegeHistory.DELETE,
-                    privilege_id=privilege.id)
+                record = PrivilegeHistory(
+                    user=user, action=PrivilegeHistory.DELETE)
+                record.update_from_privilege(privilege)
 
             privilege.delete()
             return True
@@ -764,10 +764,21 @@ class PrivilegeHistory(models.Model):
         verbose_name_plural = _('Privilege history')
 
     def __str__(self):
-        return '[%s] user %s has %sd privilege <%s>' % (
+        if self.reference:
+            privilege = str(self.reference)
+        else:
+            privilege = RolePrivilege(
+                role_type=self.role_type,
+                role_id=self.role_id,
+                authorized=self.authorized,
+                access_type=self.access_type,
+                resource_type=self.resource_type,
+                resource_id=self.resource_id)
+
+        return '[%s] user %s has %sd privilege <%d: %s>' % (
             self.datetime, self.user,
             PrivilegeHistory.ACTIONS_VERBOSE[str(self.action)],
-            self.reference if self.reference else self.privilege_id)
+            self.privilege_id, privilege)
 
     def update_from_privilege(self, privilege, save=True):
         """

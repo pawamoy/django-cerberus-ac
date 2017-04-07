@@ -15,7 +15,7 @@ $(document).ready( function () {
         autoWidth: true,
         deferRender: true,
         ajax: {
-            url: "{% url 'admin:edit_user_privileges_json' %}",
+            url: "{% url 'admin:cerberus:edit_privileges_json' role_type=box.context.role_type resource_type=box.context.resource_type %}",
             type: "POST",
             dataFilter: function(data) {
                 var json = jQuery.parseJSON(data);
@@ -88,8 +88,8 @@ $('.collapse').on('show.bs.collapse', function () {
         </tr>
     </thead>
     <tbody>
-    <!--{% for m in box.context.members %}-->
-        <form action="{% url "admin:edit_user_privileges_post" user=m.id %}" method="POST">
+    <!--{% for m in box.context.roles %}-->
+        <form action="{% url "admin:cerberus:edit_privileges_post" user=m.id %}" method="POST">
             <tr data-toggle="collapse" data-target=".userrow{{ m.id }}">
                 <td style="text-align: right" class="span5">
                     {{ m.username }}
