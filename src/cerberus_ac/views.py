@@ -10,7 +10,7 @@ from django.utils.translation import ugettext as _
 from suit_dashboard import Box, Column, DashboardView, Grid, Row
 
 from .apps import AppSettings
-from .models import RolePrivilege
+from .models import RolePrivilege, get_role_type, get_role_id
 
 app_settings = AppSettings()
 
@@ -211,11 +211,38 @@ def edit_privileges_ajax(request,
                          role_id,
                          resource_id,
                          privilege,
-                         type):
-    if type in ('allow', 'deny', 'forget'):
-        func = getattr(RolePrivilege, type)
-        return bool(func(role_type, role_id, privilege,
-                         resource_type, resource_id, request.user))
+                         action):
+    user = request.user
+    success = False
 
-    return False
+    if not user.can('update', 'role_privilege'):
+        message = _("You don't have the authorization to edit privileges")
+
+    elif get_role_type(user) == role_type and get_role_id(user) == role_id:
+        message = _("You can't edit your own privileges")
+
+    elif action in ('allow', 'deny'):
+        func = getattr(RolePrivilege, action)
+        privilege, created = func(role_type, role_id, privilege,
+                                  resource_type, resource_id, user)
+        success = True
+        if created:
+            message = _('Successfully created privilege')
+        else:
+            message = _('Successfully updated privilege')
+    elif action == 'forget':
+        deleted = RolePrivilege.forget(role_type, role_id, privilege,
+                                       resource_type, resource_id, user)
+        if deleted:
+            success = True
+            message = _('Successfully deleted privilege')
+        else:
+            message = _('Privilege did not exist')
+    else:
+        message = _('Invalid request: action parameter accepts '
+                    'allow, deny or forget')
+
+    return HttpResponse(json.dumps({'success': success, 'message': message}),
+                        content_type='application/json')
+
 

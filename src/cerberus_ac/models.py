@@ -413,7 +413,7 @@ class RolePrivilege(models.Model):
     role_id = models.CharField(_('Role ID'), max_length=255, blank=True)
 
     authorized = models.BooleanField(
-        _('Allow/Deny'), default=AppSettings.get_default_response())
+        _('Authorized'), default=AppSettings.get_default_response())
     access_type = models.CharField(_('Access type'), max_length=255)
 
     resource_type = models.CharField(_('Resource type'), max_length=255)
@@ -626,7 +626,7 @@ class RolePrivilege(models.Model):
                     created, PrivilegeHistory.UPDATE))
             record.update_from_privilege(privilege)
 
-        return privilege
+        return privilege, created
 
     @staticmethod
     def deny(role_type,
@@ -665,7 +665,7 @@ class RolePrivilege(models.Model):
                     created, PrivilegeHistory.UPDATE))
             record.update_from_privilege(privilege)
 
-        return privilege
+        return privilege, created
 
     @staticmethod
     def forget(role_type,
