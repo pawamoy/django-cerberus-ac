@@ -10,7 +10,7 @@ from django.utils.translation import ugettext as _
 from suit_dashboard import Box, Column, DashboardView, Grid, Row
 
 from .apps import AppSettings
-from .models import RolePrivilege, get_role_type, get_role_id
+from .models import RolePrivilege, get_role_id, get_role_type
 
 app_settings = AppSettings()
 
@@ -244,5 +244,3 @@ def edit_privileges_ajax(request,
 
     return HttpResponse(json.dumps({'success': success, 'message': message}),
                         content_type='application/json')
-
-
