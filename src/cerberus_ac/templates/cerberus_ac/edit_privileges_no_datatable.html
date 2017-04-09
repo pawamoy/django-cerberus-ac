@@ -16,12 +16,16 @@
         var status = data.success? 'success': 'failure';
         $("#notifications").prepend(
           '<div class="notification ' +
-          status + '"><span class="dismiss"><a title="Close">&#10799;</a></span>' +
-          data.message + '</div>');
+          status + '">' + data.message + '</div>');
+{#          <span class="dismiss"><a title="Close">&#10799;</a></span>' +#}
+{#          data.message + '</div>');#}
         $(".notification:first").delay(5000).fadeOut("slow");
-        $(".dismiss:first").click(function() {
-          $(this).parent().closest('div').fadeOut("slow");
-        });
+{#        $(".dismiss:first").click(function() {#}
+{#          var parent = $(this).parent();#}
+{#          parent = parent.get(0);#}
+{#          parent = $(parent);#}
+{#          parent.fadeOut("slow");#}
+{#        });#}
       }
     });
   }
@@ -112,7 +116,7 @@
 <table id="editprivtable" class="table table-bordered">
   <thead>
     <tr>
-      <th style="text-align: center;">User</th>
+      <th style="text-align: center;">Role</th>
       {% for resource in box.context.resources %}
         <th style="text-align: center;">{{ resource }}</th>
       {% endfor %}
@@ -121,13 +125,13 @@
   <tbody>
     {% for role in box.context.roles %}
       <tr>
-        <td data-toggle="collapse" data-target=".userrow{{ role.id }}" style="text-align: right" class="span5">
+        <td data-toggle="collapse" data-target=".rolerow{{ role.id }}" style="text-align: right" class="span5">
           {{ role }}
         </td>
         {% for resource in box.context.resources %}
           <td class="collapse">
             <div class="row">
-              <div class="collapse userrow{{ role.id }}" style="text-align: center">
+              <div class="collapse rolerow{{ role.id }}" style="text-align: center">
 {#                <div>{% trans "Create" %}#}
 {#                  <div id="update_{{ role.id }}_{{ resource.id }}" class="btn-group" data-toggle="buttons-radio">#}
 {#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'create', 'allow')" class="btn btn-check-success" type="button"></button>#}
