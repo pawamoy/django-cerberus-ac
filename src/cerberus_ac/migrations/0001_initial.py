@@ -90,7 +90,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('role_type', models.CharField(max_length=255, verbose_name='Role type')),
                 ('role_id', models.CharField(blank=True, max_length=255, verbose_name='Role ID')),
-                ('authorized', models.BooleanField(default=False, verbose_name='Allow/Deny')),
+                ('authorized', models.BooleanField(default=False, verbose_name='Authorized')),
                 ('access_type', models.CharField(max_length=255, verbose_name='Access type')),
                 ('resource_type', models.CharField(max_length=255, verbose_name='Resource type')),
                 ('resource_id', models.CharField(blank=True, max_length=255, verbose_name='Resource ID')),
