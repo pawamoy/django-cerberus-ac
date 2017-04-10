@@ -51,7 +51,7 @@ class MemberList(Index):
             # If page is out of range (e.g. 9999), deliver last page of results.
             user_list = paginator.page(paginator.num_pages)
 
-        self.grid = Grid(Row(Column(Box(template='cerberus_ac/member_info.html',
+        self.grid = Grid(Row(Column(Box(template='cerberus_ac/member_list.html',
                                context={'members': user_list}))))
 
 
