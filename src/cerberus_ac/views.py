@@ -52,10 +52,10 @@ class MemberList(Index):
             user_list = paginator.page(paginator.num_pages)
 
         self.grid = Grid(Row(Column(Box(template='cerberus_ac/member_list.html',
-                               context={'members': user_list}))))
+                         context={'members': user_list}))))
 
 
-class MemberInfo(MemberList, role_id):
+class MemberInfo(MemberList):
     """View to see member info."""
 
     title = _('Member Info - Cerberus AC')
