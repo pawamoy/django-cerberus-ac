@@ -3,14 +3,19 @@
   <li>
     <a href="{% url "admin:cerberus:index" %}">{% trans "Menu page" %}</a>
     <ul>
-      <li>
-        <a href="{% url "admin:cerberus:privileges" %}">{% trans "Privileges pages" %}</a>
-        <a href="{% url "admin:cerberus:view_member_list" %}">{% trans "Member List" %}</a>
-{#        <ul>#}
-{#          <li><a href="{% url "admin:view_privileges" %}">{% trans "View privileges" %}</a></li>#}
-{#          <li><a href="{% url "admin:edit_privileges" %}">{% trans "Edit privileges" %}</a></li>#}
-{#        </ul>#}
-      </li>
+        <li>
+            <a href="{% url "admin:cerberus:privileges" %}">{% trans "Privilege pages" %}</a>
+    {#        <ul>#}
+    {#          <li><a href="{% url "admin:view_privileges" %}">{% trans "View privileges" %}</a></li>#}
+    {#          <li><a href="{% url "admin:edit_privileges" %}">{% trans "Edit privileges" %}</a></li>#}
+    {#        </ul>#}
+        </li>
+        <li>
+            <a href="{% url "admin:cerberus:view_member_list" %}">{% trans "Member List" %}</a>
+        </li>
+        <li>
+            <a href="{% url "admin:cerberus:view_member_list" %}">{% trans "Member List" %}</a>
+        </li>
     </ul>
   </li>
 </ul>
