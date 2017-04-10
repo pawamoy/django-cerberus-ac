@@ -50,9 +50,12 @@ def cerberus_urlpatterns(admin_view_func=lambda x: x):
             name='edit_privileges_post'),
 
         # other views
-        url(r'^member_info/(?P<member_type>\w+)/(?P<member_id>\d+)/$',
+        url(r'^member_info/(?P<member_id>\d+)/$',
             admin_view_func(views.MemberInfo.as_view()),
             name='view_member_info'),
+        url(r'^member_info/list/$',
+            admin_view_func(views.MemberList.as_view()),
+            name='view_member_list'),
         url(r'^history/access/$',
             admin_view_func(views.AccessHistory.as_view()),
             name='access_history'),

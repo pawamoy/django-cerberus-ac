@@ -55,7 +55,7 @@ class MemberList(Index):
                                context={'members': user_list}))))
 
 
-class MemberInfo(MemberList):
+class MemberInfo(MemberList, role_id):
     """View to see member info."""
 
     title = _('Member Info - Cerberus AC')
