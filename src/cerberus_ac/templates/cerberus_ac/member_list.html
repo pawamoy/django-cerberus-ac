@@ -55,10 +55,10 @@
 
     <input type="text" id="search_bar_member_list" onkeyup="search()" placeholder="Filter users..">
 
-    {% if members %}
+    {% if box.context.members %}
     <ul id="user_list">
-        {% for m in members %}
-            <li><a href="{% url 'admin:cerberus:memberinfo' m.id %}">{{ m.username }}</a> ({{ m.id }})</li>
+        {% for m in box.context.members %}
+            <li><a href="{% url 'admin:cerberus:view_member_info' m.id %}">{{ m.username }}</a> ({{ m.id }})</li>
         {% endfor %}
     </ul>
     {% else %}
