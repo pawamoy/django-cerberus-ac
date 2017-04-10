@@ -1,25 +1,26 @@
 {% load static %}
 {% load i18n %}
-
-<table class="table table-bordered">
-  <thead>
-    <tr>
-      <th>User</th>
-      {% for resource in box.context.resources %}
-        <th>{{ resource }}</th>
-      {% endfor %}
-    </tr>
-  </thead>
-  <tbody>
-    {% for role in box.context.roles %}
-      <tr>
-        <td>
-          {{ role }}
-        </td>
-        {% for resource in box.context.resources %}
-          <td></td>
+<div class="table-responsive">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>User</th>
+          {% for resource in box.context.resources %}
+            <th style="text-align: center" width="100px">{{ resource }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for role in box.context.roles %}
+          <tr>
+            <td style="text-align: center" width="200px">
+              {{ role }}
+            </td>
+            {% for resource in box.context.resources %}
+              <td style="text-align: center" width="200px"></td>
+            {% endfor %}
+          </tr>
         {% endfor %}
-      </tr>
-    {% endfor %}
-  </tbody>
-</table>
+      </tbody>
+    </table>
+</div>

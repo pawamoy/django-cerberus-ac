@@ -1,20 +1,20 @@
 {% load i18n %}
 <div class="table-responsive">
-    <table class="table table-bordered">
+    <table class="table table-bordered" width="100%" style="table-layout: fixed">
         <thead>
             <tr>
-              <th width="100px">{% trans "Role" %}</th>
+              <th>{% trans "Role" %}</th>
               {% for resource_type in box.context.resource_types %}
-                <th style="text-align: center" width="100px">{{ resource_type.verbose }}</th>
+                <th style="text-align: center">{{ resource_type.verbose }}</th>
               {% endfor %}
             </tr>
         </thead>
         <tbody>
             {% for role_type in box.context.role_types %}
               <tr>
-                <td width="100px">{{ role_type.verbose }}</td>
+                <td>{{ role_type.verbose }}</td>
                 {% for resource_type in box.context.resource_types %}
-                  <td style="text-align: center" width="100px">
+                  <td style="text-align: center">
                     <a href="{% url "admin:cerberus:view_privileges" role_type=role_type.slug resource_type=resource_type.slug %}"><span class="icon-eye-open"></span></a>
                     <a href="{% url "admin:cerberus:edit_privileges" role_type=role_type.slug resource_type=resource_type.slug %}"><span class="icon-pencil"></span></a>
                   </td>
