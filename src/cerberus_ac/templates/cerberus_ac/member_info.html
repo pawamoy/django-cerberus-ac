@@ -1,15 +1,40 @@
 {% block content %}
+{% with m=box.context.member %}
+
+<div class="table-responsive">
     <h1>Member : {{ m.username }} -- {{ m.id }}</h1>
 
-    {% if members %}
-    <ul>
-        {% for m in members %}
-            <li>
-                <a href="{{ m.get_absolute_url }}">{{ m.username }}</a> ({{ m.id }})
-            </li>
-        {% endfor %}
-    </ul>
+    {% if m.id %}
+        <div class="well" id="basic_user_info">
+            <h3>Basic User Info</h3>
+            <ul>
+                <li>UID : {{ m.id }}</li>
+                <li>GID : {{ m.username }}</li>
+                <li>Username : {{ m.username }}</li>
+                <li>Email Address : {{ m.email }}</li>
+                <li>First Name : {{ m.first_name }}</li>
+                <li>Last Name : {{ m.last_name }}</li>
+                <li>Active Member : {{ m.is_active }}</li>
+            </ul>
+        </div>
+        <div class="well" id="user_groups_info">
+            <h3>User Groups</h3>
+            <ul>
+            {% for g in m.groups.all %}
+                <li>g.name</li>
+            {% endfor %}
+            </ul>
+        </div>
+        <div class="well" id="special_user_info">
+            <h3>Special User Info</h3>
+            <ul>
+                <li>bla bla</li>
+            </ul>
+        </div>
     {% else %}
-        <p>There are no users</p>
+        <p>No user found.</p>
     {% endif %}
+</div>
+
+{% endwith %}
 {% endblock %}
