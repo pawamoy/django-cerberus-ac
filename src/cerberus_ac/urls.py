@@ -54,7 +54,6 @@ def cerberus_urlpatterns(admin_view_func=lambda x: x):
             name='edit_privileges_post'),
 
         # Member Info
-
         url(r'^member_info/(?P<member_id>\d+)/$',
             admin_view_func(views.MemberInfo.as_view()),
             name='view_member_info'),
