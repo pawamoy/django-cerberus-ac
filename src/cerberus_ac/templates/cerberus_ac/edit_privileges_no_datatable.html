@@ -113,54 +113,77 @@
 
 <div id="notifications"></div>
 
-<table id="editprivtable" class="table table-bordered">
-  <thead>
-    <tr>
-      <th style="text-align: center;">Role</th>
-      {% for resource in box.context.resources %}
-        <th style="text-align: center;">{{ resource }}</th>
-      {% endfor %}
-    </tr>
-  </thead>
-  <tbody>
-    {% for role in box.context.roles %}
-      <tr>
-        <td data-toggle="collapse" data-target=".rolerow{{ role.id }}" style="text-align: right" class="span5">
-          {{ role }}
-        </td>
-        {% for resource in box.context.resources %}
-          <td class="collapse">
-            <div class="row">
-              <div class="collapse rolerow{{ role.id }}" style="text-align: center">
-{#                <div>{% trans "Create" %}#}
-{#                  <div id="update_{{ role.id }}_{{ resource.id }}" class="btn-group" data-toggle="buttons-radio">#}
-{#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'create', 'allow')" class="btn btn-check-success" type="button"></button>#}
-{#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'create', 'forget')" class="btn btn-check-default" type="button"></button>#}
-{#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'create', 'deny')" class="btn btn-check-danger" type="button"></button>#}
-{#                  </div></div>#}
-                <div>{% trans "Read" %}
-                  <div id="read_{{ role.id }}_{{ resource.id }}" class="btn-group" data-toggle="buttons-radio">
-                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'read', 'allow')" class="btn btn-check-success" type="button"></button>
-                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'read', 'forget')" class="btn btn-check-default" type="button"></button>
-                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'read', 'deny')" class="btn btn-check-danger" type="button"></button>
-                  </div></div>
-                <div>{% trans "Update" %}
-                  <div id="update_{{ role.id }}_{{ resource.id }}" class="btn-group" data-toggle="buttons-radio">
-                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'update', 'allow')" class="btn btn-check-success" type="button"></button>
-                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'update', 'forget')" class="btn btn-check-default" type="button"></button>
-                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'update', 'deny')" class="btn btn-check-danger" type="button"></button>
-                  </div></div>
-                <div>{% trans "Delete" %}
-                  <div id="delete_{{ role.id }}_{{ resource.id }}" class="btn-group" data-toggle="buttons-radio">
-                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'delete', 'allow')" class="btn btn-check-success" type="button"></button>
-                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'delete', 'forget')" class="btn btn-check-default" type="button"></button>
-                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'delete', 'deny')" class="btn btn-check-danger" type="button"></button>
-                  </div></div>
-              </div>
-            </div>
-          </td>
+<div class="table-responsive">
+    <table id="editprivtable" class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Role</th>
+          {% for resource in box.context.resources %}
+            <th style="text-align: center;">{{ resource }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for role in box.context.roles %}
+          <tr>
+            <td data-toggle="collapse" data-target=".rolerow{{ role.id }}" style="text-align: right" class="span5">
+              {{ role }}
+            </td>
+            {% for resource in box.context.resources %}
+              <td class="collapse">
+                <div class="row">
+                  <div class="collapse rolerow{{ role.id }}" style="text-align: center">
+    {#                <div>{% trans "Create" %}#}
+    {#                  <div id="update_{{ role.id }}_{{ resource.id }}" class="btn-group" data-toggle="buttons-radio">#}
+    {#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'create', 'allow')" class="btn btn-check-success" type="button"></button>#}
+    {#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'create', 'forget')" class="btn btn-check-default" type="button"></button>#}
+    {#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'create', 'deny')" class="btn btn-check-danger" type="button"></button>#}
+    {#                  </div></div>#}
+                    <div>{% trans "Read" %}
+                      <div id="read_{{ role.id }}_{{ resource.id }}" class="btn-group" data-toggle="buttons-radio">
+                        <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'read', 'allow')" class="btn btn-check-success" type="button"></button>
+                        <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'read', 'forget')" class="btn btn-check-default" type="button"></button>
+                        <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'read', 'deny')" class="btn btn-check-danger" type="button"></button>
+                      </div></div>
+                    <div>{% trans "Update" %}
+                      <div id="update_{{ role.id }}_{{ resource.id }}" class="btn-group" data-toggle="buttons-radio">
+                        <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'update', 'allow')" class="btn btn-check-success" type="button"></button>
+                        <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'update', 'forget')" class="btn btn-check-default" type="button"></button>
+                        <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'update', 'deny')" class="btn btn-check-danger" type="button"></button>
+                      </div></div>
+                    <div>{% trans "Delete" %}
+                      <div id="delete_{{ role.id }}_{{ resource.id }}" class="btn-group" data-toggle="buttons-radio">
+                        <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'delete', 'allow')" class="btn btn-check-success" type="button"></button>
+                        <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'delete', 'forget')" class="btn btn-check-default" type="button"></button>
+                        <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'delete', 'deny')" class="btn btn-check-danger" type="button"></button>
+                      </div></div>
+                  </div>
+                </div>
+              </td>
+            {% endfor %}
+          </tr>
         {% endfor %}
-      </tr>
-    {% endfor %}
-  </tbody>
-</table>
+      </tbody>
+    </table>
+</div>
+
+<script type="text/javascript" language="javascript" class="init">
+$(document).ready( function () {
+    $('#editprivtable').DataTable({
+        paging: true,
+        scrollX: true,
+        serverSide: true,
+        processing: true,
+        autoWidth: true,
+        deferRender: true,
+        ajax: {
+            url: "{% url 'admin:cerberus:edit_privileges_json' role_type=box.context.role_type resource_type=box.context.resource_type %}",
+            type: "POST",
+            dataFilter: function(data) {
+                var json = jQuery.parseJSON(data);
+                return JSON.stringify(json)
+            }
+        }
+    });
+} );
+</script>
