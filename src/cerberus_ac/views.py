@@ -54,6 +54,10 @@ class MemberList(Index):
         self.grid = Grid(Row(Column(Box(template='cerberus_ac/member_list.html',
                          context={'members': user_list}))))
 
+        return super(MemberList, self).get(request, *args, **kwargs)
+
+
+
 
 class MemberInfo(MemberList):
     """View to see member info."""
@@ -67,7 +71,6 @@ class MemberInfo(MemberList):
 
         member = app_settings.mapping.instance_from_name_and_id(
             member_type, int(member_id))
-
         self.grid = Grid(Row(Column(Box(
             template='cerberus_ac/member_info.html',
             context={'member': member}))))

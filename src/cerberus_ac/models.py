@@ -865,3 +865,4 @@ class AccessHistory(models.Model):
         if inherited:
             return string + inherited
         return string
+

@@ -1,4 +1,6 @@
 {% block content %}
+
+<div class="table-responsive">
     <h1>Member : {{ m.username }} -- {{ m.id }}</h1>
 
     {% if m.id %}
@@ -31,4 +33,6 @@
     {% else %}
         <p>No user found.</p>
     {% endif %}
+</div>
+
 {% endblock %}

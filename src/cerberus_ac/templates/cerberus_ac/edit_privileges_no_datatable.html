@@ -29,6 +29,26 @@
       }
     });
   }
+
+  $(document).ready( function () {
+    $('#editprivtable').DataTable({
+        paging: true,
+        scrollX: true,
+        serverSide: true,
+        processing: true,
+        autoWidth: true,
+        deferRender: true,
+        ajax: {
+            url: "{% url 'admin:cerberus:edit_privileges_json' role_type=box.context.role_type resource_type=box.context.resource_type %}",
+            type: "POST",
+            dataFilter: function(data) {
+                var json = jQuery.parseJSON(data);
+                return JSON.stringify(json)
+            }
+        }
+    });
+  } );
+
 </script>
 
 <style>
@@ -132,7 +152,7 @@
             {% for resource in box.context.resources %}
               <td class="collapse">
                 <div class="row">
-                  <div class="collapse rolerow{{ role.id }}" style="text-align: center">
+                  <div class="collapse rolerow{{ role.id }}" style="text-align: center; border: none;">
     {#                <div>{% trans "Create" %}#}
     {#                  <div id="update_{{ role.id }}_{{ resource.id }}" class="btn-group" data-toggle="buttons-radio">#}
     {#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'create', 'allow')" class="btn btn-check-success" type="button"></button>#}
@@ -166,24 +186,3 @@
       </tbody>
     </table>
 </div>
-
-<script type="text/javascript" language="javascript" class="init">
-$(document).ready( function () {
-    $('#editprivtable').DataTable({
-        paging: true,
-        scrollX: true,
-        serverSide: true,
-        processing: true,
-        autoWidth: true,
-        deferRender: true,
-        ajax: {
-            url: "{% url 'admin:cerberus:edit_privileges_json' role_type=box.context.role_type resource_type=box.context.resource_type %}",
-            type: "POST",
-            dataFilter: function(data) {
-                var json = jQuery.parseJSON(data);
-                return JSON.stringify(json)
-            }
-        }
-    });
-} );
-</script>

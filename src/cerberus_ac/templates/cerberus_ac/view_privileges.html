@@ -1,23 +1,23 @@
 {% load static %}
 {% load i18n %}
 <div class="table-responsive">
-    <table class="table table-bordered">
+    <table class="table table-bordered" width="100%" style="table-layout: fixed">
       <thead>
         <tr>
           <th>User</th>
           {% for resource in box.context.resources %}
-            <th style="text-align: center" width="100px">{{ resource }}</th>
+            <th style="text-align: center">{{ resource }}</th>
           {% endfor %}
         </tr>
       </thead>
       <tbody>
         {% for role in box.context.roles %}
           <tr>
-            <td style="text-align: center" width="200px">
+            <td style="text-align: center">
               {{ role }}
             </td>
             {% for resource in box.context.resources %}
-              <td style="text-align: center" width="200px"></td>
+              <td style="text-align: center"></td>
             {% endfor %}
           </tr>
         {% endfor %}
