@@ -405,6 +405,13 @@ class RoleHierarchy(models.Model):
                 result.extend(RoleHierarchy.all_heirs(r[0], r[1], search))
         return result
 
+    @staticmethod
+    def get_roots():
+        all_obj = RoleHierarchy.objects.all()
+        b_set = set([(o.role_type_b, o.role_id_b) for o in all_obj])
+        a_set = set([(o.role_type_a, o.role_id_a) for o in all_obj])
+        return b_set - a_set
+
 
 class RolePrivilege(models.Model):
     """Role privilege model."""
@@ -417,7 +424,7 @@ class RolePrivilege(models.Model):
     access_type = models.CharField(_('Access type'), max_length=255)
 
     resource_type = models.CharField(_('Resource type'), max_length=255)
-    resource_id = models.CharField(_('Resource ID'), max_length=255, blank=True)
+    resource_id = models.CharField(_('Resource ID'), max_length=255, blank=True)  # noqa
 
     creation_date = models.DateTimeField(_('Created'), auto_now_add=True)
     modification_date = models.DateTimeField(_('Last modified'), auto_now=True)
@@ -865,4 +872,3 @@ class AccessHistory(models.Model):
         if inherited:
             return string + inherited
         return string
-

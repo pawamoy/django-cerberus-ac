@@ -43,10 +43,13 @@ def cerberus_urlpatterns(admin_view_func=lambda x: x):
         url(r'^privileges/edit/(?P<role_type>\w+)/(?P<resource_type>\w+)/$',
             admin_view_func(views.EditPrivileges.as_view()),
             name='edit_privileges'),
-        url(r'^privileges/edit/(?P<role_type>\w+)/(?P<resource_type>\w+)/json/$',
+        url(r'^privileges/edit/(?P<role_type>\w+)/(?P<resource_type>\w+)/'
+            r'json/$',
             admin_view_func(views.json_info),
             name='edit_privileges_json'),
-        url(r'^privileges/edit/(?P<role_type>\w+)/(?P<resource_type>\w+)/(?P<role_id>\w+)/(?P<resource_id>\w+)/(?P<privilege>\w+)/(?P<action>\w+)/$',
+        url(r'^privileges/edit/(?P<role_type>\w+)/(?P<resource_type>\w+)/'
+            r'(?P<role_id>\w+)/(?P<resource_id>\w+)/(?P<privilege>\w+)/'
+            r'(?P<action>\w+)/$',
             admin_view_func(views.edit_privileges_ajax),
             name='edit_privileges_ajax'),
         url(r'^privileges/edit/(?P<user>\d+)/$',
@@ -61,13 +64,18 @@ def cerberus_urlpatterns(admin_view_func=lambda x: x):
             admin_view_func(views.MemberList.as_view()),
             name='member_list'),
 
-        # other views
+        # history views
         url(r'^history/access/$',
             admin_view_func(views.AccessHistory.as_view()),
             name='access_history'),
         url(r'^history/privileges/$',
             admin_view_func(views.PrivilegeHistory.as_view()),
             name='privilege_history'),
+
+        # hierarchy
+        url(r'^role/hierarchy/$',
+            admin_view_func(views.ViewRoleHierarchy.as_view()),
+            name='role_hierarchy')
     ]
 
 app_name = AppSettings.get_namespace()
