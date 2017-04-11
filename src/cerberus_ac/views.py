@@ -245,4 +245,5 @@ def edit_privileges_ajax(request,
     return HttpResponse(json.dumps({'success': success, 'message': message}),
                         content_type='application/json')
 
-def edit_privileges_json(request, )
+def edit_privileges_json(request):
+    pass

@@ -406,7 +406,6 @@ class RoleHierarchy(models.Model):
         return result
 
 
-
 class RolePrivilege(models.Model):
     """Role privilege model."""
 
