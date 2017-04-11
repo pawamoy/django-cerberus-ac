@@ -57,8 +57,6 @@ class MemberList(Index):
         return super(MemberList, self).get(request, *args, **kwargs)
 
 
-
-
 class MemberInfo(MemberList):
     """View to see member info."""
 
@@ -66,14 +64,13 @@ class MemberInfo(MemberList):
     crumbs = ({'name': _('Member Info'), 'url': 'admin:cerberus:member_info'},)
 
     def get(self, request, *args, **kwargs):
-        member_id = kwargs.pop('member_id')
-        member_type = kwargs.pop('member_type')
 
-        member = app_settings.mapping.instance_from_name_and_id(
-            member_type, int(member_id))
+        user_class = app_settings.mapping.user_classes()[1]
+        user = user_class.objects.get(id=kwargs['member_id'])
+
         self.grid = Grid(Row(Column(Box(
             template='cerberus_ac/member_info.html',
-            context={'member': member}))))
+            context={'member': user}))))
 
         return super(MemberInfo, self).get(request, *args, **kwargs)
 
@@ -247,3 +244,5 @@ def edit_privileges_ajax(request,
 
     return HttpResponse(json.dumps({'success': success, 'message': message}),
                         content_type='application/json')
+
+def edit_privileges_json(request, )

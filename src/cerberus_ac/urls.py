@@ -32,9 +32,9 @@ def cerberus_urlpatterns(admin_view_func=lambda x: x):
             admin_view_func(views.Logs.as_view()),
             name='logs'),
 
-        url(r'member_info/$',
+        url(r'member/$',
             admin_view_func(views.MemberList.as_view()),
-            name='member_list'),
+            name='member'),
 
         # role views
         url(r'^privileges/view/(?P<role_type>\w+)/(?P<resource_type>\w+)/$',
@@ -54,12 +54,12 @@ def cerberus_urlpatterns(admin_view_func=lambda x: x):
             name='edit_privileges_post'),
 
         # Member Info
-        url(r'^member_info/(?P<member_id>\d+)/$',
+        url(r'^member/info/(?P<member_id>\d+)/$',
             admin_view_func(views.MemberInfo.as_view()),
-            name='view_member_info'),
-        url(r'^member_info/list/$',
+            name='member_info'),
+        url(r'^member/list/$',
             admin_view_func(views.MemberList.as_view()),
-            name='view_member_list'),
+            name='member_list'),
 
         # other views
         url(r'^history/access/$',
