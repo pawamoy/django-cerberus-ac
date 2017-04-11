@@ -61,13 +61,18 @@ def cerberus_urlpatterns(admin_view_func=lambda x: x):
             admin_view_func(views.MemberList.as_view()),
             name='member_list'),
 
-        # other views
+        # history views
         url(r'^history/access/$',
             admin_view_func(views.AccessHistory.as_view()),
             name='access_history'),
         url(r'^history/privileges/$',
             admin_view_func(views.PrivilegeHistory.as_view()),
             name='privilege_history'),
+
+        # hierarchy
+        url(r'^role/hierarchy/$',
+            admin_view_func(views.ViewRoleHierarchy.as_view()),
+            name='role_hierarchy')
     ]
 
 app_name = AppSettings.get_namespace()

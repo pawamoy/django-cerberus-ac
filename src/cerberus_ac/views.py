@@ -10,7 +10,7 @@ from django.utils.translation import ugettext as _
 from suit_dashboard import Box, Column, DashboardView, Grid, Row
 
 from .apps import AppSettings
-from .models import RolePrivilege, get_role_id, get_role_type
+from .models import RolePrivilege, get_role_id, get_role_type, RoleHierarchy
 
 app_settings = AppSettings()
 
@@ -245,4 +245,22 @@ def edit_privileges_ajax(request,
     return HttpResponse(json.dumps({'success': success, 'message': message}),
                         content_type='application/json')
 
-def edit_privileges_json(request, )
+
+def edit_privileges_json(request):
+    pass
+
+
+class ViewRoleHierarchy(Index):
+    """Role hierarchy view."""
+
+    title = _('Role Hierarchy - Cerberus AC')
+    crumbs = ({'name': _('Cerberus'), 'url': 'admin:cerberus:role_hierarchy'},)  # noqa
+    data = [{'source': '%s %s' % (rh.role_type_b, rh.role_id_b),
+             'target': '%s %s' % (rh.role_type_a, rh.role_id_a),
+             'type': 'suit'}
+            for rh in RoleHierarchy.objects.all()]
+
+    grid = Grid(Row(Column(Box(
+        title='Role Hierarchy',
+        template='cerberus_ac/view_role_hierarchy.html',
+        context=json.dumps(data)))))
