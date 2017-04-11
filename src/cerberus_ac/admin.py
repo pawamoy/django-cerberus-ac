@@ -3,7 +3,11 @@
 """Admin module."""
 
 from django.contrib import admin
+from django.core.urlresolvers import reverse
+from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext_lazy as _
 
+from .apps import AppSettings
 from .models import (
     AccessHistory, PrivilegeHistory, Role, RoleHierarchy, RolePrivilege)
 
@@ -41,13 +45,59 @@ class RolePrivilegeAdmin(admin.ModelAdmin):
 class RoleHierarchyAdmin(admin.ModelAdmin):
     """Role hierarchy admin class."""
 
+    list_display = ('role_type_a', 'role_id_a', 'role_type_b', 'role_id_b')
+
 
 class AccessHistoryAdmin(admin.ModelAdmin):
     """Acces history admin class."""
 
+    list_display = (
+        'role_type',
+        'role_id',
+        'response',
+        'response_type',
+        'access_type',
+        'resource_type',
+        'resource_id',
+        'datetime',
+        'conveyor_type',
+        'conveyor_id'
+    )
+
 
 class PrivilegeHistoryAdmin(admin.ModelAdmin):
     """Privilege history admin class."""
+
+    list_display = (
+        'datetime',
+        'user',
+        'action',
+        'role_type',
+        'role_id',
+        'role_link',
+        'authorized',
+        'access_type',
+        'resource_type',
+        'resource_id',
+        'resource_link')
+
+    def role_link(self, obj):
+        instance = AppSettings.get_mapping().instance_from_name_and_id(
+            obj.resource_type, obj.resource_id)
+        info = (instance._meta.app_label, instance._meta.model_name)
+        admin_url = reverse('admin:%s_%s_change' % info,
+                            args=(instance.pk,))
+        return mark_safe('<a href="%s">%s</a>' % (admin_url, instance))
+    role_link.short_description = _('Role link')
+
+    def resource_link(self, obj):
+        instance = AppSettings.get_mapping().instance_from_name_and_id(
+            obj.resource_type, obj.resource_id)
+        info = (instance._meta.app_label, instance._meta.model_name)
+        admin_url = reverse('admin:%s_%s_change' % info,
+                            args=(instance.pk,))
+        return mark_safe('<a href="%s">%s</a>' % (admin_url, instance))
+    resource_link.short_description = _('Resource link')
 
 
 # class HierarchyHistoryAdmin(admin.ModelAdmin):
