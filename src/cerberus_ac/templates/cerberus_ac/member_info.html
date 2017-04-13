@@ -1,40 +1,29 @@
-{% block content %}
-{% with m=user %}
-
-<div class="table-responsive">
+{% with m=box.context.member %}
+  <div class="table-responsive">
     <h1>Member : {{ m.username }} -- {{ m.id }}</h1>
 
     {% if m.id %}
-        <div class="well" id="basic_user_info">
-            <h3>Basic User Info</h3>
-            <ul>
-                <li>UID : {{ m.id }}</li>
-                <li>GID : {{ m.username }}</li>
-                <li>Username : {{ m.username }}</li>
-                <li>Email Address : {{ m.email }}</li>
-                <li>First Name : {{ m.first_name }}</li>
-                <li>Last Name : {{ m.last_name }}</li>
-                <li>Active Member : {{ m.is_active }}</li>
-            </ul>
-        </div>
-        <div class="well" id="user_groups_info">
-            <h3>User Groups</h3>
-            <ul>
-            {% for g in m.groups.all %}
-                <li>g.name</li>
-            {% endfor %}
-            </ul>
-        </div>
-        <div class="well" id="special_user_info">
-            <h3>Special User Info</h3>
-            <ul>
-                <li>bla bla</li>
-            </ul>
-        </div>
+      <div class="well" id="basic_user_info">
+        <h3>Basic Member Info</h3>
+        <ul>
+          <li>UID : {{ m.id }}</li>
+          <li>Username : {{ m.username }}</li>
+          <li>Email Address : {{ m.email }}</li>
+          <li>First Name : {{ m.first_name }}</li>
+          <li>Last Name : {{ m.last_name }}</li>
+          <li>Active Member : {{ m.is_active }}</li>
+        </ul>
+      </div>
+      <div class="well" id="user_groups_info">
+        <h3>Member Groups</h3>
+        <ul>
+        {% for g in m.groups.all %}
+          <li>g.name</li>
+        {% endfor %}
+        </ul>
+      </div>
     {% else %}
-        <p>No user found.</p>
+      <p>No user found.</p>
     {% endif %}
-</div>
-
+  </div>
 {% endwith %}
-{% endblock %}

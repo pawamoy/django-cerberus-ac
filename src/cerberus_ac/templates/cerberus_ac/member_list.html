@@ -1,67 +1,64 @@
-<script>
-    function search(){
-        var input, filter, ul, li, a, i;
-        input = document.getElementById('search_bar_member_list');
-        filter = input.value.toUpperCase();
-        ul = document.getElementById("user_list");
-        li = ul.getElementsByTagName('li');
+{% load i18n %}
 
-        for (i=0;i<li.length;i++){
-            a = li[i].getElementsByTagName("a")[0];
-            if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
-                li[i].style.display = "";
-            } else {
-                li[i].style.display = "none";
-            }
-        }
+<script>
+  function search(){
+    var input, filter, ul, li, a, i;
+    input = document.getElementById('search_bar_member_list');
+    filter = input.value.toUpperCase();
+    ul = document.getElementById("member_list");
+    li = ul.getElementsByTagName('li');
+
+    for (i=0; i<li.length; i++){
+      a = li[i].getElementsByTagName("a")[0];
+      if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
+        li[i].style.display = "";
+      } else {
+        li[i].style.display = "none";
+      }
     }
+  }
 </script>
 
 <style>
-    #search_bar_member_list {
-        width: 100%;
-        font-size: 16px;
-        padding: 12px 20px 12px 40px;
-        border: 1px solid #ddd;
-        margin-bottom: 12px;
-    }
+  #search_bar_member_list {
+    width: 100%;
+    font-size: 16px;
+    padding: 12px 20px 12px 40px;
+    border: 1px solid #ddd;
+    margin-bottom: 12px;
+  }
 
-    #user_list {
-        list-style-type: none;
-        padding: 0;
-        margin: 0;
-    }
+  #member_list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
 
-    #user_list li a {
-        border: 1px solid #ddd;
-        margin-top: -1px;
-        background-color: #f6f6f6;
-        padding: 12px;
-        text-decoration: none;
-        font-size: 18px;
-        color: #000;
-        display: block;
-    }
+  #member_list li a {
+    border: 1px solid #ddd;
+    margin-top: -1px;
+    background-color: #f6f6f6;
+    padding: 12px;
+    text-decoration: none;
+    font-size: 18px;
+    color: #000;
+    display: block;
+  }
 
-    #user_list li a.header {
-        background-color: #e2e2e2;
-        cursor: default;
-    }
-
+  #member_list li a.header {
+    background-color: #e2e2e2;
+    cursor: default;
+  }
 </style>
 
-{% block content %}
-    <h1>Member List</h1>
+<input type="text" id="search_bar_member_list" onkeyup="search()" placeholder="{% trans "Filter members..." %}">
 
-    <input type="text" id="search_bar_member_list" onkeyup="search()" placeholder="Filter users..">
-
-    {% if box.context.members %}
-    <ul id="user_list">
-        {% for m in box.context.members %}
-            <li><a href="{% url 'admin:cerberus:view_member_info' m.id %}">{{ m.username }}</a> ({{ m.id }})</li>
-        {% endfor %}
-    </ul>
-    {% else %}
-        <p>There are no users</p>
-    {% endif %}
-{% endblock %}
+{% if box.context.members %}
+<ul id="member_list">
+  {% for m in box.context.members %}
+    <li><a href="{% url 'admin:cerberus:member_info' m.id %}">{{ m.username }} ({{ m.id }})</a></li>
+  {% endfor %}
+</ul>
+{% else %}
+  <p>{% trans "There are no members" %}</p>
+{% endif %}

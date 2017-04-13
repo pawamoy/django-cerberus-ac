@@ -1,71 +1,57 @@
 {% load i18n %}
 
 <script>
-    function search(){
-        var input, filter, ul, li, a, i;
-        input = document.getElementById('search_bar_member_list');
-        filter = input.value.toUpperCase();
-        ul = document.getElementById("user_list");
-        li = ul.getElementsByTagName('li');
+  function search(){
+    var input, filter, ul, li, a, i;
+    input = document.getElementById('search_bar');
+    filter = input.value.toUpperCase();
+    ul = document.getElementById("page_list");
+    li = ul.getElementsByTagName('li');
 
-        for (i=0;i<li.length;i++){
-            a = li[i].getElementsByTagName("a")[0];
-            if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
-                li[i].style.display = "";
-            } else {
-                li[i].style.display = "none";
-            }
-        }
+    for (i=0; i<li.length; i++){
+      a = li[i].getElementsByTagName("a")[0];
+      if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
+        li[i].style.display = "";
+      } else {
+        li[i].style.display = "none";
+      }
     }
+  }
 </script>
 
-<style>
-    #search_bar_member_list {
-        width: 100%;
-        font-size: 16px;
-        padding: 12px 20px 12px 40px;
-        border: 1px solid #ddd;
-        margin-bottom: 12px;
-    }
-
-    #user_list {
-        list-style-type: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    #user_list li a {
-        border: 1px solid #ddd;
-        margin-top: -1px;
-        background-color: #f6f6f6;
-        padding: 12px;
-        text-decoration: none;
-        font-size: 18px;
-        color: #000;
-        display: block;
-    }
-
-    #user_list li a.header {
-        background-color: #e2e2e2;
-        cursor: default;
-    }
-
-</style>
+{#<style>#}
+{#  #search_bar {#}
+{#    width: 100%;#}
+{#    font-size: 16px;#}
+{#    padding: 12px 20px 12px 40px;#}
+{#    border: 1px solid #ddd;#}
+{#    margin-bottom: 12px;#}
+{#  }#}
+{##}
+{#  #page_list {#}
+{#    list-style-type: none;#}
+{#    padding: 0;#}
+{#    margin: 0;#}
+{#  }#}
+{##}
+{#  #page_list li a {#}
+{#    border: 1px solid #ddd;#}
+{#    margin-top: -1px;#}
+{#    background-color: #f6f6f6;#}
+{#    padding: 12px;#}
+{#    text-decoration: none;#}
+{#    font-size: 18px;#}
+{#    color: #000;#}
+{#    display: block;#}
+{#  }#}
+{#</style>#}
 
 
-    <input type="text" id="search_bar_member_list" onkeyup="search()" placeholder="Filter users.."/>
+<input type="text" id="search_bar" onkeyup="search()" placeholder="Filter pages.."/>
 
-    <ul id="user_list">
-        <li>
-            <a href="{% url "admin:cerberus:privileges" %}">{% trans "Privilege pages" %}</a>
-        </li>
-        <li>
-            <a href="{% url "admin:cerberus:member_list" %}">{% trans "Member List" %}</a>
-        </li>
-        <li>
-            <a href="{% url "admin:cerberus:role_hierarchy" %}">{% trans "Role Hierarchy" %}</a>
-        </li>
-        <li>
-            <a href="#">{% trans "meh" %}</a>
-        </li>
-    </ul>
+<ul id="page_list">
+  <li><a href="{% url "admin:cerberus:index" %}">{% trans "Index" %}</a></li>
+  <li><a href="{% url "admin:cerberus:privileges" %}">{% trans "Privileges matrix" %}</a></li>
+  <li><a href="{% url "admin:cerberus:member_list" %}">{% trans "Member list" %}</a></li>
+  <li><a href="{% url "admin:cerberus:role_hierarchy" %}">{% trans "Role hierarchy" %}</a></li>
+</ul>

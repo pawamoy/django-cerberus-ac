@@ -95,7 +95,7 @@ class PrivilegeHistoryAdmin(admin.ModelAdmin):
         info = (instance._meta.app_label, instance._meta.model_name)
         admin_url = reverse('admin:%s_%s_change' % info,
                             args=(instance.pk,))
-        return format_html('<a href="{}">{</a>', admin_url, instance)
+        return format_html('<a href="{}">{}</a>', admin_url, instance)
     resource_link.short_description = _('Resource link')
 
 

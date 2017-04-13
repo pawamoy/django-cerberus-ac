@@ -1,0 +1,83 @@
+{% load i18n %}
+{#{% if page.has_other_pages %}#}
+{#  <div class="pagination">#}
+{#<!-- Older page -->#}
+{#    {% if page.has_previous %}#}
+{#      <a href="?{{ page_param }}={{ page.previous_page_number }}">&lt;&nbsp;{% trans "Previous" %}</a>#}
+{#    {% endif %}#}
+{##}
+{#<!-- First page -->#}
+{#    {% if current_page > 4 %}#}
+{#      <a href="?{{ page_param }}=1">1</a>&nbsp;&#8943;#}
+{#    {% endif %}#}
+{##}
+{#<!-- Current page -3 -->#}
+{#    {% if current_page > 3 %}#}
+{#      <a href="?{{ page_param }}={{ current_page|add:"-3" }}">{{ current_page|add:"-3" }}</a>#}
+{#    {% endif %}#}
+{##}
+{#<!-- Current page -2 -->#}
+{#    {% if current_page > 2 %}#}
+{#      <a href="?{{ page_param }}={{ current_page|add:"-2" }}">{{ current_page|add:"-2" }}</a>#}
+{#    {% endif %}#}
+{##}
+{#<!-- Current page -1 -->#}
+{#    <!-- current_page > 1 -->#}
+{#    {% if page.has_previous %}#}
+{#      <a href="?{{ page_param }}={{ page.previous_page_number }}">{{ current_page|add:"-1" }}</a>#}
+{#    {% endif %}#}
+{##}
+{#    <!-- Current page -->#}
+{#    {{ current_page }}#}
+{##}
+{#<!-- Current page +1 -->#}
+{#    <!-- current_page < total_pages -->#}
+{#    {% if page.has_next %}#}
+{#      <a href="?{{ page_param }}={{ page.next_page_number }}">{{ current_page|add:"1" }}</a>#}
+{#    {% endif %}#}
+{##}
+{#<!-- Current page +2 -->#}
+{#    {% if current_page < total_pages|add:"-1" and total_pages > 2 %}#}
+{#      <a href="?{{ page_param }}={{ current_page|add:"2" }}">{{ current_page|add:"2" }}</a>#}
+{#    {% endif %}#}
+{##}
+{#<!-- Current page +3 -->#}
+{#    {% if current_page < total_pages|add:"-2" %}#}
+{#      <a href="?{{ page_param }}={{ current_page|add:"3" }}">{{ current_page|add:"3" }}</a>#}
+{#    {% endif %}#}
+{##}
+{#<!-- Last page -->#}
+{#    {% if current_page < total_pages|add:"-3" and total_pages > 4 %}#}
+{#      &#8943;&nbsp;<a href="?{{ page_param }}={{ total_pages }}">{{ total_pages }}</a>#}
+{#    {% endif %}#}
+{##}
+{#<!-- Newer page -->#}
+{#    {% if page.has_next %}#}
+{#      <a href="?{{ page_param }}={{ page.next_page_number }}">{% trans "Next" %}&nbsp;&gt;</a>#}
+{#    {% endif %}#}
+{#  </div>#}
+{#{% endif %}#}
+
+<div class="pagination-block">
+  <div class="pagination">
+    <ul>
+{#      {% if page.has_previous %}#}
+{#        <li><a href="?{{ page_param }}={{ page.previous_page_number }}&{{ fixed_page_param }}={{ fixed_page_num }}">&laquo; {% trans "Previous" %}</a></li>#}
+{#      {% endif %}#}
+{#      <li class="disabled"><a href="#" onclick="return false;">...</a></li>#}
+      {% for i in page.paginator.page_range %}
+        {% if page.number == i %}
+          <li class="active"><a href="">{{ i }}</a></li>
+        {% else %}
+          <li><a href="?{{ page_param }}={{ i }}&{{ fixed_page_param }}={{ fixed_page_num }}">{{ i }}</a></li>
+        {% endif %}
+      {% endfor %}
+{#      {% if page.has_next %}#}
+{#        <li><a href="?{{ page_param }}={{ page.next_page_number }}&{{ fixed_page_param }}={{ fixed_page_num }}">{% trans "Next" %} &raquo;</a></li>#}
+{#      {% endif %}#}
+    </ul>
+  </div>
+  <div class="pagination-info muted">
+    {{ page.number }} - {{ page.paginator.num_pages }} &nbsp; / &nbsp; {{ page.paginator.count }}
+  </div>
+</div>
