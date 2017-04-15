@@ -313,12 +313,16 @@ class ViewRoleHierarchy(Index):
     title = _('Role Hierarchy Graph - Cerberus AC')
     crumbs = ({'name': _('Role Hierarchy Graph'),
                'url': 'admin:cerberus:role_hierarchy'},)
-    data = [{'source': '%s %s' % (rh.role_type_b, rh.role_id_b),
-             'target': '%s %s' % (rh.role_type_a, rh.role_id_a),
-             'type': 'suit'}
-            for rh in RoleHierarchy.objects.all()]
 
-    grid = Grid(Row(Column(Box(
-        title='Role Hierarchy Graph',
-        template='cerberus_ac/view_role_hierarchy.html',
-        context=json.dumps(data)))))
+    def get(self, request, *args, **kwargs):
+        data = [{'source': '%s %s' % (rh.role_type_b, rh.role_id_b),
+                 'target': '%s %s' % (rh.role_type_a, rh.role_id_a),
+                 'type': 'suit'}
+                for rh in RoleHierarchy.objects.all()]
+
+        self.grid = Grid(Row(Column(Box(
+            title='Role Hierarchy Graph',
+            template='cerberus_ac/view_role_hierarchy.html',
+            context=json.dumps(data)))))
+
+        return super(request, *args, **kwargs)
