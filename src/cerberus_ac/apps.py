@@ -43,7 +43,6 @@ def check_mapping(name, value):
         raise ValueError('Names in %s values must be unique' % name)
 
 
-
 class AppSettings(aps.AppSettings):
     """
     Application settings class.
@@ -68,8 +67,8 @@ class AppSettings(aps.AppSettings):
                           transformer=lambda v: Mapping(v),
                           default=())
 
-    # class Meta:
-    #     setting_prefix = 'CERBERUS_'
+    class Meta:
+        setting_prefix = 'CERBERUS_'
 
 
 class Mapping(object):
