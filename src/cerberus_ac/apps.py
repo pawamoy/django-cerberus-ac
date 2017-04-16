@@ -5,7 +5,8 @@
 import importlib
 
 from django.apps import AppConfig
-from django.conf import settings
+
+import appsettings as aps
 
 
 class CerberusACConfig(AppConfig):
@@ -23,145 +24,52 @@ def _import(complete_path):
     return function_or_class
 
 
-class AppSettings(object):
+def check_mapping(name, value):
+    """Check the value of given mapping setting."""
+    if not isinstance(value, tuple):
+        raise ValueError('%s must be a tuple' % name)
+    if not all(isinstance(o, tuple) for o in value):
+        raise ValueError('%s must be a tuple of (key, value) tuples' % name)
+    for k, v in value:
+        if not isinstance(k, str):
+            raise ValueError('Keys in %s must be str' % name)
+        if not isinstance(v, dict):
+            raise ValueError('Values in %s must be dict' % name)
+        if set(v.keys()) != {'name', 'attr'}:
+            raise ValueError('Values in %s must be dict '
+                             'with name and attr keys' % name)
+    l = [o[1] for o in value]
+    if len(set([x['name'] for x in l if l.count(x['name']) > 1])) > 0:
+        raise ValueError('Names in %s values must be unique' % name)
+
+
+
+class AppSettings(aps.AppSettings):
     """
     Application settings class.
 
-    This class provides static getters for each setting, and also an instance
-    ``load`` method to load every setting in an instance.
+    Settings:
+    - default_response (bool):
+    - skip_implicit (bool):
+    - log_access (bool):
+    - log_privileges (bool):
+    - log_hierarchy (bool):
+    - mapping (tuple):
+    - namespace (str):
     """
 
-    DEFAULT_RESPONSE = False
-    SKIP_IMPLICIT = False
-    LOG_ACCESS = True
-    LOG_PRIVILEGES = True
-    LOG_HIERARCHY = True
-    MAPPING = {}
-    NAMESPACE = ''
+    default_response = aps.BoolSetting(default=False)
+    skip_implicit = aps.BoolSetting(default=False)
+    log_access = aps.BoolSetting(default=True)
+    log_privileges = aps.BoolSetting(default=True)
+    log_hierarchy = aps.BoolSetting(default=True)
+    namespace = aps.StringSetting(default='')
+    mapping = aps.Setting(checker=check_mapping,
+                          transformer=lambda v: Mapping(v),
+                          default=())
 
-    def __init__(self):
-        """Load settings in self."""
-        self.default_response = AppSettings.get_default_response()
-        self.skip_implicit = AppSettings.get_skip_implicit()
-        self.log_access = AppSettings.get_log_access()
-        self.log_privileges = AppSettings.get_log_privileges()
-        self.log_hierarchy = AppSettings.get_log_hierarchy()
-        self.mapping = AppSettings.get_mapping()
-        self.namespace = AppSettings.get_namespace()
-
-    @staticmethod
-    def check():
-        """Run every check method for settings."""
-        AppSettings.check_default_response()
-        AppSettings.check_skip_implicit()
-        AppSettings.check_log_access()
-        AppSettings.check_log_privileges()
-        AppSettings.check_log_hierarchy()
-        AppSettings.check_mapping()
-        AppSettings.check_namespace()
-
-    @staticmethod
-    def check_default_response():
-        """Check the value of given default response setting."""
-        default_response = AppSettings.get_default_response()
-        if not isinstance(default_response, bool):
-            raise ValueError('DEFAULT_RESPONSE must be True or False')
-
-    @staticmethod
-    def get_default_response():
-        """Return default response setting."""
-        return getattr(settings, 'CERBERUS_DEFAULT_RESPONSE',
-                       AppSettings.DEFAULT_RESPONSE)
-
-    @staticmethod
-    def check_skip_implicit():
-        """Check the value of given skip implicit setting."""
-        skip_implicit = AppSettings.get_skip_implicit()
-        if not isinstance(skip_implicit, bool):
-            raise ValueError('SKIP_IMPLICIT must be True or False')
-
-    @staticmethod
-    def get_skip_implicit():
-        """Return skip implicit setting."""
-        return getattr(settings, 'CERBERUS_SKIP_IMPLICIT',
-                       AppSettings.SKIP_IMPLICIT)
-
-    @staticmethod
-    def check_log_access():
-        """Check the value of given log access setting."""
-        log_access = AppSettings.get_log_access()
-        if not isinstance(log_access, bool):
-            raise ValueError('LOG_ACCESS must be True or False')
-
-    @staticmethod
-    def get_log_access():
-        """Return log access setting."""
-        return getattr(settings, 'CERBERUS_LOG_ACCESS',
-                       AppSettings.LOG_ACCESS)
-
-    @staticmethod
-    def check_log_privileges():
-        """Check the value of given log privileges setting."""
-        log_privileges = AppSettings.get_log_privileges()
-        if not isinstance(log_privileges, bool):
-            raise ValueError('LOG_PRIVILEGES must be True or False')
-
-    @staticmethod
-    def get_log_privileges():
-        """Return log privileges setting."""
-        return getattr(settings, 'CERBERUS_LOG_PRIVILEGES',
-                       AppSettings.LOG_PRIVILEGES)
-
-    @staticmethod
-    def check_log_hierarchy():
-        """Check the value of given log hierarchy setting."""
-        log_hierarchy = AppSettings.get_log_hierarchy()
-        if not isinstance(log_hierarchy, bool):
-            raise ValueError('LOG_HIERARCHY must be True or False')
-
-    @staticmethod
-    def get_log_hierarchy():
-        """Return log hierarchy setting."""
-        return getattr(settings, 'CERBERUS_LOG_HIERARCHY',
-                       AppSettings.LOG_HIERARCHY)
-
-    @staticmethod
-    def check_mapping():
-        """Check the value of given mapping setting."""
-        mapping = getattr(settings, 'CERBERUS_MAPPING', AppSettings.MAPPING)
-        if not isinstance(mapping, tuple):
-            raise ValueError('MAPPING must be a tuple')
-        if not all(isinstance(o, tuple) for o in mapping):
-            raise ValueError('MAPPING must be a tuple of (key, value) tuples')
-        for k, v in mapping:
-            if not isinstance(k, str):
-                raise ValueError('Keys in MAPPING must be str')
-            if not isinstance(v, dict):
-                raise ValueError('Values in MAPPING must be dict')
-            if set(v.keys()) != {'name', 'attr'}:
-                raise ValueError('Values in MAPPING must be dict '
-                                 'with name and attr keys')
-        l = [o[1] for o in mapping]
-        if len(set([x['name'] for x in l if l.count(x['name']) > 1])) > 0:
-            raise ValueError('Names in MAPPING values must be unique')
-
-    @staticmethod
-    def get_mapping():
-        """Return mapping setting."""
-        return Mapping(getattr(
-            settings, 'CERBERUS_MAPPING', AppSettings.MAPPING))
-
-    @staticmethod
-    def check_namespace():
-        """Check the value of given namespace setting."""
-        namespace = AppSettings.get_namespace()
-        if not isinstance(namespace, str):
-            raise ValueError('NAMESPACE must be str')
-
-    @staticmethod
-    def get_namespace():
-        """Return namespace setting."""
-        return getattr(settings, 'CERBERUS_NAMESPACE', AppSettings.NAMESPACE)
+    # class Meta:
+    #     setting_prefix = 'CERBERUS_'
 
 
 class Mapping(object):

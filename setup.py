@@ -67,5 +67,8 @@ setup(
     ],
     keywords=[
         'dj-CerberusAC','access control','ontology-based','least privilege','role based access control','django access control',
+    ],
+    install_requires=[
+        'django-app-settings'
     ]
 )
