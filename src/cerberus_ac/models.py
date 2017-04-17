@@ -241,7 +241,8 @@ class RoleMixin(object):
             role_type_a=role_type, role_id_a=role_id,
             role_type_b=self.role_type(), role_id_b=self.role_id())
 
-    def can(self, perm, resource, resource_id=''):
+    def can(self, perm, resource, resource_id='',
+            skip_implicit=None, log=None):
         """
         Check if this role has privilege ``perm`` on resource.
 
@@ -249,6 +250,8 @@ class RoleMixin(object):
             perm (str): string describing permission or privilege.
             resource (str/obj): a resource instance or a string describing it.
             resource_id (str): only used when resource is a string.
+            skip_implicit (bool): True, False or None for project's default.
+            log (bool): True, False or None for project's default.
 
         Returns:
             bool: True or False
@@ -256,7 +259,8 @@ class RoleMixin(object):
         resource_type, resource_id = get_resource_type_and_id(resource, resource_id)  # noqa
         return RolePrivilege.authorize(
             role_type=self.role_type(), role_id=self.role_id(), perm=perm,
-            resource_type=resource_type, resource_id=resource_id)
+            resource_type=resource_type, resource_id=resource_id,
+            skip_implicit=skip_implicit, log=log)
 
 
 # TODO: write a ResourceMixin class? And the according Resource class?
@@ -756,7 +760,7 @@ class PrivilegeHistory(models.Model):
     role_type = models.CharField(_('Role type'), max_length=255, blank=True)
     role_id = models.CharField(_('Role ID'), max_length=255, blank=True)
 
-    authorized = models.NullBooleanField(_('Authorization'), default=None)
+    authorized = models.NullBooleanField(_('Authorized'), default=None)
     access_type = models.CharField(
         _('Access type'), max_length=255, blank=True)
 
