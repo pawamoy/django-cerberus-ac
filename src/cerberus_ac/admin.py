@@ -33,33 +33,82 @@ from .models import (
 # TODO: override save_model methods for history
 # https://docs.djangoproject.com/en/1.10/ref/contrib/admin/#django.contrib.admin.ModelAdmin.save_model
 
+def obj_link_generator(type_attr, id_attr, short_description):
+    def obj_link(obj):
+        obj_type = getattr(obj, type_attr)
+        obj_id = getattr(obj, id_attr)
+        instance = AppSettings.get_mapping().instance_from_name_and_id(
+            obj_type, obj_id)
+        if instance is None:
+            return '-'
+        info = (instance._meta.app_label, instance._meta.model_name)
+        admin_url = reverse('admin:%s_%s_change' % info,
+                            args=(instance.pk,))
+        return format_html('<a href="{}">{}</a>', admin_url, instance)
+    obj_link.short_description = short_description
+    return obj_link
+
+
+role_link = obj_link_generator(
+    'role_type', 'role_id', _('Role link'))
+resource_link = obj_link_generator(
+    'resource_type', 'resource_id', _('Resource link'))
+hierarchy_role_link_a = obj_link_generator(
+    'role_type_a', 'role_id_a', _('Role link A'))
+hierarchy_role_link_b = obj_link_generator(
+    'role_type_b', 'role_id_b', _('Role link B'))
+
 
 class RoleAdmin(admin.ModelAdmin):
     """Role admin class."""
+
+    list_display = ('type', 'rid')
 
 
 class RolePrivilegeAdmin(admin.ModelAdmin):
     """Role privilege admin class."""
 
+    list_display = (
+        '__str__',
+        'role_type',
+        'role_id',
+        role_link,
+        'authorized',
+        'access_type',
+        'resource_type',
+        'resource_id',
+        resource_link,
+        'creation_date',
+        'modification_date')
+
 
 class RoleHierarchyAdmin(admin.ModelAdmin):
     """Role hierarchy admin class."""
 
-    list_display = ('role_type_a', 'role_id_a', 'role_type_b', 'role_id_b')
+    list_display = (
+        '__str__',
+        'role_type_a',
+        'role_id_a',
+        hierarchy_role_link_a,
+        'role_type_b',
+        'role_id_b',
+        hierarchy_role_link_b)
 
 
 class AccessHistoryAdmin(admin.ModelAdmin):
     """Acces history admin class."""
 
     list_display = (
+        'datetime',
         'role_type',
         'role_id',
+        role_link,
         'response',
         'response_type',
         'access_type',
         'resource_type',
+        resource_link,
         'resource_id',
-        'datetime',
         'conveyor_type',
         'conveyor_id')
 
@@ -73,30 +122,12 @@ class PrivilegeHistoryAdmin(admin.ModelAdmin):
         'action',
         'role_type',
         'role_id',
-        'role_link',
+        role_link,
         'authorized',
         'access_type',
         'resource_type',
         'resource_id',
-        'resource_link')
-
-    def role_link(self, obj):
-        instance = AppSettings.get_mapping().instance_from_name_and_id(
-            obj.resource_type, obj.resource_id)
-        info = (instance._meta.app_label, instance._meta.model_name)
-        admin_url = reverse('admin:%s_%s_change' % info,
-                            args=(instance.pk,))
-        return format_html('<a href="{}">{}</a>', admin_url, instance)
-    role_link.short_description = _('Role link')
-
-    def resource_link(self, obj):
-        instance = AppSettings.get_mapping().instance_from_name_and_id(
-            obj.resource_type, obj.resource_id)
-        info = (instance._meta.app_label, instance._meta.model_name)
-        admin_url = reverse('admin:%s_%s_change' % info,
-                            args=(instance.pk,))
-        return format_html('<a href="{}">{}</a>', admin_url, instance)
-    resource_link.short_description = _('Resource link')
+        resource_link)
 
 
 # class HierarchyHistoryAdmin(admin.ModelAdmin):
