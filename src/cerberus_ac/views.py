@@ -242,7 +242,9 @@ def edit_privileges_ajax(request,
     if not user.can('update', 'role_privilege'):
         message = _("You don't have the authorization to edit privileges")
 
-    elif get_role_type(user) == role_type and get_role_id(user) == role_id:
+    elif (not app_settings.allow_update_own_privileges and
+          get_role_type(user) == role_type and
+          get_role_id(user) == role_id):
         message = _("You can't edit your own privileges")
 
     elif action in ('allow', 'deny'):
@@ -325,4 +327,4 @@ class ViewRoleHierarchy(Index):
             template='cerberus_ac/view_role_hierarchy.html',
             context=json.dumps(data)))))
 
-        return super(request, *args, **kwargs)
+        return super(ViewRoleHierarchy, self).get(request, *args, **kwargs)

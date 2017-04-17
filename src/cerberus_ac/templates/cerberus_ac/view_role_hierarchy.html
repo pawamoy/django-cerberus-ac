@@ -32,6 +32,7 @@ text {
 
 </style>
 <script src="http://d3js.org/d3.v3.min.js"></script>
+<div id="role_hierarchy_chart"></div>
 <script>
 
 var links = {{ box.context|safe }};
@@ -56,7 +57,7 @@ var force = d3.layout.force()
     .on("tick", tick)
     .start();
 
-var svg = d3.select("body").append("svg")
+var svg = d3.select("#role_hierarchy_chart").append("svg")
     .attr("width", width)
     .attr("height", height);
 
