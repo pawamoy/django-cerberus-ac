@@ -57,6 +57,7 @@ class AppSettings(aps.AppSettings):
     - namespace (str):
     """
 
+    allow_update_own_privileges = aps.BoolSetting(default=False)
     default_response = aps.BoolSetting(default=False)
     skip_implicit = aps.BoolSetting(default=False)
     log_access = aps.BoolSetting(default=True)
@@ -112,13 +113,16 @@ class Mapping(object):
         cls = self.class_from_name(name)
         if cls:
             if hasattr(cls, 'objects') and id:
-                return cls.objects.get(id=id)
-            return cls, id
+                try:
+                    return cls.objects.get(id=id)
+                except cls.DoesNotExist:
+                    return None
+            return None
         from .models import Role
         try:
             return Role.objects.get(type=name, rid=id)
         except Role.DoesNotExist:
-            return name, id
+            return None
 
     def name_from_instance(self, obj):
         """
