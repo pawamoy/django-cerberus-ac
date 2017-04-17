@@ -3,6 +3,7 @@ Changelog
 =========
 
 0.1.3 (2017-04-04)
+==================
 
 * Admin classes added for separation of privileges
 * Models updated

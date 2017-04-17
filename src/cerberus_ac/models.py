@@ -152,7 +152,7 @@ class RoleMixin(object):
         if search is not None:
             return [app_settings.mapping.instance_from_name_and_id(*h)
                     for h in RoleHierarchy.all_heirs(
-                self.role_type(), self.role_id(), search)]
+                    self.role_type(), self.role_id(), search)]
         return [app_settings.mapping.instance_from_name_and_id(*h)
                 for h in RoleHierarchy.heirs(self.role_type(), self.role_id())]
 
@@ -199,7 +199,7 @@ class RoleMixin(object):
         if search is not None:
             return [app_settings.mapping.instance_from_name_and_id(*c)
                     for c in RoleHierarchy.all_conveyors(
-                self.role_type(), self.role_id(), search)]
+                    self.role_type(), self.role_id(), search)]
         return [app_settings.mapping.instance_from_name_and_id(*c)
                 for c in RoleHierarchy.conveyors(self.role_type(), self.role_id())]  # noqa
 
@@ -508,8 +508,8 @@ class RolePrivilege(models.Model):
                     resource_type, resource_id)
 
                 if attempt.response is not None:
-                    attempt.inherited_type = above_role_type
-                    attempt.inherited_id = above_role_id
+                    attempt.conveyor_type = above_role_type
+                    attempt.conveyor_id = above_role_id
                     break
 
         # Else check role implicit perms
@@ -531,8 +531,8 @@ class RolePrivilege(models.Model):
         #
         #             if attempt.response is not None:
         #                 attempt.response_type = AccessHistory.IMPLICIT
-        #                 attempt.inherited_type = above_role_type
-        #                 attempt.inherited_id = above_role_id
+        #                 attempt.conveyor_type = above_role_type
+        #                 attempt.conveyor_id = above_role_id
         #                 break
 
         # Else give default response

@@ -24,54 +24,6 @@ def _import(complete_path):
     return function_or_class
 
 
-def check_mapping(name, value):
-    """Check the value of given mapping setting."""
-    if not isinstance(value, tuple):
-        raise ValueError('%s must be a tuple' % name)
-    if not all(isinstance(o, tuple) for o in value):
-        raise ValueError('%s must be a tuple of (key, value) tuples' % name)
-    for k, v in value:
-        if not isinstance(k, str):
-            raise ValueError('Keys in %s must be str' % name)
-        if not isinstance(v, dict):
-            raise ValueError('Values in %s must be dict' % name)
-        if set(v.keys()) != {'name', 'attr'}:
-            raise ValueError('Values in %s must be dict '
-                             'with name and attr keys' % name)
-    l = [o[1] for o in value]
-    if len(set([x['name'] for x in l if l.count(x['name']) > 1])) > 0:
-        raise ValueError('Names in %s values must be unique' % name)
-
-
-class AppSettings(aps.AppSettings):
-    """
-    Application settings class.
-
-    Settings:
-    - default_response (bool):
-    - skip_implicit (bool):
-    - log_access (bool):
-    - log_privileges (bool):
-    - log_hierarchy (bool):
-    - mapping (tuple):
-    - namespace (str):
-    """
-
-    allow_update_own_privileges = aps.BoolSetting(default=False)
-    default_response = aps.BoolSetting(default=False)
-    skip_implicit = aps.BoolSetting(default=False)
-    log_access = aps.BoolSetting(default=True)
-    log_privileges = aps.BoolSetting(default=True)
-    log_hierarchy = aps.BoolSetting(default=True)
-    namespace = aps.StringSetting(default='')
-    mapping = aps.Setting(checker=check_mapping,
-                          transformer=lambda v: Mapping(v),
-                          default=())
-
-    class Meta:
-        setting_prefix = 'CERBERUS_'
-
-
 class Mapping(object):
     """Mapping class to map roles/resources names to their classes."""
 
@@ -171,3 +123,51 @@ class Mapping(object):
         """Return the resource classes."""
         return [_import(k) for k, v in self.mapping
                 if 'resource' in v['attr'].split()]
+
+
+def check_mapping(name, value):
+    """Check the value of given mapping setting."""
+    if not isinstance(value, tuple):
+        raise ValueError('%s must be a tuple' % name)
+    if not all(isinstance(o, tuple) for o in value):
+        raise ValueError('%s must be a tuple of (key, value) tuples' % name)
+    for k, v in value:
+        if not isinstance(k, str):
+            raise ValueError('Keys in %s must be str' % name)
+        if not isinstance(v, dict):
+            raise ValueError('Values in %s must be dict' % name)
+        if set(v.keys()) != {'name', 'attr'}:
+            raise ValueError('Values in %s must be dict '
+                             'with name and attr keys' % name)
+    _ = [o[1] for o in value]
+    if {x['name'] for x in _ if _.count(x['name']) > 1}:
+        raise ValueError('Names in %s values must be unique' % name)
+
+
+class AppSettings(aps.AppSettings):
+    """
+    Application settings class.
+
+    Settings:
+    - default_response (bool):
+    - skip_implicit (bool):
+    - log_access (bool):
+    - log_privileges (bool):
+    - log_hierarchy (bool):
+    - mapping (tuple):
+    - namespace (str):
+    """
+
+    allow_update_own_privileges = aps.BoolSetting(default=False)
+    default_response = aps.BoolSetting(default=False)
+    skip_implicit = aps.BoolSetting(default=False)
+    log_access = aps.BoolSetting(default=True)
+    log_privileges = aps.BoolSetting(default=True)
+    log_hierarchy = aps.BoolSetting(default=True)
+    namespace = aps.StringSetting(default='')
+    mapping = aps.Setting(checker=check_mapping,
+                          transformer=Mapping,
+                          default=())
+
+    class Meta:
+        setting_prefix = 'CERBERUS_'

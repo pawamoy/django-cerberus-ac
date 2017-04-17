@@ -1,5 +1,5 @@
-
 Authors
 =======
 
-* Mihnea Gheorghiu -  
+* Mihnea Gheorghiu
+* Timothée Mazzucotelli

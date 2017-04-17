@@ -33,7 +33,7 @@ setup(
     description='Django Ontology Based Access Control Module',
     long_description='%s\n%s' % (
         re.compile('^.. start-badges.*^.. end-badges', re.M | re.S)
-            .sub('', read('README.rst')),
+        .sub('', read('README.rst')),
         re.sub(':[a-z]+:`~?(.*?)`', r'``\1``', read('CHANGELOG.rst'))
     ),
     author='Mihnea Gheorghiu',
@@ -50,12 +50,11 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: ISC License (ISCL)',
         'Operating System :: Unix',
-        'Operating System :: POSIX',
-        'Operating System :: Microsoft :: Windows',
         'Framework :: Django',
         'Framework :: Django :: 1.8',
         'Framework :: Django :: 1.9',
         # 'Framework :: Django :: 1.10',
+        # 'Framework :: Django :: 1.11',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
@@ -66,7 +65,8 @@ setup(
         'Topic :: Utilities',
     ],
     keywords=[
-        'dj-CerberusAC','access control','ontology-based','least privilege','role based access control','django access control',
+        'dj-CerberusAC', 'access control', 'ontology-based', 'least privilege',
+        'role based access control', 'django access control',
     ],
     install_requires=[
         'django-app-settings'

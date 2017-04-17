@@ -5,6 +5,7 @@ Cerberus Access Control
 .. start-badges
 
 
+
 |travis|
 |codacygrade|
 |codacycoverage|
@@ -43,9 +44,10 @@ Cerberus Access Control
     :alt: Join the chat at https://gitter.im/dj-CerberusAC/Lobby
 
 
+
 .. end-badges
 
-Django Ontology Based Access Control Module.
+Django Ontology Based Access Control Module
 
 License
 =======
@@ -60,12 +62,6 @@ Installation
 ::
 
     pip install django-cerberus-ac
-
-Usage
-=====
-
-In your main project's ``__init__.py`` , create 2 functions to pass the list of resources available and list of roles.
-
 
 Documentation
 =============

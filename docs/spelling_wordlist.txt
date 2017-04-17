@@ -22,3 +22,6 @@ Gheorghiu
 Django
 JQuery
 Admin
+django
+Timothée
+Mazzucotelli

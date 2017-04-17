@@ -78,5 +78,6 @@ def cerberus_urlpatterns(admin_view_func=lambda x: x):
             name='role_hierarchy')
     ]
 
+
 app_name = AppSettings.get_namespace()
 urlpatterns = cerberus_urlpatterns()

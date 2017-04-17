@@ -128,31 +128,31 @@ class ViewPrivileges(Privileges):
         return super(ViewPrivileges, self).get(request, *args, **kwargs)
 
 
+def get_paginated_data(instances, page, num):
+    paginator = Paginator(instances, num)
+
+    try:
+        paginated_data = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page
+        paginated_data = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results
+        paginated_data = paginator.page(paginator.num_pages)
+    return paginated_data
+
+
 class EditPrivileges(Privileges):
     """View to edit user privileges."""
 
     title = _('Edit Privileges - Cerberus AC')
     crumbs = ({'name': _('Edit')}, )
 
-    def get_paginated_data(self, instances, page, num):
-        paginator = Paginator(instances, num)
-
-        try:
-            paginated_data = paginator.page(page)
-        except PageNotAnInteger:
-            # If page is not an integer, deliver first page
-            paginated_data = paginator.page(1)
-        except EmptyPage:
-            # If page is out of range (e.g. 9999), deliver last page of results
-            paginated_data = paginator.page(paginator.num_pages)
-
-        return paginated_data
-
-    def get_filtered_roles(self, queryset, string):
-        return queryset
-
-    def get_filtered_resources(self, queryset, string):
-        return queryset
+    # def get_filtered_roles(self, queryset, string):
+    #     return queryset
+    #
+    # def get_filtered_resources(self, queryset, string):
+    #     return queryset
 
     def get(self, request, *args, **kwargs):
         role_type = kwargs.pop('role_type')
@@ -162,18 +162,18 @@ class EditPrivileges(Privileges):
         role_instances = role_class.objects.all()
         resource_instances = resource_class.objects.all()
 
-        role_string = request.GET.get('role_string')
-        resource_string = request.GET.get('resource_string')
-        role_instances = self.get_filtered_roles(role_instances, role_string)
-        resource_instances = self.get_filtered_resources(
-            resource_instances, resource_string)
+        # role_string = request.GET.get('role_string')
+        # resource_string = request.GET.get('resource_string')
+        # role_instances = self.get_filtered_roles(role_instances, role_string)
+        # resource_instances = self.get_filtered_resources(
+        #     resource_instances, resource_string)
 
         # role_page = request.GET.get('role_page')
         # resource_page = request.GET.get('resource_page')
         # role_instances = role_instances.order_by('id')
         # resource_instances = resource_instances.order_by('id')
-        # role_instances = self.get_paginated_data(role_instances, role_page, 40)
-        # resource_instances = self.get_paginated_data(
+        # role_instances = get_paginated_data(role_instances, role_page, 40)
+        # resource_instances = get_paginated_data(
         #     resource_instances, resource_page, 10)
 
         self.grid = Grid(Row(Column(
@@ -293,7 +293,8 @@ def edit_privileges_json(request, role_type, resource_type):
             for privilege in RolePrivilege.objects.filter(
                     role_type=role_type, role_id=role.id,
                     resource_type=resource_type, resource_id=resource.id):
-                current_privileges.append([privilege.access_type, privilege.authorized])
+                current_privileges.append([privilege.access_type,
+                                           privilege.authorized])
                 db_access_types.append(privilege.access_type)
             for default_access_type in default_access_types:
                 if default_access_type not in db_access_types:
