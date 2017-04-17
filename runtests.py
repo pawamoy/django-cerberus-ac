@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 """
 Entry point for Django tests.
 
@@ -18,6 +17,7 @@ try:
         USE_TZ=True,
         DATABASES={
             'default': {
+                'NAME': 'default',
                 'ENGINE': 'django.db.backends.sqlite3',
             }
         },

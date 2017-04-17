@@ -5,6 +5,7 @@ Cerberus Access Control
 .. start-badges
 
 
+
 |travis|
 |codacygrade|
 |codacycoverage|
@@ -43,9 +44,10 @@ Cerberus Access Control
     :alt: Join the chat at https://gitter.im/Deavelleye/dj-CerberusAC
 
 
+
 .. end-badges
 
-Django Ontology Based Access Control Module.
+Django Ontology Based Access Control Module
 
 License
 =======
@@ -66,7 +68,7 @@ Documentation
 
 `On ReadTheDocs`_
 
-.. _`On ReadTheDocs`: http://REPLACE_WITH_RTD_SLUG.readthedocs.io/
+.. _`On ReadTheDocs`: http://dj-cerberusac.readthedocs.io/
 
 Development
 ===========
