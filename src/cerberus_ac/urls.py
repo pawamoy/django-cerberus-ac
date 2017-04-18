@@ -44,17 +44,17 @@ def cerberus_urlpatterns(admin_view_func=lambda x: x):
             admin_view_func(views.EditPrivileges.as_view()),
             name='edit_privileges'),
         url(r'^privileges/edit/(?P<role_type>\w+)/(?P<resource_type>\w+)/'
-            r'json/$',
-            admin_view_func(views.json_info),
-            name='edit_privileges_json'),
-        url(r'^privileges/edit/(?P<role_type>\w+)/(?P<resource_type>\w+)/'
             r'(?P<role_id>\w+)/(?P<resource_id>\w+)/(?P<privilege>\w+)/'
             r'(?P<action>\w+)/$',
-            admin_view_func(views.edit_privileges_ajax),
-            name='edit_privileges_ajax'),
-        url(r'^privileges/edit/(?P<user>\d+)/$',
-            admin_view_func(views.edit_perm_post),
-            name='edit_privileges_post'),
+            admin_view_func(views.ajax_edit_privileges),
+            name='ajax_edit_privileges'),
+        url(r'^privileges/load_rr/(?P<role_type>\w+)/(?P<resource_type>\w+)/',
+            admin_view_func(views.ajax_load_roles_and_resources),
+            name='ajax_load_roles_and_resources'),
+        url(r'^privileges/load/(?P<role_type>\w+)/(?P<role_id>\w+)/'
+            r'(?P<resource_type>\w+)/',
+            admin_view_func(views.ajax_load_privileges),
+            name='ajax_load_privileges'),
 
         # Member Info
         url(r'^members/$',

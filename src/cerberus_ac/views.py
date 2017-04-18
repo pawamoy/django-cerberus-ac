@@ -3,7 +3,6 @@
 """Views module."""
 import json
 
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 
@@ -11,6 +10,7 @@ from suit_dashboard import Box, Column, DashboardView, Grid, Row
 
 from .apps import AppSettings
 from .models import RoleHierarchy, RolePrivilege, get_role_id, get_role_type
+from .utils import get_paginated_data
 
 app_settings = AppSettings()
 
@@ -35,24 +35,16 @@ class MemberList(Index):
     crumbs = ({'name': _('Member List'), 'url': 'admin:cerberus:member_list'},)
 
     def get(self, request, *args, **kwargs):
-        role_instances = []
-        for r in app_settings.mapping.role_classes():
-            role_instances.extend(r.objects.all())
+        member_class = app_settings.mapping.user_classes()[0]
+        members = member_class.objects.all()
 
-        paginator = Paginator(role_instances, 50)
-
-        page = request.GET.get('page_user_list')
-        try:
-            user_list = paginator.page(page)
-        except PageNotAnInteger:
-            user_list = paginator.page(1)
-        except EmptyPage:
-            user_list = paginator.page(paginator.num_pages)
+        # members = get_paginated_data(
+        #     members, request.GET.get('page_user_list'), 50)
 
         self.grid = Grid(Row(Column(Box(
             title=_('Member list'),
             template='cerberus_ac/member_list.html',
-            context={'members': user_list}))))
+            context={'members': members}))))
 
         return super(MemberList, self).get(request, *args, **kwargs)
 
@@ -128,31 +120,11 @@ class ViewPrivileges(Privileges):
         return super(ViewPrivileges, self).get(request, *args, **kwargs)
 
 
-def get_paginated_data(instances, page, num):
-    paginator = Paginator(instances, num)
-
-    try:
-        paginated_data = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page
-        paginated_data = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results
-        paginated_data = paginator.page(paginator.num_pages)
-    return paginated_data
-
-
 class EditPrivileges(Privileges):
     """View to edit user privileges."""
 
     title = _('Edit Privileges - Cerberus AC')
     crumbs = ({'name': _('Edit')}, )
-
-    # def get_filtered_roles(self, queryset, string):
-    #     return queryset
-    #
-    # def get_filtered_resources(self, queryset, string):
-    #     return queryset
 
     def get(self, request, *args, **kwargs):
         role_type = kwargs.pop('role_type')
@@ -162,25 +134,11 @@ class EditPrivileges(Privileges):
         role_instances = role_class.objects.all()
         resource_instances = resource_class.objects.all()
 
-        # role_string = request.GET.get('role_string')
-        # resource_string = request.GET.get('resource_string')
-        # role_instances = self.get_filtered_roles(role_instances, role_string)
-        # resource_instances = self.get_filtered_resources(
-        #     resource_instances, resource_string)
-
-        # role_page = request.GET.get('role_page')
-        # resource_page = request.GET.get('resource_page')
-        # role_instances = role_instances.order_by('id')
-        # resource_instances = resource_instances.order_by('id')
-        # role_instances = get_paginated_data(role_instances, role_page, 40)
-        # resource_instances = get_paginated_data(
-        #     resource_instances, resource_page, 10)
-
         self.grid = Grid(Row(Column(
             Box(title=_('Edit role privileges between %s and %s') % (
                     role_class._meta.verbose_name_plural,
                     resource_class._meta.verbose_name_plural),
-                template='cerberus_ac/edit_privileges_no_datatable.html',
+                template='cerberus_ac/edit_privileges.html',
                 context={'roles': role_instances,
                          'resources': resource_instances,
                          'role_type': role_type,
@@ -188,25 +146,6 @@ class EditPrivileges(Privileges):
         )))
 
         return super(EditPrivileges, self).get(request, *args, **kwargs)
-
-
-def json_info(request, role_type, resource_type):
-    # role_class = app_settings.mapping.class_from_name(role_type)
-    resource_class = app_settings.mapping.class_from_name(resource_type)
-    # role_instances = role_class.objects.all()
-    resource_instances = resource_class.objects.all()
-
-    res_list_json = json.dumps(
-        [{'name': str(res)} for res in resource_instances])
-
-    return HttpResponse(res_list_json, content_type="application/json")
-
-
-def edit_perm_post(request, user):
-    """Handler for user privileges POSTs."""
-    # if request.method == "POST":
-    #     form = UserPermForm(request.POST)
-    pass
 
 
 class AccessHistory(Logs):
@@ -229,7 +168,29 @@ class PrivilegeHistory(Logs):
         template='cerberus_ac/privilege_history.html'))))
 
 
-def edit_privileges_ajax(request,
+class ViewRoleHierarchy(Index):
+    """Role hierarchy view."""
+
+    title = _('Role Hierarchy Graph - Cerberus AC')
+    crumbs = ({'name': _('Role Hierarchy Graph'),
+               'url': 'admin:cerberus:role_hierarchy'},)
+
+    def get(self, request, *args, **kwargs):
+        data = [{'source': '%s %s' % (rh.role_type_b, rh.role_id_b),
+                 'target': '%s %s' % (rh.role_type_a, rh.role_id_a),
+                 'type': 'suit'}
+                for rh in RoleHierarchy.objects.all()]
+
+        self.grid = Grid(Row(Column(Box(
+            title='Role Hierarchy Graph',
+            template='cerberus_ac/view_role_hierarchy.html',
+            context=json.dumps(data)))))
+
+        return super(ViewRoleHierarchy, self).get(request, *args, **kwargs)
+
+
+# Ajax views ------------------------------------------------------------------
+def ajax_edit_privileges(request,
                          role_type,
                          resource_type,
                          role_id,
@@ -310,22 +271,20 @@ def edit_privileges_json(request, role_type, resource_type):
     return HttpResponse(json.dumps(data), content_type="application/json")
 
 
-class ViewRoleHierarchy(Index):
-    """Role hierarchy view."""
+def ajax_load_roles_and_resources(request, role_type, resource_type):
+    role_class = app_settings.mapping.class_from_name(role_type)
+    resource_class = app_settings.mapping.class_from_name(resource_type)
 
-    title = _('Role Hierarchy Graph - Cerberus AC')
-    crumbs = ({'name': _('Role Hierarchy Graph'),
-               'url': 'admin:cerberus:role_hierarchy'},)
+    role_instances = role_class.objects.order_by('id')
+    resource_instances = resource_class.objects.order_by('id')
 
-    def get(self, request, *args, **kwargs):
-        data = [{'source': '%s %s' % (rh.role_type_b, rh.role_id_b),
-                 'target': '%s %s' % (rh.role_type_a, rh.role_id_a),
-                 'type': 'suit'}
-                for rh in RoleHierarchy.objects.all()]
+    role_instances = [(r.id, str(r)) for r in role_instances]
+    resource_instances = [(r.id, str(r)) for r in resource_instances]
 
-        self.grid = Grid(Row(Column(Box(
-            title='Role Hierarchy Graph',
-            template='cerberus_ac/view_role_hierarchy.html',
-            context=json.dumps(data)))))
+    data = {'roles': role_instances, 'resources': resource_instances}
 
-        return super(ViewRoleHierarchy, self).get(request, *args, **kwargs)
+    return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+def ajax_load_privileges(request, role_type, role_id, resource_type):
+    pass

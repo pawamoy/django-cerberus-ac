@@ -1,154 +1,225 @@
 {% load static %}
 {% load i18n %}
 
+{% comment %}
+
+https://datatables.net/reference/api/column%28%29.visible%28%29
+https://datatables.net/examples/api/show_hide.html
+
+{% endcomment %}
+
 <link rel="stylesheet" type="text/css" href="{% static "cerberus_ac/datatables/datatables.min.css" %}"/>
 <script type="text/javascript" src="{% static "cerberus_ac/datatables/datatables.min.js" %}"></script>
 
 <script type="text/javascript" language="javascript" class="init">
-
-$(document).ready( function () {
-    $('#editprivtable').DataTable({
-        paging: true,
-        scrollX: true,
-        serverSide: true,
-        processing: true,
-        autoWidth: true,
-        deferRender: true,
-        ajax: {
-            url: "{% url 'admin:cerberus:edit_privileges_json' role_type=box.context.role_type resource_type=box.context.resource_type %}",
-            type: "POST",
-            dataFilter: function(data) {
-                var json = jQuery.parseJSON(data);
-                return JSON.stringify(json)
-            }
-        }
+  var generic_url = '{% url "admin:cerberus:ajax_edit_privileges" box.context.role_type box.context.resource_type 'ro' 'rs' 'p' 'a' %}';
+  function set_privilege(role_id, resource_id, privilege, action) {
+    var final_url = generic_url.replace('/ro/rs/p/a', '/' + role_id + '/' + resource_id + '/' + privilege + '/' + action);
+    $.ajax({
+      url: final_url,
+      type: 'GET',
+      dataType: 'json',
+      success: function(data) {
+        var status = data.success? 'success': 'failure';
+        $("#notifications").prepend('<div class="notification ' + status + '">' + data.message + '</div>');
+        $(".notification:first").delay(5000).fadeOut("slow");
+      }
     });
-} );
+  }
 
-$('.collapse').on('show.bs.collapse', function () {
-    $('.collapse.in').collapse('hide');
-});
+  {# Load table contents through JSON #}
+{#  $.getJSON("{% url 'admin:cerberus:edit_privileges_json' role_type=box.context.role_type resource_type=box.context.resource_type %}", data, function() {#}
+{#    var i, j, table_head_tr = $("#table_head_tr");#}
+{#    table_head_tr.append('<th>{% trans "Role" %}</th>');#}
+{#    for (i=0; i<data.resources.length; i++) {#}
+{#      table_head_tr.append('<th style="text-align: right;">' + data.resources[i] + '</th>');#}
+{#    }#}
+{#    var row, role_id, role_name, resource_id, resource_name, privileges, tbody = $('#tbody');#}
+{#    for (i=0; i<data.rows.length; i++) {#}
+{#      row = data.rows[i];#}
+{#      role_id = row[0];#}
+{#      role_name = row[1];#}
+{#      resource_id = row[2];#}
+{#      resource_name = row[3];#}
+{#      privileges = row[4];#}
+{##}
+{#      // TODO: continue#}
+{#      // http://stackoverflow.com/questions/17724017/using-jquery-to-build-table-rows-from-ajax-responsejson#17724264 #}
+{#    }#}
+{#  });#}
+
+
+  // TODO: use an ajax call like above, transform data then use it in datables
+  // with data and columns attributes, deferRender works with data
+  $(document).ready(function() {
+    var roles = [];
+    var resources = [];
+    $('#editprivtable').DataTable({
+      paging: true,
+      scrollX: true,
+      deferRender: true,
+      ajax: {
+        url: '{% url "admin:cerberus:ajax_load_roles_and_resources" box.context.role_type box.context.resource_type %}',
+        dataSrc: function(json) {
+          roles.push.apply(json.roles);
+          resources.push.apply(json.resources);
+          var new_json = [];
+          for (var i=0, ien=json.roles.length; i<ien ; i++) {
+{#            new_json.push([json.roles[i][1]]);#}
+            new_json.push([json.roles[i]]);
+          }
+          return new_json;
+        }
+      },
+      columnDefs: [{
+        render: function(data, type, row) {
+          return data[1];
+        },
+        targets: 0
+      }]
+    });
+  });
 
 </script>
 
 <style>
+  button.btn-check-success {
+    background: #95d394; /* Old browsers */
+    background: -moz-linear-gradient(top, #b2ecb2, #92cd96); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top, #b2ecb2, #92cd96); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(top, #b2ecb2, #92cd96); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b2ecb2', endColorstr='#92cd96',GradientType=0 ); /* IE6-9 */
+  }
+  button.btn-check-default {
+    background: #faffff; /* Old browsers */
+    background: -moz-linear-gradient(top, #faffff, #faffff); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top, #faffff, #faffff); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(top, #faffff, #faffff); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#faffff', endColorstr='#faffff',GradientType=0 ); /* IE6-9 */
+  }
+  button.btn-check-danger {
+    background: #d68489; /* Old browsers */
+    background: -moz-linear-gradient(top, #e59998, #e88b7f); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top, #e59998, #e88b7f); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(top, #e59998, #e88b7f); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e59998', endColorstr='#e88b7f',GradientType=0 ); /* IE6-9 */
+  }
 
-    button.btn-check-success {
-      background: #95d394; /* Old browsers */
-      background: -moz-linear-gradient(top, #b2ecb2, #92cd96); /* FF3.6-15 */
-      background: -webkit-linear-gradient(top, #b2ecb2, #92cd96); /* Chrome10-25,Safari5.1-6 */
-      background: linear-gradient(top, #b2ecb2, #92cd96); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-      filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b2ecb2', endColorstr='#92cd96',GradientType=0 ); /* IE6-9 */
-    }
-    button.btn-check-default {
-      background: #faffff; /* Old browsers */
-      background: -moz-linear-gradient(top, #faffff, #faffff); /* FF3.6-15 */
-      background: -webkit-linear-gradient(top, #faffff, #faffff); /* Chrome10-25,Safari5.1-6 */
-      background: linear-gradient(top, #faffff, #faffff); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-      filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#faffff', endColorstr='#faffff',GradientType=0 ); /* IE6-9 */
-    }
-    button.btn-check-danger {
-      background: #d68489; /* Old browsers */
-      background: -moz-linear-gradient(top, #e59998, #e88b7f); /* FF3.6-15 */
-      background: -webkit-linear-gradient(top, #e59998, #e88b7f); /* Chrome10-25,Safari5.1-6 */
-      background: linear-gradient(top, #e59998, #e88b7f); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-      filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e59998', endColorstr='#e88b7f',GradientType=0 ); /* IE6-9 */
-    }
+  button.active.btn-check-success {
+    background: #17e71a; /* Old browsers */
+    background: -moz-linear-gradient(top, #2ce42b, #23e927); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top, #2ce42b, #23e927); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(top, #2ce42b, #23e927); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2ce42b', endColorstr='#23e927',GradientType=0 ); /* IE6-9 */
+  }
+  button.active.btn-check-default {
+    background: #ffffff; /* Old browsers */
+    background: -moz-linear-gradient(top, #ffffff, #ffffff); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top, #ffffff, #ffffff); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(top, #ffffff, #ffffff); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */
+  }
+  button.active.btn-check-danger {
+    background: #e72f26; /* Old browsers */
+    background: -moz-linear-gradient(top, #ee1f1e, #de1914); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top, #ee1f1e, #de1914); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(top, #ee1f1e, #de1914); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ee1f1e', endColorstr='#de1914',GradientType=0 ); /* IE6-9 */
+  }
 
-    button.active.btn-check-success {
-      background: #17e71a; /* Old browsers */
-      background: -moz-linear-gradient(top, #2ce42b, #23e927); /* FF3.6-15 */
-      background: -webkit-linear-gradient(top, #2ce42b, #23e927); /* Chrome10-25,Safari5.1-6 */
-      background: linear-gradient(top, #2ce42b, #23e927); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-      filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2ce42b', endColorstr='#23e927',GradientType=0 ); /* IE6-9 */
-    }
-    button.active.btn-check-default {
-      background: #ffffff; /* Old browsers */
-      background: -moz-linear-gradient(top, #ffffff, #ffffff); /* FF3.6-15 */
-      background: -webkit-linear-gradient(top, #ffffff, #ffffff); /* Chrome10-25,Safari5.1-6 */
-      background: linear-gradient(top, #ffffff, #ffffff); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-      filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */
-    }
-    button.active.btn-check-danger {
-      background: #e72f26; /* Old browsers */
-      background: -moz-linear-gradient(top, #ee1f1e, #de1914); /* FF3.6-15 */
-      background: -webkit-linear-gradient(top, #ee1f1e, #de1914); /* Chrome10-25,Safari5.1-6 */
-      background: linear-gradient(top, #ee1f1e, #de1914); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-      filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ee1f1e', endColorstr='#de1914',GradientType=0 ); /* IE6-9 */
-    }
+  #notifications {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    max-width: 300px;
+    min-width: 150px;
+    z-index: 105;
+    text-align: center
+  }
+  .notification {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    color: white;
+    padding: 5px;
+  }
+  .notification.success {
+    background-color: #43c77d
+  }
+  .notification.failure {
+    background-color: #c78182
+  }
+  .notification span.dismiss {
+    border: 1px solid #FFF;
+    padding: 0 5px;
+    cursor: pointer;
+    float: right;
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+  .notification a {
+    color: white;
+    text-decoration: none;
+  }
+
+  #editprivtable {
+    overflow-x: scroll;
+  }
+
+  .pagination {
+    display: block;
+  }
 </style>
 
-<table id="editprivtable" class="display">
-    <thead>
-        <tr>
-            <th>User</th>
-{#            {% for r in box.context.resources %}#}
-{#                <th>{{ r }}</th>#}
-{#            {% endfor %}#}
-        </tr>
-    </thead>
-    <tbody>
-    <!--{% for m in box.context.roles %}-->
-        <form action="{% url "admin:cerberus:edit_privileges_post" user=m.id %}" method="POST">
-            <tr data-toggle="collapse" data-target=".userrow{{ m.id }}">
-                <td style="text-align: right" class="span5">
-                    {{ m.username }}
-                    <input type="submit" value="Save" name="submit_{{ m.id }}"/>
-                    <input type="submit" value="Inherited" name="inherited_{{ m.id }}"/>
-                </td>
-{#                <!--{% for r in box.context.resources %}-->#}
-                    <td></td>
-{#                <!--{% endfor %}-->#}
-            </tr>
-            <tr>
-                <td class="hiddenRow">
-                    <div id="userrow{{ m.id }}" class="collapse userrow{{ m.id }}">
-                        ID : {{ m.id }}<br>
-                        Groups: {{ m.get_groups }}<br>
-                        Username : {{ m.username }}<br>
-                        Mail : {{ m.email }} <br>
-                        Active : {{ m.is_active }}<br>
-                        Last login: {{ m.last_login }}<br>
-                        Register date: {{ m.date_joined }}<br>
-                    </div>
-                </td>
-{#                <!--{% for r in box.context.resources %}-->#}
-{#                    <td class="hiddenRow " >#}
-{#                        <div class="row">#}
-{#                            <div class="collapse userrow{{ m.id }}" style="text-align: right">#}
-{#                              <div>{% trans "Create" %}#}
-{#                                <div id="update_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">#}
-{#                                    <button class="btn btn-check-success" id="allow_create_{{ m.id }}_{{ r.id }}" type="button"></button>#}
-{#                                    <button class="btn btn-check-default" id="default_create_{{ m.id }}_{{ r.id }}" type="button"></button>#}
-{#                                    <button class="btn btn-check-danger" id="deny_create_{{ m.id }}_{{ r.id }}" type="button"></button>#}
-{#                                </div></div>#}
-{#                              <div>{% trans "Read" %}#}
-{#                                <div id="read_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">#}
-{#                                    <button class="btn btn-check-success" id="allow_read_{{ m.id }}_{{ r.id }}" type="button"></button>#}
-{#                                    <button class="btn btn-check-default" id="default_read_{{ m.id }}_{{ r.id }}" type="button"></button>#}
-{#                                    <button class="btn btn-check-danger" id="deny_read_{{ m.id }}_{{ r.id }}" type="button"></button>#}
-{#                                </div></div>#}
-{#                              <div>{% trans "Update" %}#}
-{#                                <div id="update_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">#}
-{#                                    <button class="btn btn-check-success" id="allow_update_{{ m.id }}_{{ r.id }}" type="button"></button>#}
-{#                                    <button class="btn btn-check-default" id="default_update_{{ m.id }}_{{ r.id }}" type="button"></button>#}
-{#                                    <button class="btn btn-check-danger" id="deny_update_{{ m.id }}_{{ r.id }}" type="button"></button>#}
-{#                                </div></div>#}
-{#                              <div>{% trans "Delete" %}#}
-{#                                <div id="delete_{{ m.id }}_{{ r.id }}" class="btn-group" data-toggle="buttons-radio">#}
-{#                                    <button class="btn btn-check-success" id="allow_delete_{{ m.id }}_{{ r.id }}" type="button"></button>#}
-{#                                    <button class="btn btn-check-default" id="default_delete_{{ m.id }}_{{ r.id }}" type="button"></button>#}
-{#                                    <button class="btn btn-check-danger" id="deny_delete_{{ m.id }}_{{ r.id }}" type="button"></button>#}
-{#                                </div></div>#}
-{#                            </div>#}
-{#                        </div>#}
-{#                    </td>#}
-{##}
-{#                <!--{% endfor %}-->#}
-                </tr>
-            </form>
-        <!--{% endfor %}-->
-        </tbody>
-    <tfoot>
-        </tfoot>
+<div id="notifications"></div>
+
+<table id="editprivtable" class="table table-bordered" width="100%" style="table-layout: fixed">
+  <thead>
+    <tr id="table_head_tr">
+      <th>{% trans "Role" %}</th>
+{#      {% for resource in box.context.resources %}#}
+{#        <th style="text-align: right;">{{ resource }}</th>#}
+{#      {% endfor %}#}
+    </tr>
+  </thead>
+{#  <tbody id="tbody">#}
+{#    {% for role in box.context.roles %}#}
+{#      <tr id="{{ role }}">#}
+{#        <td data-toggle="collapse" data-target=".rolerow{{ role.id }}" style="text-align: right">#}
+{#          {{ role }}#}
+{#        </td>#}
+{#        {% for resource in box.context.resources %}#}
+{#          <td class="collapse">#}
+{#            <div class="row">#}
+{#              <div class="collapse rolerow{{ role.id }}" style="text-align: right; border: none;">#}
+{#                <div>{% trans "Create" %}#}
+{#                  <div id="update_{{ role.id }}_{{ resource.id }}" class="btn-group" data-toggle="buttons-radio">#}
+{#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'create', 'allow')" class="btn btn-check-success" type="button"></button>#}
+{#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'create', 'forget')" class="btn btn-check-default" type="button"></button>#}
+{#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'create', 'deny')" class="btn btn-check-danger" type="button"></button>#}
+{#                  </div></div>#}
+{#                <div>{% trans "Read" %}#}
+{#                  <div id="read_{{ role.id }}_{{ resource.id }}" class="btn-group" data-toggle="buttons-radio">#}
+{#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'read', 'allow')" class="btn btn-check-success" type="button"></button>#}
+{#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'read', 'forget')" class="btn btn-check-default" type="button"></button>#}
+{#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'read', 'deny')" class="btn btn-check-danger" type="button"></button>#}
+{#                  </div></div>#}
+{#                <div>{% trans "Update" %}#}
+{#                  <div id="update_{{ role.id }}_{{ resource.id }}" class="btn-group" data-toggle="buttons-radio">#}
+{#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'update', 'allow')" class="btn btn-check-success" type="button"></button>#}
+{#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'update', 'forget')" class="btn btn-check-default" type="button"></button>#}
+{#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'update', 'deny')" class="btn btn-check-danger" type="button"></button>#}
+{#                  </div></div>#}
+{#                <div>{% trans "Delete" %}#}
+{#                  <div id="delete_{{ role.id }}_{{ resource.id }}" class="btn-group" data-toggle="buttons-radio">#}
+{#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'delete', 'allow')" class="btn btn-check-success" type="button"></button>#}
+{#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'delete', 'forget')" class="btn btn-check-default" type="button"></button>#}
+{#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'delete', 'deny')" class="btn btn-check-danger" type="button"></button>#}
+{#                  </div></div>#}
+{#              </div>#}
+{#            </div>#}
+{#          </td>#}
+{#        {% endfor %}#}
+{#      </tr>#}
+{#    {% endfor %}#}
+{#  </tbody>#}
 </table>
