@@ -25,3 +25,6 @@ Admin
 django
 Timothée
 Mazzucotelli
+Github
+backend
+namespace
