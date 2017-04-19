@@ -2,6 +2,11 @@
 Changelog
 =========
 
+0.1.6 (2017-04-19)
+==================
+
+- Finish implementation of edit privileges page (efficient below 1000*1000 matrices).
+
 0.1.5 (2017-04-18)
 ==================
 
