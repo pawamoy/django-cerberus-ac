@@ -45,7 +45,7 @@ project = u'Cerberus Access Control'
 year = '2017'
 author = u'Mihnea Gheorghiu'
 copyright = '{0}, {1}'.format(year, author)
-version = release = u'0.1.5'
+version = release = u'0.1.6'
 
 pygments_style = 'trac'
 templates_path = ['.']

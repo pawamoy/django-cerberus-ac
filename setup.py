@@ -28,7 +28,7 @@ def read(*names, **kwargs):
 
 setup(
     name='django-cerberus-ac',
-    version='0.1.5',
+    version='0.1.6',
     license='ISC',
     description='Django Ontology Based Access Control Module',
     long_description='%s\n%s' % (
