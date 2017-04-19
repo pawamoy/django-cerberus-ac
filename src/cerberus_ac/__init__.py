@@ -2,7 +2,7 @@
 
 u"""Cerberus Access Control package."""
 
-__version__ = '0.1.6'
+__version__ = '0.1.7'
 
 default_app_config = 'cerberus_ac.apps.CerberusACConfig'
 
