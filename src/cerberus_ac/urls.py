@@ -28,14 +28,6 @@ def cerberus_urlpatterns(admin_view_func=lambda x: x):
             admin_view_func(views.Privileges.as_view()),
             name='privileges'),
 
-        url(r'logs/$',
-            admin_view_func(views.Logs.as_view()),
-            name='logs'),
-
-        url(r'member/$',
-            admin_view_func(views.MemberList.as_view()),
-            name='member'),
-
         # role views
         url(r'^privileges/view/(?P<role_type>\w+)/(?P<resource_type>\w+)/$',
             admin_view_func(views.ViewPrivileges.as_view()),

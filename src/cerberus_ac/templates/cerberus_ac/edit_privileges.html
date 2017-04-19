@@ -1,22 +1,21 @@
 {% load static %}
 {% load i18n %}
 
-{% comment %}
-
-https://datatables.net/reference/api/column%28%29.visible%28%29
-https://datatables.net/examples/api/show_hide.html
-
-{% endcomment %}
-
 <link rel="stylesheet" type="text/css" href="{% static "cerberus_ac/datatables/datatables.min.css" %}"/>
 <script type="text/javascript" src="{% static "cerberus_ac/datatables/datatables.min.js" %}"></script>
 
 <script type="text/javascript" language="javascript" class="init">
-  var generic_url = '{% url "admin:cerberus:ajax_edit_privileges" box.context.role_type box.context.resource_type 'ro' 'rs' 'p' 'a' %}';
+  var table;
+  var roles;
+  var resources;
+
+  var set_privilege_url = '{% url "admin:cerberus:ajax_edit_privileges" box.context.role_type box.context.resource_type 'RO' 'RS' 'P' 'A' %}';
+  var load_privileges_url = '{% url "admin:cerberus:ajax_load_privileges" box.context.role_type 'ROLE_ID' box.context.resource_type %}';
+
   function set_privilege(role_id, resource_id, privilege, action) {
-    var final_url = generic_url.replace('/ro/rs/p/a', '/' + role_id + '/' + resource_id + '/' + privilege + '/' + action);
+    var params = '/' + role_id + '/' + resource_id + '/' + privilege + '/' + action;
     $.ajax({
-      url: final_url,
+      url: set_privilege_url.replace('/RO/RS/P/A', params),
       type: 'GET',
       dataType: 'json',
       success: function(data) {
@@ -27,56 +26,144 @@ https://datatables.net/examples/api/show_hide.html
     });
   }
 
-  {# Load table contents through JSON #}
-{#  $.getJSON("{% url 'admin:cerberus:edit_privileges_json' role_type=box.context.role_type resource_type=box.context.resource_type %}", data, function() {#}
-{#    var i, j, table_head_tr = $("#table_head_tr");#}
-{#    table_head_tr.append('<th>{% trans "Role" %}</th>');#}
-{#    for (i=0; i<data.resources.length; i++) {#}
-{#      table_head_tr.append('<th style="text-align: right;">' + data.resources[i] + '</th>');#}
-{#    }#}
-{#    var row, role_id, role_name, resource_id, resource_name, privileges, tbody = $('#tbody');#}
-{#    for (i=0; i<data.rows.length; i++) {#}
-{#      row = data.rows[i];#}
-{#      role_id = row[0];#}
-{#      role_name = row[1];#}
-{#      resource_id = row[2];#}
-{#      resource_name = row[3];#}
-{#      privileges = row[4];#}
-{##}
-{#      // TODO: continue#}
-{#      // http://stackoverflow.com/questions/17724017/using-jquery-to-build-table-rows-from-ajax-responsejson#17724264 #}
-{#    }#}
-{#  });#}
+  function load_privileges(row_index) {
+    var role_id = roles[row_index][0];
+    var params = '/' + role_id + '/';
+    var button = '<button onclick="set_privilege(' + role_id + ', RESOURCE_ID, ACCESS_TYPE, ACTION)" class="active btn btn-check-COLOR" type="button"></button>';
+    // TODO: record what has been loaded, don't reload when re-click?
+    $.ajax({
+      url: load_privileges_url.replace('/ROLE_ID/', params),
+      type: 'GET',
+      dataType: 'json',
+      success: function (data) {
+        var privileges, column, rlen, cell, res_button, priv_button, action_buttons, cell_data, allow_btn, forget_btn, deny_btn;
+        for (column=0, rlen=resources.length; column<rlen; column++) {
+          cell_data = '';
+          cell = table.cell(row_index, column+1);
+          privileges = data[column];
+          res_button = button.replace('RESOURCE_ID', resources[column][0]);
+          for (var p in privileges) {
+            action_buttons = '';
+            priv_button = res_button.replace('ACCESS_TYPE', "'" + p + "'");
 
+            allow_btn = priv_button.replace('ACTION', "'allow'").replace('COLOR', 'success');
+            forget_btn = priv_button.replace('ACTION', "'forget'").replace('COLOR', 'default');
+            deny_btn = priv_button.replace('ACTION', "'deny'").replace('COLOR', 'danger');
 
-  // TODO: use an ajax call like above, transform data then use it in datables
-  // with data and columns attributes, deferRender works with data
-  $(document).ready(function() {
-    var roles = [];
-    var resources = [];
-    $('#editprivtable').DataTable({
-      paging: true,
-      scrollX: true,
-      deferRender: true,
-      ajax: {
-        url: '{% url "admin:cerberus:ajax_load_roles_and_resources" box.context.role_type box.context.resource_type %}',
-        dataSrc: function(json) {
-          roles.push.apply(json.roles);
-          resources.push.apply(json.resources);
-          var new_json = [];
-          for (var i=0, ien=json.roles.length; i<ien ; i++) {
-{#            new_json.push([json.roles[i][1]]);#}
-            new_json.push([json.roles[i]]);
+            if (privileges[p] === true) {
+              forget_btn = forget_btn.replace('active ', '');
+              deny_btn = deny_btn.replace('active ', '');
+            } else if (privileges[p] === false) {
+              forget_btn = forget_btn.replace('active ', '');
+              allow_btn = allow_btn.replace('active ', '');
+            } else {
+              allow_btn = allow_btn.replace('active ', '');
+              deny_btn = deny_btn.replace('active ', '');
+            }
+
+            action_buttons = allow_btn + forget_btn + deny_btn;
+            cell_data += '<div>' + p + ' <div class="btn-group" data-toggle="buttons-radio">' + action_buttons + '</div></div>'
           }
-          return new_json;
+          cell.data(cell_data);
         }
-      },
-      columnDefs: [{
-        render: function(data, type, row) {
-          return data[1];
-        },
-        targets: 0
-      }]
+      }
+    });
+  }
+
+  function search_resource() {
+    var i, ien, input, filter, name, column;
+    input = document.getElementById('search_resource');
+    filter = input.value.toUpperCase();
+
+    if (filter.length === 0) {
+      for (i=0, ien=resources.length; i<ien; i++) {
+        table.column(i+1).visible(true, false);
+      }
+    } else {
+      for (i=0, ien=resources.length; i<ien; i++) {
+        name = resources[i][1];
+        column = table.column(i+1);
+        if (name.toUpperCase().indexOf(filter) > -1) {
+          column.visible(true, false);
+        } else {
+          column.visible(false, false);
+        }
+      }
+    }
+
+    table.draw();
+  }
+
+  $(document).ready(function() {
+    // get the roles and resources from server
+    $.ajax({
+      url: '{% url "admin:cerberus:ajax_load_roles_and_resources" box.context.role_type box.context.resource_type %}',
+      type: 'GET',
+      dataType: 'json',
+      success: function(json) {
+        var i, ien;
+
+        // save roles and resources in global variables
+        roles = json.roles;
+        resources = json.resources;
+
+        // format roles for datatable's data
+        var data = [];
+        for (i=0, ien=json.roles.length; i<ien; i++) {
+          data.push([json.roles[i][1]]);
+        }
+
+        // format resources for datatable's columns
+        var columns = [{title: '{% trans "Role" %}'}];
+        for (i=0, ien=json.resources.length; i<ien; i++) {
+          columns.push({
+            title: json.resources[i][1],
+            defaultContent: '',
+            searchable: false,
+            orderable: false
+          });
+        }
+
+        // build datatable
+        table = $('#editprivtable').DataTable({
+          paging: true,
+          scrollX: true,
+          deferRender: true,
+          data: data,
+          columns: columns,
+          columnDefs: [{
+
+          }],
+          // please see https://datatables.net/extensions/fixedcolumns/
+          // -> additional complexity
+          // fixedColumns: {
+          //   leftColumns: 1
+          // },
+          language: {
+            search: '{% trans "Search role:" %}',
+            paginate: {
+              previous: '{% trans "Previous" %}',
+              next: '{% trans "Next" %}'
+            }
+          }
+        });
+
+        // add the "filter resource" input
+        $('#editprivtable_filter').append(
+          '<label>{% trans "Search resource:" %}<input id="search_resource" onkeyup="search_resource()" type="text">');
+
+        // add event listener on rows to load/fold/unfold privileges
+        $('tbody').on('click', 'tr td:first-child', function() {
+          var i, ien;
+          for (i=0, ien=roles.length; i<ien; i++) {
+            // careful: we assume here that role names are unique!!
+            if (roles[i][1] === $(this).text()) {
+              load_privileges(i);
+              break;
+            }
+          }
+        })
+      }
     });
   });
 
@@ -172,15 +259,8 @@ https://datatables.net/examples/api/show_hide.html
 
 <div id="notifications"></div>
 
-<table id="editprivtable" class="table table-bordered" width="100%" style="table-layout: fixed">
-  <thead>
-    <tr id="table_head_tr">
-      <th>{% trans "Role" %}</th>
-{#      {% for resource in box.context.resources %}#}
-{#        <th style="text-align: right;">{{ resource }}</th>#}
-{#      {% endfor %}#}
-    </tr>
-  </thead>
+{#width="100%" style="table-layout: fixed"#}
+<table id="editprivtable" class="table table-bordered">
 {#  <tbody id="tbody">#}
 {#    {% for role in box.context.roles %}#}
 {#      <tr id="{{ role }}">#}
@@ -191,35 +271,4 @@ https://datatables.net/examples/api/show_hide.html
 {#          <td class="collapse">#}
 {#            <div class="row">#}
 {#              <div class="collapse rolerow{{ role.id }}" style="text-align: right; border: none;">#}
-{#                <div>{% trans "Create" %}#}
-{#                  <div id="update_{{ role.id }}_{{ resource.id }}" class="btn-group" data-toggle="buttons-radio">#}
-{#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'create', 'allow')" class="btn btn-check-success" type="button"></button>#}
-{#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'create', 'forget')" class="btn btn-check-default" type="button"></button>#}
-{#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'create', 'deny')" class="btn btn-check-danger" type="button"></button>#}
-{#                  </div></div>#}
-{#                <div>{% trans "Read" %}#}
-{#                  <div id="read_{{ role.id }}_{{ resource.id }}" class="btn-group" data-toggle="buttons-radio">#}
-{#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'read', 'allow')" class="btn btn-check-success" type="button"></button>#}
-{#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'read', 'forget')" class="btn btn-check-default" type="button"></button>#}
-{#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'read', 'deny')" class="btn btn-check-danger" type="button"></button>#}
-{#                  </div></div>#}
-{#                <div>{% trans "Update" %}#}
-{#                  <div id="update_{{ role.id }}_{{ resource.id }}" class="btn-group" data-toggle="buttons-radio">#}
-{#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'update', 'allow')" class="btn btn-check-success" type="button"></button>#}
-{#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'update', 'forget')" class="btn btn-check-default" type="button"></button>#}
-{#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'update', 'deny')" class="btn btn-check-danger" type="button"></button>#}
-{#                  </div></div>#}
-{#                <div>{% trans "Delete" %}#}
-{#                  <div id="delete_{{ role.id }}_{{ resource.id }}" class="btn-group" data-toggle="buttons-radio">#}
-{#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'delete', 'allow')" class="btn btn-check-success" type="button"></button>#}
-{#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'delete', 'forget')" class="btn btn-check-default" type="button"></button>#}
-{#                    <button onclick="set_privilege({{ role.id }}, {{ resource.id }}, 'delete', 'deny')" class="btn btn-check-danger" type="button"></button>#}
-{#                  </div></div>#}
-{#              </div>#}
-{#            </div>#}
-{#          </td>#}
-{#        {% endfor %}#}
-{#      </tr>#}
-{#    {% endfor %}#}
-{#  </tbody>#}
 </table>

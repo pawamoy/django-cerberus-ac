@@ -5,6 +5,7 @@ import json
 
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
+from django.views.defaults import bad_request
 
 from suit_dashboard import Box, Column, DashboardView, Grid, Row
 
@@ -200,7 +201,9 @@ def ajax_edit_privileges(request,
     user = request.user
     success = False
 
-    if not user.can('update', 'role_privilege'):
+    if not request.is_ajax():
+        return bad_request(request, ValueError('not an ajax request'))
+    elif not user.can('update', 'role_privilege'):
         message = _("You don't have the authorization to edit privileges")
 
     elif (not app_settings.allow_update_own_privileges and
@@ -233,45 +236,10 @@ def ajax_edit_privileges(request,
                         content_type='application/json')
 
 
-def edit_privileges_json(request, role_type, resource_type):
-    role_class = app_settings.mapping.class_from_name(role_type)
-    resource_class = app_settings.mapping.class_from_name(resource_type)
-    role_instances = role_class.objects.order_by('id')
-    resource_instances = resource_class.objects.order_by('id')
-
-    body = []
-    head = []
-    default_access_types = ('read', 'update', 'delete')
-
-    for role in role_instances:
-        row = [role.id, str(role)]
-        for resource in resource_instances:
-            str_res = str(resource)
-            head.append(str_res)
-            row.extend([resource.id, str_res])
-            current_privileges = []
-            db_access_types = []
-            for privilege in RolePrivilege.objects.filter(
-                    role_type=role_type, role_id=role.id,
-                    resource_type=resource_type, resource_id=resource.id):
-                current_privileges.append([privilege.access_type,
-                                           privilege.authorized])
-                db_access_types.append(privilege.access_type)
-            for default_access_type in default_access_types:
-                if default_access_type not in db_access_types:
-                    current_privileges.append([default_access_type, False])
-            row.append(current_privileges)
-        body.append(row)
-
-    data = {
-        'head': head,
-        'body': body
-    }
-
-    return HttpResponse(json.dumps(data), content_type="application/json")
-
-
 def ajax_load_roles_and_resources(request, role_type, resource_type):
+    if not request.is_ajax():
+        return bad_request(request, ValueError('not an ajax request'))
+
     role_class = app_settings.mapping.class_from_name(role_type)
     resource_class = app_settings.mapping.class_from_name(resource_type)
 
@@ -287,4 +255,27 @@ def ajax_load_roles_and_resources(request, role_type, resource_type):
 
 
 def ajax_load_privileges(request, role_type, role_id, resource_type):
-    pass
+    if not request.is_ajax():
+        return bad_request(request, ValueError('not an ajax request'))
+
+    resource_class = app_settings.mapping.class_from_name(resource_type)
+    resource_instances = resource_class.objects.order_by('id')
+
+    default_access_types = ('read', 'update', 'delete')
+
+    data = []
+
+    for resource in resource_instances:
+        current_privileges = {}
+        db_access_types = []
+        for privilege in RolePrivilege.objects.filter(
+                role_type=role_type, role_id=role_id,
+                resource_type=resource_type, resource_id=resource.id):
+            current_privileges[privilege.access_type] = privilege.authorized
+            db_access_types.append(privilege.access_type)
+        for default_access_type in default_access_types:
+            if default_access_type not in db_access_types:
+                current_privileges[default_access_type] = None
+        data.append(current_privileges)
+
+    return HttpResponse(json.dumps(data), content_type="application/json")
