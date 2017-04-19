@@ -1,3 +1,4 @@
+{% load static %}
 <style>
 
 .link {
@@ -31,7 +32,7 @@ text {
 }
 
 </style>
-<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="{% static "cerberus_ac/d3/d3.min.js" %}"></script>
 <div id="role_hierarchy_chart"></div>
 <script>
 
