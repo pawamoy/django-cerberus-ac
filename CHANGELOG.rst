@@ -2,6 +2,11 @@
 Changelog
 =========
 
+0.1.7 (2017-04-19)
+==================
+
+- Add ``d3.min.js`` as a static asset to enable it in SSL context.
+
 0.1.6 (2017-04-19)
 ==================
 
