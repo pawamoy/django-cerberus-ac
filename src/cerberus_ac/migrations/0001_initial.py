@@ -47,7 +47,7 @@ class Migration(migrations.Migration):
                 ('datetime', models.DateTimeField(auto_now_add=True, verbose_name='Date and time')),
                 ('role_type', models.CharField(blank=True, max_length=255, verbose_name='Role type')),
                 ('role_id', models.CharField(blank=True, max_length=255, verbose_name='Role ID')),
-                ('authorized', models.NullBooleanField(default=None, verbose_name='Authorization')),
+                ('authorized', models.NullBooleanField(default=None, verbose_name='Authorized')),
                 ('access_type', models.CharField(blank=True, max_length=255, verbose_name='Access type')),
                 ('resource_type', models.CharField(blank=True, max_length=255, verbose_name='Resource type')),
                 ('resource_id', models.CharField(blank=True, max_length=255, verbose_name='Resource ID')),
