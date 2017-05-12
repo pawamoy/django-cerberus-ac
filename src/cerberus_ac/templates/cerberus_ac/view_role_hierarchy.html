@@ -1,5 +1,7 @@
 {% load static %}
 
+{# https://jsfiddle.net/6w4op2go/ #}
+
 <style>
   .svg-container {
     display: inline-block;
@@ -60,6 +62,27 @@ links.forEach(function(link) {
   link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});
 });
 
+
+var margin = {top: -5, right: -5, bottom: -5, left: -5};
+    var width = 500 - margin.left - margin.right,
+	height = 400- margin.top - margin.bottom;
+
+
+var w = 500, h = 300, r = 6;
+
+var color = d3.scale.category20();
+
+var force = d3.layout.force()
+    .nodes(d3.values(nodes))
+    .links(links)
+    .size([900, 500]) // node display area
+    .linkDistance(60)
+    .linkStrength(2)
+    .charge(-300)
+    .on("tick", tick)
+    .start();
+
+/*
 var force = d3.layout.force()
     .nodes(d3.values(nodes))
     .links(links)
@@ -68,6 +91,8 @@ var force = d3.layout.force()
     .charge(-300)
     .on("tick", tick)
     .start();
+*/
+
 
 var zoom = d3.behavior.zoom().on("zoom", zoomed);
 
@@ -77,18 +102,30 @@ var drag = d3.behavior.drag()
     .on("drag", dragged)
     .on("dragend", dragended);
 
-// http://stackoverflow.com/questions/16265123/resize-svg-when-window-is-resized-in-d3-js#25978286
-var svg = d3.select("#role_hierarchy_chart")
-    .append("div")
-    .classed("svg-container", true)
-    .append("svg")
-    .attr("preserveAspectRatio", "xMinYMin meet")
-    .attr("width", "100%")
-    .attr("height", "100%")
-    .classed("svg-content-responsive", true)
+var svg = d3.select("#role_hierarchy_chart").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
     .append("g")
-    .call(zoom)
-    .append("g");
+	.attr("transform", "translate(" + margin.left + "," + margin.right + ")")
+	.call(zoom).on("dblclick.zoom", null);
+
+svg.append("rect")
+.attr("class", "overlay")
+.attr("width", width)
+.attr("height", height);
+
+// http://stackoverflow.com/questions/16265123/resize-svg-when-window-is-resized-in-d3-js#25978286
+// var svg = d3.select("#role_hierarchy_chart")
+//     .append("div")
+//     .classed("svg-container", true)
+//     .append("svg")
+//     .attr("preserveAspectRatio", "xMinYMin meet")
+//     .attr("width", "100%")
+//     .attr("height", "100%")
+//     .classed("svg-content-responsive", true)
+//     .append("g")
+//     .call(zoom)
+//     .append("g");
 
 // Draggable rectangle
 var rect = svg.append('rect')
@@ -116,6 +153,7 @@ svg.append("defs").selectAll("marker")
   .append("path")
     .attr("d", "M0,-5L10,0L0,5");
 
+/*
 var path = container.append("g").selectAll("path")
     .data(force.links())
   .enter().append("path")
@@ -170,4 +208,201 @@ function dragended(d) {
   d3.select(this).classed("dragging", false);
 }
 
+*/
+
+
+
+
+
+var linkedByIndex = {};
+
+
+
+
+
+
+
+//sort links by source, then target
+links.sort(function(a,b) {
+  if (a.source > b.source) {return 1;}
+  else if (a.source < b.source) {return -1;}
+  else {
+    if (a.target > b.target) {return 1;}
+    if (a.target < b.target) {return -1;}
+    else {return 0;}
+  }
+});
+//any links with duplicate source and target get an incremented 'linknum'
+for (var i=0; i<links.length; i++) {
+  if (i !== 0 &&
+    links[i].source === links[i-1].source &&
+    links[i].target === links[i-1].target) {
+        links[i].linknum = links[i-1].linknum + 1;
+    }
+  else {links[i].linknum = 1;}
+}
+
+
+var link = svg.selectAll(".link")
+  .data(links)
+ .enter()
+  .append("g")
+  .attr("class", "link")
+  .append("line")
+  .attr("class", "link-line")
+  .style("stroke-width", 1);
+
+var linkText = svg.append("svg:g").selectAll("g.linklabelholder").data(force.links());
+
+linkText.enter().append("g").attr("class", "linklabelholder")
+   .append("text")
+   .attr("class", "linklabel")
+ .style("font-size", "13px")
+   .attr("x", "50")
+ .attr("y", "-20")
+   .attr("text-anchor", "start")
+   .style("fill","#000")
+ .append("textPath")
+   .attr("xlink:href",function(d,i) { return "#linkId_" + i;})
+   .text(function(d) {
+  return d.label;
+ });
+
+
+var path = svg.append("svg:g").selectAll("path")
+  .data(force.links())
+  .enter().append("svg:path")
+  .attr("class", function(d) { return "link " + d.label; })
+  .attr("id",function(d,i) { return "linkId_" + i; })
+  .attr("marker-end", function(d) { return "url(#" + d.label + ")"; });
+
+var node = svg.selectAll(".node")
+  .data(nodes)
+ .enter()
+  .append("circle")
+  .attr("class", "node")
+  .attr("r", 20)
+   .attr("cx", function(d) { return d.x; })
+    .attr("cy", function(d) { return d.y; })
+  .style("fill", function (d) { return color(d.type); })
+  .on("mouseover", mouseover)
+  .on("mouseout", mouseout)
+  .call(drag);
+
+
+var path_label = svg.append("svg:g").selectAll(".path_label")
+  .data(force.links())
+  .enter()
+  .append("svg:text")
+  .attr("class", "path_label")
+  .append("svg:textPath")
+  .attr("startOffset", "50%")
+  .attr("text-anchor", "middle")
+  .attr("xlink:href", function(d) { return "#" + d.source.index + "_" + d.target.index; })
+  .style("fill", "#000")
+  .style("font-family", "Arial")
+  .text(function(d) { return d.label; });
+
+var linkPath = link.append("svg:path")
+  .attr("class", function(d) { return "link " + d.label; })
+  .attr("marker-end", function(d) { return "url(#" + d.label + ")"; });
+
+var textPath = link.append("svg:path")
+  .attr("id", function(d) { return d.source.index + "_" + d.target.index; })
+  .attr("class", "textpath");
+
+
+
+
+
+svg.style("opacity", 1e-6)
+  .transition()
+  .duration(1000)
+  .style("opacity", 1);
+
+node.on("click", function(d) { d.fixed = true; });
+
+node.on("dblclick", function(d) { d.fixed = false; });
+
+node.append("title")
+  .text(function (d) { return d.name; });
+
+force.on("tick", function (e) {
+  var k = 6 * e.alpha;
+
+  i = 0;
+  for (var key in nodes) {
+    if (nodes.hasOwnProperty(key)) {
+      nodes[key].y += i & 1 ? k : -k;
+      nodes[key].x += i & 2 ? k : -k;
+      i++;
+    }
+  }
+
+
+  node.attr("cx", function(d) {
+    return d.x = Math.max(r, Math.min(w - r, d.x));
+  })
+  .attr("cy", function(d) {
+    return d.y = Math.max(r, Math.min(h - r, d.y));
+  });
+});
+
+links.forEach(function(d) {
+  linkedByIndex[d.source.index + "," + d.target.index] = 1;
+  linkedByIndex[d.target.index + "," + d.source.index] = 1;
+});
+
+
+function neighboring(a, b) {
+  return a.index === b.index || linkedByIndex[a.index + "," + b.index];
+}
+
+function mouseover(d) {
+  d3.selectAll(".node").attr("r",30).style("stroke","black");
+  d3.selectAll(".link").style("stroke","black").style("stroke-width",2);
+  d3.selectAll(".link").transition().duration(500)
+    .style("opacity", function(o) {
+      return o.source === d || o.target === d ? 1 : .1;
+  });
+
+  d3.selectAll(".node").transition().duration(500)
+    .style("opacity", function(o) {
+      return neighboring(d, o) ? 1 : .1;
+  });
+}
+
+function mouseout() {
+
+	// var co = "path.link"+d.rtype;
+  d3.selectAll(".node").attr("r",20).style("stroke","white");
+  d3.selectAll(".link").attr("class", "link")
+  .append("line").attr("class", "link-line").style("stroke-width",1);
+  d3.selectAll(".link").transition().duration(500)
+    .style("opacity", 1);
+  d3.selectAll(".node").transition().duration(500)
+    .style("opacity", 1);
+}
+
+function zoomed() {
+	svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+}
+
+function dragstarted(d) {
+  d3.event.sourceEvent.stopPropagation();
+
+  d3.select(this).classed("dragging", true);
+  force.start();
+}
+
+function dragged(d) {
+
+  d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
+
+}
+
+function dragended(d) {
+
+  d3.select(this).classed("dragging", false);
+}
 </script>
