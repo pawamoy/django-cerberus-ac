@@ -68,6 +68,9 @@ class RoleAdmin(admin.ModelAdmin):
 class RolePrivilegeAdmin(admin.ModelAdmin):
     """Role privilege admin class."""
 
+    actions_on_top = True
+    actions_on_bottom = True
+
     list_display = (
         '__str__',
         'role_type',
@@ -80,6 +83,11 @@ class RolePrivilegeAdmin(admin.ModelAdmin):
         resource_link,
         'creation_date',
         'modification_date')
+
+    list_filter = (
+        'role_type', 'resource_type', 'authorized', 'access_type',
+        'modification_date')
+    date_hierarchy = 'creation_date'
 
 
 class RoleHierarchyAdmin(admin.ModelAdmin):
