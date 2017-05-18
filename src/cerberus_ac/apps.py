@@ -67,7 +67,7 @@ class Mapping(object):
             if hasattr(cls, 'objects') and id:
                 try:
                     return cls.objects.get(id=id)
-                except cls.DoesNotExist:
+                except (cls.DoesNotExist, ValueError):
                     return None
             return None
         from .models import Role
