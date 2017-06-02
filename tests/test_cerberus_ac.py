@@ -75,19 +75,19 @@ class MainTestCase(TestCase):
     def test_wrong_settings_trigger_exception(self):
         """Check that settings with wrong values trigger exceptions."""
         with pytest.raises(ValueError):
-            AppSettings.check_default_response()
+            AppSettings.default_response.check()
         with pytest.raises(ValueError):
-            AppSettings.check_skip_implicit()
+            AppSettings.skip_implicit.check()
         with pytest.raises(ValueError):
-            AppSettings.check_log_access()
+            AppSettings.log_access.check()
         with pytest.raises(ValueError):
-            AppSettings.check_log_privileges()
+            AppSettings.log_privileges.check()
         with pytest.raises(ValueError):
-            AppSettings.check_log_hierarchy()
+            AppSettings.log_hierarchy.check()
 
     def test_import_classes(self):
         """Test classes imported correctly."""
-        assert set(AppSettings.get_mapping().role_classes()) == {Role, FakeUser, FakeGroup}  # noqa
+        assert set(AppSettings.mapping.get().role_classes()) == {Role, FakeUser, FakeGroup}  # noqa
 
     def test_getting_resource_type_and_id(self):
         """Test get_resource_type and get_resource_id methods."""

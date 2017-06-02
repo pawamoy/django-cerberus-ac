@@ -424,7 +424,7 @@ class RolePrivilege(models.Model):
     role_id = models.CharField(_('Role ID'), max_length=255, blank=True)
 
     authorized = models.BooleanField(
-        _('Authorized'), default=AppSettings.get_default_response())
+        _('Authorized'), default=AppSettings.default_response.get())
     access_type = models.CharField(_('Access type'), max_length=255)
 
     resource_type = models.CharField(_('Resource type'), max_length=255)
@@ -484,10 +484,10 @@ class RolePrivilege(models.Model):
             bool: role has perm on resource (or not).
         """
         if skip_implicit is None:
-            skip_implicit = AppSettings.get_skip_implicit()
+            skip_implicit = AppSettings.skip_implicit.get()
 
         if log is None:
-            log = AppSettings.get_log_access()
+            log = AppSettings.log_access.get()
 
         attempt = AccessHistory(role_type=role_type, role_id=role_id,
                                 resource_type=resource_type,
@@ -537,7 +537,7 @@ class RolePrivilege(models.Model):
 
         # Else give default response
         if attempt.response is None:
-            attempt.response = AppSettings.get_default_response()
+            attempt.response = AppSettings.default_response.get()
             attempt.response_type = AccessHistory.DEFAULT
 
         if log:

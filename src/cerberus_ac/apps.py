@@ -125,24 +125,30 @@ class Mapping(object):
                 if 'resource' in v['attr'].split()]
 
 
-def check_mapping(name, value):
-    """Check the value of given mapping setting."""
-    if not isinstance(value, tuple):
-        raise ValueError('%s must be a tuple' % name)
-    if not all(isinstance(o, tuple) for o in value):
-        raise ValueError('%s must be a tuple of (key, value) tuples' % name)
-    for k, v in value:
-        if not isinstance(k, str):
-            raise ValueError('Keys in %s must be str' % name)
-        if not isinstance(v, dict):
-            raise ValueError('Values in %s must be dict' % name)
-        if set(v.keys()) != {'name', 'attr'}:
-            raise ValueError('Values in %s must be dict '
-                             'with name and attr keys' % name)
-    _ = [o[1] for o in value]
-    if {x['name'] for x in _ if _.count(x['name']) > 1}:
-        raise ValueError('Names in %s values must be unique' % name)
+class MappingSetting(aps.Setting):
+    def check(self):
+        """Check the value of given mapping setting."""
+        value = self.get_raw()
+        if value == self.default:
+            return
+        if not isinstance(value, tuple):
+            raise ValueError('%s must be a tuple' % name)
+        if not all(isinstance(o, tuple) for o in value):
+            raise ValueError('%s must be a tuple of (key, value) tuples' % name)
+        for k, v in value:
+            if not isinstance(k, str):
+                raise ValueError('Keys in %s must be str' % name)
+            if not isinstance(v, dict):
+                raise ValueError('Values in %s must be dict' % name)
+            if set(v.keys()) != {'name', 'attr'}:
+                raise ValueError('Values in %s must be dict '
+                                 'with name and attr keys' % name)
+        _ = [o[1] for o in value]
+        if {x['name'] for x in _ if _.count(x['name']) > 1}:
+            raise ValueError('Names in %s values must be unique' % name)
 
+    def transform(self):
+        return Mapping(self.get_raw())
 
 class AppSettings(aps.AppSettings):
     """
@@ -158,16 +164,14 @@ class AppSettings(aps.AppSettings):
     - namespace (str):
     """
 
-    allow_update_own_privileges = aps.BoolSetting(default=False)
-    default_response = aps.BoolSetting(default=False)
-    skip_implicit = aps.BoolSetting(default=False)
-    log_access = aps.BoolSetting(default=True)
-    log_privileges = aps.BoolSetting(default=True)
-    log_hierarchy = aps.BoolSetting(default=True)
+    allow_update_own_privileges = aps.BooleanSetting(default=False)
+    default_response = aps.BooleanSetting(default=False)
+    skip_implicit = aps.BooleanSetting(default=False)
+    log_access = aps.BooleanSetting(default=True)
+    log_privileges = aps.BooleanSetting(default=True)
+    log_hierarchy = aps.BooleanSetting(default=True)
     namespace = aps.StringSetting(default='')
-    mapping = aps.Setting(checker=check_mapping,
-                          transformer=Mapping,
-                          default=())
+    mapping = MappingSetting(default=())
 
     class Meta:
         setting_prefix = 'CERBERUS_'
