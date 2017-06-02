@@ -34,6 +34,8 @@ default_context:
     package_name:                    'cerberus_ac'
     project_name:                    'Cerberus Access Control'
     project_short_description:       'Django Ontology Based Access Control Module'
+    prospector:                      'yes'
+    pylama:                          'no'
     python_versions:                 '2.7,3.4,3.5,3.6,3.7-dev,pypy'
     pyup:                            'yes'
     release_date:                    '2017-02-21'
