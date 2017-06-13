@@ -10,7 +10,8 @@ from django_fake_model import models as f
 from cerberus_ac.apps import AppSettings
 from cerberus_ac.models import (
     AccessHistory, PrivilegeHistory, Role, RoleHierarchy, RoleMixin,
-    RolePrivilege, get_resource_id, get_resource_type)
+    RolePrivilege)
+from cerberus_ac.utils import get_resource_id, get_resource_type
 
 
 class FakeUser(f.FakeModel, RoleMixin):

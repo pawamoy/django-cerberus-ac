@@ -17,116 +17,11 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from .apps import AppSettings
+from .utils import (
+    get_resource_type, get_resource_id, get_resource_type_and_id,
+    get_role_type, get_role_id, get_role_type_and_id)
 
 app_settings = AppSettings()
-
-
-def get_role_type(role):
-    """
-    Get a role's type.
-
-    Args:
-        role (obj): a Python object.
-
-    Returns:
-        str: the role's type.
-    """
-    if hasattr(role, 'role_type'):
-        attr = role.role_type
-        if callable(attr):
-            return attr()
-        return attr
-    return app_settings.mapping.name_from_instance(role)
-
-
-def get_role_id(role):
-    """
-    Get a role's ID.
-
-    Args:
-        role (obj): a Python object.
-
-    Returns:
-        str: the role's ID or None.
-    """
-    if hasattr(role, 'role_id'):
-        attr = role.role_id
-        if callable(attr):
-            return str(attr())
-        return str(attr)
-    elif hasattr(role, 'id'):
-        return str(role.id)
-    return ''
-
-
-def get_role_type_and_id(role, role_id=''):
-    """
-    Return both type and ID of a role.
-
-    Args:
-        role (obj): string or role instance.
-        role_id (str): string ID or None.
-
-    Returns:
-        tuple: type and ID of role.
-    """
-    if isinstance(role, str):
-        return role, role_id
-    return get_role_type(role), get_role_id(role)
-
-
-def get_resource_type(resource):
-    """
-    Get a resource's type.
-
-    Args:
-        resource (obj): a Python object.
-
-    Returns:
-        str: the resource's type.
-    """
-    if hasattr(resource, 'resource_type'):
-        attr = resource.resource_type
-        if callable(attr):
-            return attr()
-        return attr
-    return app_settings.mapping.name_from_instance(resource)
-
-
-def get_resource_id(resource):
-    """
-    Get a resource's ID.
-
-    Args:
-        resource (obj): a Python object.
-
-    Returns:
-        str: the resource's ID or None.
-    """
-    if hasattr(resource, 'resource_id'):
-        attr = resource.resource_id
-        if callable(attr):
-            return attr()
-        return attr
-    elif hasattr(resource, 'id'):
-        return resource.id
-    return None
-
-
-def get_resource_type_and_id(resource, resource_id=''):
-    """
-    Return both type and ID of a resource.
-
-    Args:
-        resource (obj): string or resource instance.
-        resource_id (str): string ID or None.
-
-    Returns:
-        tuple: type and ID of resource.
-    """
-    if isinstance(resource, str):
-        return resource, resource_id
-    return get_resource_type(resource), get_resource_id(resource)
 
 
 class RoleMixin(object):
@@ -137,24 +32,15 @@ class RoleMixin(object):
     privileges granted to a role, be it a custom class or Role instance.
     """
 
-    def role_type(self):
-        """Return the role type of this instance."""
-        return app_settings.mapping.name_from_instance(self)
-
-    def role_id(self):
-        """Return the role ID of this instance."""
-        if hasattr(self, 'id'):
-            return self.id
-        return None
-
     def heirs(self, search=None):
         """Return the children of this role."""
+        role_type, role_id = get_role_type_and_id(self)
         if search is not None:
             return [app_settings.mapping.instance_from_name_and_id(*h)
                     for h in RoleHierarchy.all_heirs(
-                    self.role_type(), self.role_id(), search)]
+                    role_type, role_id, search)]
         return [app_settings.mapping.instance_from_name_and_id(*h)
-                for h in RoleHierarchy.heirs(self.role_type(), self.role_id())]
+                for h in RoleHierarchy.heirs(role_type, role_id)]
 
     def inherits_from(self, role, role_id=''):
         """
@@ -167,11 +53,12 @@ class RoleMixin(object):
         Returns:
             bool: True or False
         """
-        role_type, role_id = get_role_type_and_id(role, role_id)
+        role_type_a, role_id_a = get_role_type_and_id(self)
+        role_type_b, role_id_b = get_role_type_and_id(role, role_id)
         try:
             RoleHierarchy.objects.get(
-                role_type_a=self.role_type(), role_id_a=self.role_id(),
-                role_type_b=role_type, role_id_b=role_id)
+                role_type_a=role_type_a, role_id_a=role_id_a,
+                role_type_b=role_type_b, role_id_b=role_id_b)
             return True
         except RoleHierarchy.DoesNotExist:
             return False
@@ -189,19 +76,21 @@ class RoleMixin(object):
         Returns:
             obj: the created RoleHierarchy object.
         """
-        role_type, role_id = get_role_type_and_id(role, role_id)
+        role_type_a, role_id_a = get_role_type_and_id(self)
+        role_type_b, role_id_b = get_role_type_and_id(role, role_id)
         return RoleHierarchy.objects.create(
-            role_type_a=self.role_type(), role_id_a=self.role_id(),
-            role_type_b=role_type, role_id_b=role_id)
+            role_type_a=role_type_a, role_id_a=role_id_a,
+            role_type_b=role_type_b, role_id_b=role_id_b)
 
     def conveyors(self, search=None):
         """Return the roles conveying privileges to this role."""
+        role_type, role_id = get_role_type_and_id(self)
         if search is not None:
             return [app_settings.mapping.instance_from_name_and_id(*c)
                     for c in RoleHierarchy.all_conveyors(
-                    self.role_type(), self.role_id(), search)]
+                    role_type, role_id, search)]
         return [app_settings.mapping.instance_from_name_and_id(*c)
-                for c in RoleHierarchy.conveyors(self.role_type(), self.role_id())]  # noqa
+                for c in RoleHierarchy.conveyors(role_type, role_id)]
 
     def conveys_to(self, role, role_id=''):
         """
@@ -214,11 +103,12 @@ class RoleMixin(object):
         Returns:
             bool: True or False
         """
-        role_type, role_id = get_role_type_and_id(role, role_id)
+        role_type_a, role_id_a = get_role_type_and_id(role, role_id)
+        role_type_b, role_id_b = get_role_type_and_id(self)
         try:
             RoleHierarchy.objects.get(
-                role_type_a=role_type, role_id_a=role_id,
-                role_type_b=self.role_type(), role_id_b=self.role_id())
+                role_type_a=role_type_a, role_id_a=role_id_a,
+                role_type_b=role_type_b, role_id_b=role_id_b)
             return True
         except RoleHierarchy.DoesNotExist:
             return False
@@ -236,10 +126,11 @@ class RoleMixin(object):
         Returns:
             obj: the created RoleHierarchy object.
         """
-        role_type, role_id = get_role_type_and_id(role, role_id)
+        role_type_a, role_id_a = get_role_type_and_id(role, role_id)
+        role_type_b, role_id_b = get_role_type_and_id(self)
         return RoleHierarchy.objects.create(
-            role_type_a=role_type, role_id_a=role_id,
-            role_type_b=self.role_type(), role_id_b=self.role_id())
+            role_type_a=role_type_a, role_id_a=role_id_a,
+            role_type_b=role_type_b, role_id_b=role_id_b)
 
     def can(self, perm, resource, resource_id='',
             skip_implicit=None, log=None):
@@ -256,9 +147,10 @@ class RoleMixin(object):
         Returns:
             bool: True or False
         """
+        role_type, role_id = get_role_type_and_id(self)
         resource_type, resource_id = get_resource_type_and_id(resource, resource_id)  # noqa
         return RolePrivilege.authorize(
-            role_type=self.role_type(), role_id=self.role_id(), perm=perm,
+            role_type=role_type, role_id=role_id, perm=perm,
             resource_type=resource_type, resource_id=resource_id,
             skip_implicit=skip_implicit, log=log)
 
@@ -513,27 +405,26 @@ class RolePrivilege(models.Model):
                     break
 
         # Else check role implicit perms
-        # TODO: uncomment this when implicit mechanisms are implemented
-        # if attempt.response is None and not skip_implicit:
-        #     attempt.response = RolePrivilege.authorize_implicit(
-        #         role_type, role_id, perm, resource_type, resource_id)
-        #
-        #     if attempt.response is not None:
-        #         attempt.response_type = AccessHistory.IMPLICIT
-        #
-        #     # Else check inherited implicit perms
-        #     else:
-        #
-        #         for above_role_type, above_role_id in RoleHierarchy.all_conveyors(role_type, role_id):  # noqa
-        #             attempt.response = RolePrivilege.authorize_implicit(
-        #                 above_role_type, above_role_id, perm,
-        #                 resource_type, resource_id)
-        #
-        #             if attempt.response is not None:
-        #                 attempt.response_type = AccessHistory.IMPLICIT
-        #                 attempt.conveyor_type = above_role_type
-        #                 attempt.conveyor_id = above_role_id
-        #                 break
+        if attempt.response is None and not skip_implicit:
+            attempt.response = RolePrivilege.authorize_implicit(
+                role_type, role_id, perm, resource_type, resource_id)
+
+            if attempt.response is not None:
+                attempt.response_type = AccessHistory.IMPLICIT
+
+            # Else check inherited implicit perms
+            else:
+
+                for above_role_type, above_role_id in RoleHierarchy.all_conveyors(role_type, role_id):  # noqa
+                    attempt.response = RolePrivilege.authorize_implicit(
+                        above_role_type, above_role_id, perm,
+                        resource_type, resource_id)
+
+                    if attempt.response is not None:
+                        attempt.response_type = AccessHistory.IMPLICIT
+                        attempt.conveyor_type = above_role_type
+                        attempt.conveyor_id = above_role_id
+                        break
 
         # Else give default response
         if attempt.response is None:
@@ -583,9 +474,6 @@ class RolePrivilege(models.Model):
         """
         Run an implicit authorization check.
 
-        This method checks that the given permission can be implicitly
-        obtained through the ``implicit_perms`` method.
-
         Args:
             role_type (str): a string describing the type of role.
             role_id (str): the role's ID.
@@ -598,6 +486,30 @@ class RolePrivilege(models.Model):
             None: if ACCESS_CONTROL_IMPLICIT is False,
                 or perm is in ignored_perms.
         """
+        role_instance = app_settings.mapping.instance_from_name_and_id(
+            role_type, role_id)
+        if resource_id:
+            attr_name = 'can_%s_%s_%s' % (perm, resource_type, resource_id)
+            if hasattr(role_instance, attr_name):
+                attr = getattr(role_instance, attr_name)
+                if callable(attr):
+                    return attr()
+                return attr
+        attr_name = 'can_%s_%s' % (perm, resource_type)
+        if hasattr(role_instance, attr_name):
+            attr = getattr(role_instance, attr_name)
+            if callable(attr):
+                return attr(resource_id=resource_id)
+            return attr
+        attr_name = 'can_%s' % perm
+        if hasattr(role_instance, attr_name):
+            attr = getattr(role_instance, attr_name)
+            if callable(attr):
+                return attr(
+                    instance=app_settings.mapping.instance_from_name_and_id(
+                        resource_type, resource_id),
+                    resource_type=resource_type, resource_id=resource_id)
+            return attr
         return None
 
     @staticmethod
