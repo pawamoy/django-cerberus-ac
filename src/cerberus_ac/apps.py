@@ -132,23 +132,26 @@ class MappingSetting(aps.Setting):
         if value == self.default:
             return
         if not isinstance(value, tuple):
-            raise ValueError('%s must be a tuple' % name)
+            raise ValueError('%s must be a tuple' % self.full_name)
         if not all(isinstance(o, tuple) for o in value):
-            raise ValueError('%s must be a tuple of (key, value) tuples' % name)
+            raise ValueError(
+                '%s must be a tuple of (key, value) tuples' % self.full_name)
         for k, v in value:
             if not isinstance(k, str):
-                raise ValueError('Keys in %s must be str' % name)
+                raise ValueError('Keys in %s must be str' % self.full_name)
             if not isinstance(v, dict):
-                raise ValueError('Values in %s must be dict' % name)
+                raise ValueError('Values in %s must be dict' % self.full_name)
             if set(v.keys()) != {'name', 'attr'}:
                 raise ValueError('Values in %s must be dict '
-                                 'with name and attr keys' % name)
+                                 'with name and attr keys' % self.full_name)
         _ = [o[1] for o in value]
         if {x['name'] for x in _ if _.count(x['name']) > 1}:
-            raise ValueError('Names in %s values must be unique' % name)
+            raise ValueError(
+                'Names in %s values must be unique' % self.full_name)
 
     def transform(self):
         return Mapping(self.get_raw())
+
 
 class AppSettings(aps.AppSettings):
     """
