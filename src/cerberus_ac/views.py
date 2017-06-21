@@ -84,10 +84,10 @@ class Privileges(Index):
     """Menu for privileges."""
 
     context = {'role_types': [{
-        'verbose': app_settings.mapping.class_from_name(t)._meta.verbose_name,
+        'verbose': app_settings.mapping.get_class(t)._meta.verbose_name,
         'slug': t} for t in app_settings.mapping.role_types()
     ], 'resource_types': [{
-        'verbose': app_settings.mapping.class_from_name(t)._meta.verbose_name,
+        'verbose': app_settings.mapping.get_class(t)._meta.verbose_name,
         'slug': t} for t in app_settings.mapping.resource_types()
     ]}
 
@@ -109,8 +109,8 @@ class ViewPrivileges(Privileges):
     def get(self, request, *args, **kwargs):
         role_type = kwargs.pop('role_type')
         resource_type = kwargs.pop('resource_type')
-        role_class = app_settings.mapping.class_from_name(role_type)
-        resource_class = app_settings.mapping.class_from_name(resource_type)
+        role_class = app_settings.mapping.get_class(role_type)
+        resource_class = app_settings.mapping.get_class(resource_type)
         role_instances = role_class.objects.all()
         resource_instances = resource_class.objects.all()
         self.grid = Grid(Row(Column(Box(
@@ -130,8 +130,8 @@ class EditPrivileges(Privileges):
     def get(self, request, *args, **kwargs):
         role_type = kwargs.pop('role_type')
         resource_type = kwargs.pop('resource_type')
-        role_class = app_settings.mapping.class_from_name(role_type)
-        resource_class = app_settings.mapping.class_from_name(resource_type)
+        role_class = app_settings.mapping.get_class(role_type)
+        resource_class = app_settings.mapping.get_class(resource_type)
         role_instances = role_class.objects.all()
         resource_instances = resource_class.objects.all()
 
@@ -177,10 +177,33 @@ class ViewRoleHierarchy(Index):
                'url': 'admin:cerberus:role_hierarchy'},)
 
     def get(self, request, *args, **kwargs):
-        data = [{'source': '%s %s' % (rh.role_type_b, rh.role_id_b),
-                 'target': '%s %s' % (rh.role_type_a, rh.role_id_a),
-                 'type': 'suit'}
-                for rh in RoleHierarchy.objects.all()]
+        # link
+        # {"source": 3, "target": 11}
+        # node
+        # {"size": 10, "score": 0, "id": "security", "type": "circle"}
+
+        roles = []
+        links = []
+        for tuple4 in list(RoleHierarchy.objects.values_list(
+                'role_type_a', 'role_id_a', 'role_type_b', 'role_id_b')):
+            role_a = ('%s %s' % (tuple4[0], tuple4[1])) if tuple4[1] else tuple4[0]  # noqa
+            role_b = (('%s %s' % (tuple4[2], tuple4[3])) if tuple4[3] else tuple4[2])  # noqa
+            if role_a not in roles:
+                roles.append(role_a)
+            if role_b not in roles:
+                roles.append(role_b)
+            links.append({'source': roles.index(role_a),
+                          'target': roles.index(role_b)})
+
+        data = {
+            'directed': True,
+            'multigraph': False,
+            'links': links,
+            'nodes': [
+                {'size': 10, 'score': 0, 'id': r, 'type': 'circle'}
+                for r in roles
+            ]
+        }
 
         self.grid = Grid(Row(Column(Box(
             title='Role Hierarchy Graph',
@@ -240,8 +263,8 @@ def ajax_load_roles_and_resources(request, role_type, resource_type):
     if not request.is_ajax():
         return bad_request(request, ValueError('not an ajax request'))
 
-    role_class = app_settings.mapping.class_from_name(role_type)
-    resource_class = app_settings.mapping.class_from_name(resource_type)
+    role_class = app_settings.mapping.get_class(role_type)
+    resource_class = app_settings.mapping.get_class(resource_type)
 
     role_instances = role_class.objects.order_by('id')
     resource_instances = resource_class.objects.order_by('id')
@@ -258,7 +281,7 @@ def ajax_load_privileges(request, role_type, role_id, resource_type):
     if not request.is_ajax():
         return bad_request(request, ValueError('not an ajax request'))
 
-    resource_class = app_settings.mapping.class_from_name(resource_type)
+    resource_class = app_settings.mapping.get_class(resource_type)
     resource_instances = resource_class.objects.order_by('id')
 
     default_access_types = ('read', 'update', 'delete')

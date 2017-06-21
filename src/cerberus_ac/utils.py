@@ -38,7 +38,7 @@ def get_role_type(role):
         if callable(attr):
             return attr()
         return attr
-    return app_settings.mapping.name_from_instance(role)
+    return app_settings.mapping.get_name(role)
 
 
 def get_role_id(role):
@@ -92,7 +92,7 @@ def get_resource_type(resource):
         if callable(attr):
             return attr()
         return attr
-    return app_settings.mapping.name_from_instance(resource)
+    return app_settings.mapping.get_name(resource)
 
 
 def get_resource_id(resource):

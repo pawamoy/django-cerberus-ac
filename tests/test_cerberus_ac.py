@@ -122,19 +122,19 @@ class MainTestCase(TestCase):
 
     def set_role_hierarchy(self):
         """Set a role hierarchy."""
-        self.users[0].inherit_from(self.groups[0])
-        self.users[0].inherit_from(self.groups[1])
+        self.users[0].take_role(self.groups[0])
+        self.users[0].take_role(self.groups[1])
         self.groups[1].convey_to(self.users[1])
         self.roles[0].convey_to(self.users[0])
         self.roles[1].convey_to(self.users[1])
         self.roles[2].convey_to(self.users[2])
-        self.roles[2].inherit_from(self.groups[2])
+        self.roles[2].take_role(self.groups[2])
 
     def test_role_hierarchy(self):
         """Role hierarchy test method."""
-        assert self.users[0].inherits_from(self.groups[0])
-        assert self.users[0].inherits_from(self.groups[1])
-        assert not self.users[0].inherits_from(self.groups[2])
+        assert self.users[0].has_role(self.groups[0])
+        assert self.users[0].has_role(self.groups[1])
+        assert not self.users[0].has_role(self.groups[2])
         assert not self.groups[2].conveys_to(self.groups[1])
         assert set(self.groups[1].heirs()) == {
             self.users[0], self.users[1]}

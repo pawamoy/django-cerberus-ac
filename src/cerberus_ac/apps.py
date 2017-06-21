@@ -36,7 +36,7 @@ class Mapping(object):
         """
         self.mapping = mapping
 
-    def class_from_name(self, name):
+    def get_class(self, name):
         """
         Return the class given the name of a role/resource.
 
@@ -51,7 +51,7 @@ class Mapping(object):
                 return _import(k)
         return None
 
-    def instance_from_name_and_id(self, name, id):
+    def get_instance(self, name, id):
         """
         Return an instance given a role/resource type and an ID.
 
@@ -62,7 +62,7 @@ class Mapping(object):
         Returns:
             obj: the instance or a (name, id) tuple if not found.
         """
-        cls = self.class_from_name(name)
+        cls = self.get_class(name)
         if cls:
             if hasattr(cls, 'objects') and id:
                 try:
@@ -76,7 +76,7 @@ class Mapping(object):
         except Role.DoesNotExist:
             return None
 
-    def name_from_instance(self, obj):
+    def get_name(self, obj):
         """
         Return the type of a role/resource given a Python object.
 
@@ -175,6 +175,7 @@ class AppSettings(aps.AppSettings):
     log_hierarchy = aps.BooleanSetting(default=True)
     namespace = aps.StringSetting(default='')
     mapping = MappingSetting(default=())
+    access_permission = aps.StringSetting(default='read')
 
     class Meta:
         setting_prefix = 'CERBERUS_'
