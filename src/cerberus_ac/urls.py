@@ -56,14 +56,6 @@ def cerberus_urlpatterns(admin_view_func=lambda x: x):
             admin_view_func(views.MemberInfo.as_view()),
             name='member_info'),
 
-        # history views
-        url(r'^history/access/$',
-            admin_view_func(views.AccessHistory.as_view()),
-            name='access_history'),
-        url(r'^history/privileges/$',
-            admin_view_func(views.PrivilegeHistory.as_view()),
-            name='privilege_history'),
-
         # hierarchy
         url(r'^role/hierarchy/$',
             admin_view_func(views.ViewRoleHierarchy.as_view()),

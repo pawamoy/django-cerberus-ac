@@ -30,8 +30,6 @@ from .models import (
 #
 # Use decorator like @security_admin_site.register(AccessHistory)
 
-# TODO: override save_model methods for history
-# https://docs.djangoproject.com/en/1.10/ref/contrib/admin/#django.contrib.admin.ModelAdmin.save_model
 
 def obj_link_generator(type_attr, id_attr, short_description):
     def obj_link(obj):
@@ -88,6 +86,13 @@ class RolePrivilegeAdmin(admin.ModelAdmin):
         'role_type', 'resource_type', 'authorized', 'access_type',
         'modification_date')
     date_hierarchy = 'creation_date'
+
+    def save_model(self, request, obj, form, change):
+        record = PrivilegeHistory(
+            user=request.user, action={False: PrivilegeHistory.CREATE}.get(
+                change, PrivilegeHistory.UPDATE))
+        record.update_from_privilege(obj)
+        super().save_model(request, obj, form, change)
 
 
 class RoleHierarchyAdmin(admin.ModelAdmin):

@@ -70,16 +70,6 @@ class MemberInfo(Index):
         return super(MemberInfo, self).get(request, *args, **kwargs)
 
 
-class Logs(Index):
-    """Cerberus Logs Menu."""
-
-    title = _('Logs - Cerberus AC')
-    crumbs = ({'name': _('Cerberus'), 'url': 'admin:cerberus:cerberus_logs'},)
-    grid = Grid(Row(Column(Box(
-        title='Logs',
-        template='cerberus_ac/logs.html'))))
-
-
 class Privileges(Index):
     """Menu for privileges."""
 
@@ -147,26 +137,6 @@ class EditPrivileges(Privileges):
         )))
 
         return super(EditPrivileges, self).get(request, *args, **kwargs)
-
-
-class AccessHistory(Logs):
-    """Cerberus Object Access Logs."""
-
-    title = _('Object Access - Cerberus AC')
-    crumbs = ({'name': _('Cerberus'), 'url': 'admin:cerberus:access_history'},)
-    grid = Grid(Row(Column(Box(
-        title='Object Access',
-        template='cerberus_ac/access_history.html'))))
-
-
-class PrivilegeHistory(Logs):
-    """Cerberus Permission changes Logs."""
-
-    title = _('Permission Changes - Cerberus AC')
-    crumbs = ({'name': _('Cerberus'), 'url': 'admin:cerberus:privilege_history'},)  # noqa
-    grid = Grid(Row(Column(Box(
-        title='Permission Changes',
-        template='cerberus_ac/privilege_history.html'))))
 
 
 class ViewRoleHierarchy(Index):

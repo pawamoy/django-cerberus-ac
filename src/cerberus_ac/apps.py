@@ -76,21 +76,25 @@ class Mapping(object):
         except Role.DoesNotExist:
             return None
 
-    def get_name(self, obj):
+    def get_type(self, obj):
         """
         Return the type of a role/resource given a Python object.
 
         Args:
-            obj (obj): a Python object.
+            obj (obj): a Python object (class are accepted).
 
         Returns:
             str: the role/resource type.
         """
+        if isinstance(obj, type):
+            class_name = obj.__name__
+        else:
+            class_name = obj.__class__.__name__
         for k, v in self.mapping:
             # FIXME: use complete path, not just the end
-            if k.split('.')[-1] == obj.__class__.__name__:
+            if k.split('.')[-1] == class_name:
                 return v['name']
-        return obj.__class__.__name__
+        return class_name
 
     def user_classes(self):
         """Return the user-role classes."""

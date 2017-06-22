@@ -13,13 +13,12 @@ Models and mixins for access control.
 
 from django.conf import settings
 from django.db import models
+from django.db.models import QuerySet
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from .apps import AppSettings
-from .utils import (
-    get_resource_type, get_resource_id, get_resource_type_and_id,
-    get_role_type, get_role_id, get_role_type_and_id)
+from .utils import get_resource_type_and_id, get_role_type_and_id
 
 app_settings = AppSettings()
 
@@ -42,25 +41,32 @@ class RoleMixin(object):
         return [app_settings.mapping.get_instance(*h)
                 for h in RoleHierarchy.heirs(role_type, role_id)]
 
-    def has_role(self, role, role_id=''):
+    def has_role(self, role, role_id='', direct=False):
         """
         Check if this role inherits privileges from the given role.
 
         Args:
             role (str/role): a string describing the role, or a role instance.
             role_id (str): only used when role is a string.
+            direct (bool): check only direct relations or transitive ones.
 
         Returns:
             bool: True or False
         """
         role_type_a, role_id_a = get_role_type_and_id(self)
         role_type_b, role_id_b = get_role_type_and_id(role, role_id)
-        try:
-            RoleHierarchy.objects.get(
-                role_type_a=role_type_a, role_id_a=role_id_a,
-                role_type_b=role_type_b, role_id_b=role_id_b)
-            return True
-        except RoleHierarchy.DoesNotExist:
+        if direct:
+            try:
+                RoleHierarchy.objects.get(
+                    role_type_a=role_type_a, role_id_a=role_id_a,
+                    role_type_b=role_type_b, role_id_b=role_id_b)
+                return True
+            except RoleHierarchy.DoesNotExist:
+                return False
+        else:
+            if (role_type_b, role_id_b) in RoleHierarchy.all_conveyors(
+                    role_type_a, role_id_a):
+                return True
             return False
 
     def take_role(self, role, role_id=''):
@@ -132,16 +138,23 @@ class RoleMixin(object):
             role_type_a=role_type_a, role_id_a=role_id_a,
             role_type_b=role_type_b, role_id_b=role_id_b)
 
-    def has_access(self, resource, resource_id=''):
+    def has_access_to(self, resource, resource_id=''):
         return self.can(app_settings.access_permission, resource, resource_id,
                         log=False)
 
-    def accessible_resources(self, resources):
-        if isinstance(resources, str):
-            resource_type = resources
-            model = app_settings.mapping.get_class(resource_type)
-            if not model:
-                return []
+    def accessible(self, resources):
+        if isinstance(resources, (str, QuerySet)):
+            if isinstance(resources, str):
+                resource_type = resources
+                model = app_settings.mapping.get_class(resource_type)
+                if not model:
+                    return []
+                queryset = model.objects
+            else:
+                model = resources.model
+                resource_type = app_settings.mapping.get_type(model)
+                queryset = resources
+
             self_type, self_id = get_role_type_and_id(self)
             roles = [(self_type, self_id)]
             roles.extend(RoleHierarchy.all_conveyors(self_type, self_id))
@@ -153,9 +166,11 @@ class RoleMixin(object):
                     'resource_id', flat=True
                 )))
 
-            return model.objects.filter(id__in=resources_id)
+            return queryset.filter(id__in=resources_id)
         else:
-            return [r for r in resources if self.has_access(r)]
+            # FIXME: can optimize a lot here by grouping objects by type,
+            # and doing like above, once for each type
+            return [r for r in resources if self.has_access_to(r)]
 
     def can(self, perm, resource, resource_id='',
             skip_implicit=None, log=None):
@@ -179,13 +194,26 @@ class RoleMixin(object):
             resource_type=resource_type, resource_id=resource_id,
             skip_implicit=skip_implicit, log=log)
 
+    # def allow(perm, role, role_id=''): pass
+    # def deny(perm, role, role_id=''): pass
+    # def forget(perm, role, role_id=''): pass
 
-# TODO: write a ResourceMixin class? And the according Resource class?
+
+# TODO: write the according Resource model
 class ResourceMixin(object):
     """Mixin for Resource models / classes."""
 
+    # TODO: implement methods
+    # def accessors(role_type=None): return []
+    # def is_accessed_by(role, role_id=''): return False
 
-# TODO: is this class useful? Should it just be a class, not a model?
+    # def allow(perm, role, role_id=''): pass
+    # def deny(perm, role, role_id=''): pass
+    # def forget(perm, role, role_id=''): pass
+
+    # def accept(perm, role, role_id='', skip_implicit=None, log=None): pass
+
+
 class Role(models.Model, RoleMixin):
     """Concrete model for roles."""
 
@@ -656,7 +684,8 @@ class RolePrivilege(models.Model):
             return False
 
 
-# TODO: implement HierarchyHistory model?
+# TODO: implement HierarchyHistory model
+# role creation must be recorded
 
 
 class PrivilegeHistory(models.Model):
