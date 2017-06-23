@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """Views module."""
+
 import json
 
 from django.http import HttpResponse
@@ -10,8 +11,8 @@ from django.views.defaults import bad_request
 from suit_dashboard import Box, Column, DashboardView, Grid, Row
 
 from .apps import AppSettings
-from .models import RoleHierarchy, RolePrivilege, get_role_id, get_role_type
-from .utils import get_paginated_data
+from .models import RoleHierarchy, RolePrivilege
+from .utils import get_role_id, get_role_type
 
 app_settings = AppSettings()
 
@@ -154,23 +155,41 @@ class ViewRoleHierarchy(Index):
 
         roles = []
         links = []
+        count = {}
         for tuple4 in list(RoleHierarchy.objects.values_list(
                 'role_type_a', 'role_id_a', 'role_type_b', 'role_id_b')):
             role_a = ('%s %s' % (tuple4[0], tuple4[1])) if tuple4[1] else tuple4[0]  # noqa
             role_b = (('%s %s' % (tuple4[2], tuple4[3])) if tuple4[3] else tuple4[2])  # noqa
-            if role_a not in roles:
+            if role_a not in count:
+                count[role_a] = 1
                 roles.append(role_a)
-            if role_b not in roles:
+            else:
+                count[role_a] += 1
+            if role_b not in count:
+                count[role_b] = 1
                 roles.append(role_b)
-            links.append({'source': roles.index(role_a),
-                          'target': roles.index(role_b)})
+            else:
+                count[role_b] += 1
+            # I think we can add scores on links
+            links.append({'source': roles.index(role_b),
+                          'target': roles.index(role_a)})
 
+        # possible types: circle, square, triangle-up/down, diamond, cross
         data = {
             'directed': True,
             'multigraph': False,
             'links': links,
             'nodes': [
-                {'size': 10, 'score': 0, 'id': r, 'type': 'circle'}
+                {'size': min(count[r], 50), 'score': min(count[r] / 100, 1),
+                 'id': r if ' ' not in r else str(
+                     app_settings.mapping.get_instance(*r.split(' '))),
+                 'type': {
+                     'member': 'circle',
+                     'relative': 'square',
+                     'cohort': 'diamond',
+                     'gene': 'cross',
+                     'copy_number_variant': 'cross',
+                 }.get(r.split(' ')[0], 'triangle-down')}
                 for r in roles
             ]
         }

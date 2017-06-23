@@ -117,7 +117,7 @@ class MainTestCase(TestCase):
         assert get_resource_id(nodb_resource_2) is None
         assert get_resource_type(nodb_resource_3) == 'user_data'
         assert get_resource_id(nodb_resource_3) is None
-        assert get_resource_type(object) == 'type'
+        assert get_resource_type(object) == 'object'
         assert get_resource_type(1) == 'int'
 
     def set_role_hierarchy(self):

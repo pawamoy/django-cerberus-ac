@@ -1,4 +1,4 @@
-{% load static %}
+{% load static i18n %}
 
 {# http://bl.ocks.org/eyaler/10586116 #}
 
@@ -6,6 +6,8 @@
 #role_hierarchy_chart {
   overflow: hidden;
   margin: 0;
+  color: unset;
+  background-color: transparent;
 }
 
 text {
@@ -14,6 +16,33 @@ text {
 }
 </style>
 <script src="{% static "cerberus_ac/d3/d3.min.js" %}"></script>
+<div>
+  {% trans "Use keyboard shortcuts to filter nodes by:" %}
+  <ul class="list-inline">
+    <li>
+      {% trans "shape:" %}
+      c ({% trans "circle" %}),
+      d ({% trans "triangle-down" %}),
+      r ({% trans "diamond" %}),
+      s ({% trans "square" %}),
+      t ({% trans "triangle-up" %}),
+      x ({% trans "cross" %})
+    </li>
+    <li>
+      {% trans "score:" %}
+      l ({% trans "low" %}),
+      h ({% trans "high" %}),
+      m ({% trans "medium" %})
+    </li>
+    <li>{% trans "orphan:" %} 0</li>
+    <li>
+      {% trans "link score:" %}
+      1 ({% trans "low" %}),
+      2 ({% trans "high" %}),
+      3 ({% trans "medium" %})
+    </li>
+  </ul>
+</div>
 <div id="role_hierarchy_chart"></div>
 <script>
 
@@ -47,7 +76,7 @@ var max_score = 1;
 
 var color = d3.scale.linear()
   .domain([min_score, (min_score + max_score) / 2, max_score])
-  .range(["lime", "yellow", "red"]);
+  .range(["mediumpurple", "steelblue", "darkturquoise"]);
 
 var highlight_color = "blue";
 var highlight_trans = 0.1;
@@ -70,8 +99,8 @@ var max_text_size = 24;
 var nominal_stroke = 1.5;
 var max_stroke = 4.5;
 var max_base_node_size = 36;
-var min_zoom = 0.1;
-var max_zoom = 7;
+var min_zoom = 0.2;
+var max_zoom = 3;
 var svg = d3.select("#role_hierarchy_chart").append("svg");
 var zoom = d3.behavior.zoom().scaleExtent([min_zoom, max_zoom]);
 var g = svg.append("g");
@@ -83,13 +112,13 @@ graph.links.forEach(function(d) {
 });
 
 function isConnected(a, b) {
-  return linkedByIndex[a.index + "," + b.index] || linkedByIndex[b.index + "," + a.index] || a.index == b.index;
+  return linkedByIndex[a.index + "," + b.index] || linkedByIndex[b.index + "," + a.index] || a.index === b.index;
 }
 
 function hasConnections(a) {
   for (var property in linkedByIndex) {
     s = property.split(",");
-    if ((s[0] == a.index || s[1] == a.index) && linkedByIndex[property]) return true;
+    if ((s[0] === a.index || s[1] === a.index) && linkedByIndex[property]) return true;
   }
   return false;
 }
@@ -109,19 +138,28 @@ var link = g.selectAll(".link")
     else return default_link_color;
   });
 
-/* // TODO: somewhat readd arrows with this code
-  svg.append("defs").selectAll(".link")
-    .append("marker")
-    .attr("id", function(d) { return d; })
-    .attr("viewBox", "0 -5 10 10")
-    .attr("refX", 15)
-    .attr("refY", -1.5)
-    .attr("markerWidth", 6)
-    .attr("markerHeight", 6)
-    .attr("orient", "auto")
+g.append("defs").selectAll("marker")
+  .data(["arrow"])
+  .enter().append("marker")
+  .attr("id", function(d) {
+    return d;
+  })
+  .attr("viewBox", "0 -5 10 10")
+  .attr("refX", 40)
+  .attr("refY", 0)
+  .attr("markerWidth", 5)
+  .attr("markerHeight", 5)
+  .attr("orient", "auto")
   .append("path")
-    .attr("d", "M0,-5L10,0L0,5");
-*/
+  .attr("d", "M0,-5L10,0L0,5");
+
+g.selectAll(".link")
+  .attr("class", function(d) {
+    return "link " + "arrow";
+  })
+  .attr("marker-end", function(d) {
+    return "url(#" + "arrow" + ")";
+  });
 
 var node = g.selectAll(".node")
   .data(graph.nodes)
@@ -212,7 +250,7 @@ function exit_highlight() {
   highlight_node = null;
   if (focus_node === null) {
     svg.style("cursor", "move");
-    if (highlight_color != "white") {
+    if (highlight_color !== "white") {
       circle.style(towhite, "white");
       text.style("font-weight", "normal");
       link.style("stroke", function(o) {
@@ -233,7 +271,7 @@ function set_focus(d) {
     });
 
     link.style("opacity", function(o) {
-      return o.source.index == d.index || o.target.index == d.index ? 1 : highlight_trans;
+      return o.source.index === d.index || o.target.index === d.index ? 1 : highlight_trans;
     });
   }
 }
@@ -244,7 +282,7 @@ function set_highlight(d) {
   if (focus_node !== null) d = focus_node;
   highlight_node = d;
 
-  if (highlight_color != "white") {
+  if (highlight_color !== "white") {
     circle.style(towhite, function(o) {
       return isConnected(d, o) ? highlight_color : "white";
     });
@@ -252,7 +290,7 @@ function set_highlight(d) {
       return isConnected(d, o) ? "bold" : "normal";
     });
     link.style("stroke", function(o) {
-      return o.source.index == d.index || o.target.index == d.index ? highlight_color : ((isNumber(o.score) && o.score >= 0) ? color(o.score) : default_link_color);
+      return o.source.index === d.index || o.target.index === d.index ? highlight_color : ((isNumber(o.score) && o.score >= 0) ? color(o.score) : default_link_color);
     });
   }
 }
@@ -331,7 +369,7 @@ function resize() {
 }
 
 function keydown() {
-  if (d3.event.keyCode == 32) {
+  if (d3.event.keyCode === 32) {
     force.stop();
   } else if (d3.event.keyCode >= 48 && d3.event.keyCode <= 90 && !d3.event.ctrlKey && !d3.event.altKey && !d3.event.metaKey) {
     switch (String.fromCharCode(d3.event.keyCode)) {

@@ -98,7 +98,7 @@ class RoleMixin(object):
         return [app_settings.mapping.get_instance(*c)
                 for c in RoleHierarchy.conveyors(role_type, role_id)]
 
-    def conveys_to(self, role, role_id=''):
+    def conveys_role_to(self, role, role_id=''):
         """
         Check if this role conveys privileges to the given role.
 
@@ -119,7 +119,7 @@ class RoleMixin(object):
         except RoleHierarchy.DoesNotExist:
             return False
 
-    def convey_to(self, role, role_id=''):
+    def convey_role_to(self, role, role_id=''):
         """
         Set this role as parent of the given role.
 
