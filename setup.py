@@ -71,5 +71,10 @@ setup(
     ],
     install_requires=[
         'django-app-settings'
-    ]
+    ],
+    entry_points={
+        'archan': [
+            'cerberus_ac.Privileges = cerberus_ac.plugins:Privileges'
+        ]
+    },
 )
