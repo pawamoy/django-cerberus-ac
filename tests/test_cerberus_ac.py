@@ -124,10 +124,10 @@ class MainTestCase(TestCase):
         """Set a role hierarchy."""
         self.users[0].take_role(self.groups[0])
         self.users[0].take_role(self.groups[1])
-        self.groups[1].convey_to(self.users[1])
-        self.roles[0].convey_to(self.users[0])
-        self.roles[1].convey_to(self.users[1])
-        self.roles[2].convey_to(self.users[2])
+        self.groups[1].convey_role_to(self.users[1])
+        self.roles[0].convey_role_to(self.users[0])
+        self.roles[1].convey_role_to(self.users[1])
+        self.roles[2].convey_role_to(self.users[2])
         self.roles[2].take_role(self.groups[2])
 
     def test_role_hierarchy(self):
@@ -135,12 +135,12 @@ class MainTestCase(TestCase):
         assert self.users[0].has_role(self.groups[0])
         assert self.users[0].has_role(self.groups[1])
         assert not self.users[0].has_role(self.groups[2])
-        assert not self.groups[2].conveys_to(self.groups[1])
+        assert not self.groups[2].conveys_role_to(self.groups[1])
         assert set(self.groups[1].heirs()) == {
             self.users[0], self.users[1]}
-        assert self.roles[0].conveys_to(self.users[0])
-        assert self.roles[1].conveys_to(self.users[1])
-        assert self.roles[2].conveys_to(self.users[2])
+        assert self.roles[0].conveys_role_to(self.users[0])
+        assert self.roles[1].conveys_role_to(self.users[1])
+        assert self.roles[2].conveys_role_to(self.users[2])
         assert set(self.users[0].conveyors()) == {
             self.groups[0], self.groups[1], self.roles[0]}
         assert set(
