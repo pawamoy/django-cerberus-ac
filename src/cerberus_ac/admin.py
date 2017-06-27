@@ -35,7 +35,7 @@ def obj_link_generator(type_attr, id_attr, short_description):
     def obj_link(obj):
         obj_type = getattr(obj, type_attr)
         obj_id = getattr(obj, id_attr)
-        instance = AppSettings.get_mapping().get_instance(
+        instance = AppSettings.mapping.get().get_instance(
             obj_type, obj_id)
         if instance is None:
             return '-'
