@@ -2,6 +2,20 @@
 Changelog
 =========
 
+0.2.0 (2017-07-03)
+==================
+
+- Override ``save_models`` admin methods to add user in history records.
+- Add and rename methods in ``RoleMixin``.
+- Fix mapping setting check function.
+- Implement implicit authorization.
+- Add Science/Reseach classifier.
+- Fix bug when id cannot be coerced to right type.
+- Add migration 2.
+- Improve ``RolePrivilege`` admin.
+- Add drag and zoom to role hierarchy graph.
+- Update initial migration to reflect code.
+
 0.1.7 (2017-04-19)
 ==================
 
