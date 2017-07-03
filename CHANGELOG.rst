@@ -9,7 +9,7 @@ Changelog
 - Add and rename methods in ``RoleMixin``.
 - Fix mapping setting check function.
 - Implement implicit authorization.
-- Add Science/Reseach classifier.
+- Add Science/Research classifier.
 - Fix bug when id cannot be coerced to right type.
 - Add migration 2.
 - Improve ``RolePrivilege`` admin.
