@@ -184,6 +184,7 @@ class ViewRoleHierarchy(Index):
                  'id': r if ' ' not in r else str(
                      app_settings.mapping.get_instance(*r.split(' '))),
                  'type': {
+                     # FIXME: put this outside of cerberus: it's genida related
                      'member': 'circle',
                      'relative': 'square',
                      'cohort': 'diamond',
