@@ -50,8 +50,8 @@ version = release = u'0.2.0'
 pygments_style = 'trac'
 templates_path = ['.']
 extlinks = {
-    'issue': ('https://github.com/Deavelleye/dj-CerberusAC/issues/%s', '#'),
-    'pr': ('https://github.com/Deavelleye/dj-CerberusAC/pull/%s', 'PR #'),
+    'issue': ('https://github.com/Genida/django-cerberus-ac/issues/%s', '#'),
+    'pr': ('https://github.com/Genida/django-cerberus-ac/pull/%s', 'PR #'),
 }
 
 # on_rtd is whether we are on readthedocs.org

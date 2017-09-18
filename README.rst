@@ -15,20 +15,20 @@ Cerberus Access Control
 |gitter|
 
 
-.. |travis| image:: https://travis-ci.org/Deavelleye/dj-CerberusAC.svg?branch=master
-    :target: https://travis-ci.org/Deavelleye/dj-CerberusAC/
+.. |travis| image:: https://travis-ci.org/Genida/django-cerberus-ac.svg?branch=master
+    :target: https://travis-ci.org/Genida/django-cerberus-ac
     :alt: Travis-CI Build Status
 
 .. |codacygrade| image:: https://api.codacy.com/project/badge/Grade/9317db72ae5b4616a12b962ae21fe169
-    :target: https://www.codacy.com/app/Deavelleye/dj-CerberusAC/dashboard
+    :target: https://www.codacy.com/app/Genida/django-cerberus-ac/dashboard
     :alt: Codacy Code Quality Status
 
 .. |codacycoverage| image:: https://api.codacy.com/project/badge/Coverage/9317db72ae5b4616a12b962ae21fe169
-    :target: https://www.codacy.com/app/Deavelleye/dj-CerberusAC/dashboard
+    :target: https://www.codacy.com/app/Genida/django-cerberus-ac/dashboard
     :alt: Codacy Code Coverage
 
-.. |pyup| image:: https://pyup.io/repos/github/Deavelleye/dj-CerberusAC/shield.svg
-    :target: https://pyup.io/repos/github/Deavelleye/dj-CerberusAC/
+.. |pyup| image:: https://pyup.io/repos/github/Genida/django-cerberus-ac/shield.svg
+    :target: https://pyup.io/repos/github/Genida/django-cerberus-ac/
     :alt: Updates
 
 .. |version| image:: https://img.shields.io/pypi/v/django-cerberus-ac.svg?style=flat
@@ -39,9 +39,9 @@ Cerberus Access Control
     :target: https://pypi.python.org/pypi/django-cerberus-ac/
     :alt: PyPI Wheel
 
-.. |gitter| image:: https://badges.gitter.im/dj-CerberusAC/Lobby.svg
-    :target: https://gitter.im/dj-CerberusAC/Lobby
-    :alt: Join the chat at https://gitter.im/dj-CerberusAC/Lobby
+.. |gitter| image:: https://badges.gitter.im/Genida/django-cerberus-ac.svg
+    :target: https://gitter.im/Genida/django-cerberus-ac
+    :alt: Join the chat at https://gitter.im/Genida/django-cerberus-ac
 
 
 
@@ -68,7 +68,7 @@ Documentation
 
 `On ReadTheDocs`_
 
-.. _`On ReadTheDocs`: http://dj-cerberusac.readthedocs.io/
+.. _`On ReadTheDocs`: http://django-cerberus-ac.readthedocs.io/
 
 Development
 ===========

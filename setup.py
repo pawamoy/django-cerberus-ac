@@ -38,7 +38,7 @@ setup(
     ),
     author='Mihnea Gheorghiu',
     author_email='mikigi92@gmail.com',
-    url='https://github.com/Deavelleye/dj-CerberusAC',
+    url='https://github.com/Genida/django-cerberus-ac',
     packages=find_packages('src'),
     package_dir={'': 'src'},
     py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
@@ -66,7 +66,7 @@ setup(
         'Topic :: Utilities',
     ],
     keywords=[
-        'dj-CerberusAC', 'access control', 'ontology-based', 'least privilege',
+        'django-cerberus-ac', 'access control', 'ontology-based', 'least privilege',
         'role based access control', 'django access control',
     ],
     install_requires=[
