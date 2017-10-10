@@ -1,0 +1,480 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#"
+     xml:base="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#accept_create -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#accept_create">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <owl:inverseOf rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#can_create"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Resource"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Role"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#accept_delete -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#accept_delete">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <owl:inverseOf rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#can_delete"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Resource"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Role"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#accept_read -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#accept_read">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <owl:inverseOf rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#can_read"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Resource"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Role"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#accept_update -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#accept_update">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <owl:inverseOf rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#can_update"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Resource"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Role"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#can_create -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#can_create">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Role"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Resource"/>
+        <owl:propertyChainAxiom rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#has_role"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#can_create"/>
+        </owl:propertyChainAxiom>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#can_delete -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#can_delete">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Role"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Resource"/>
+        <owl:propertyChainAxiom rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#has_role"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#can_delete"/>
+        </owl:propertyChainAxiom>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#can_read -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#can_read">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Role"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Resource"/>
+        <owl:propertyChainAxiom rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#has_role"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#can_read"/>
+        </owl:propertyChainAxiom>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#can_update -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#can_update">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Role"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Resource"/>
+        <owl:propertyChainAxiom rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#has_role"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#can_update"/>
+        </owl:propertyChainAxiom>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#has_cnv -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#has_cnv"/>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#has_gene -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#has_gene"/>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#has_patient -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#has_patient">
+        <rdfs:subPropertyOf rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#can_delete"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#can_read"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#can_update"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <owl:inverseOf rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#is_patient_of"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#User"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Patient"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#has_role -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#has_role">
+        <rdfs:subPropertyOf rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#can_read"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Role"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Cohort"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Role"/>
+        <owl:propertyChainAxiom rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#has_role"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#has_role"/>
+        </owl:propertyChainAxiom>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#has_syndrome -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#has_syndrome"/>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#is_patient_of -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#is_patient_of">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Patient"/>
+        <rdfs:range rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#User"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Answer -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Answer">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Resource"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Chart -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Chart">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Resource"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Cohort -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Cohort">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Role"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#CopyNumberVariant -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#CopyNumberVariant">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Resource"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Gene -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Gene">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Resource"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Patient -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Patient">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Role"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Permission -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Permission">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Resource"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Privilege -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Privilege">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Resource"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Question -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Question">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Resource"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Questionnaire -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Questionnaire">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Resource"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Resource -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Resource"/>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Role -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Role"/>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#User -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#User">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Role"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Visualization -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Visualization">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Resource"/>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#AccessControlInterface -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#AccessControlInterface">
+        <rdf:type rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Resource"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Admin -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Admin">
+        <rdf:type rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Role"/>
+        <can_read rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#AdminInterface"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#AdminInterface -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#AdminInterface">
+        <rdf:type rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Resource"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#DataAdmin -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#DataAdmin">
+        <rdf:type rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Role"/>
+        <can_read rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#MedicalDataInterface"/>
+        <has_role rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Admin"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#MedicalDataInterface -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#MedicalDataInterface">
+        <rdf:type rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Resource"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#PatientAlice -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#PatientAlice">
+        <rdf:type rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Patient"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#PatientBob -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#PatientBob">
+        <rdf:type rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Patient"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#SecurityAdmin -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#SecurityAdmin">
+        <rdf:type rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Role"/>
+        <can_read rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#AccessControlInterface"/>
+        <has_role rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Admin"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#SecurityCreatorAdmin -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#SecurityCreatorAdmin">
+        <rdf:type rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Role"/>
+        <rdf:type>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#can_create"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Permission"/>
+            </owl:Restriction>
+        </rdf:type>
+        <rdf:type>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#can_create"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Resource"/>
+            </owl:Restriction>
+        </rdf:type>
+        <rdf:type>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#can_create"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Role"/>
+            </owl:Restriction>
+        </rdf:type>
+        <has_role rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#SecurityAdmin"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#SecurityEditorAdmin -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#SecurityEditorAdmin">
+        <rdf:type rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Role"/>
+        <rdf:type>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#can_create"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Privilege"/>
+            </owl:Restriction>
+        </rdf:type>
+        <rdf:type>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#can_read"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Permission"/>
+            </owl:Restriction>
+        </rdf:type>
+        <rdf:type>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#can_read"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Resource"/>
+            </owl:Restriction>
+        </rdf:type>
+        <rdf:type>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#can_read"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Role"/>
+            </owl:Restriction>
+        </rdf:type>
+        <has_role rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#SecurityAdmin"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#UserCarl -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#UserCarl">
+        <rdf:type rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#User"/>
+        <can_read rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#PatientBob"/>
+        <has_patient rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#PatientAlice"/>
+        <has_role rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#PatientBob"/>
+        <has_role rdf:resource="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#SecurityCreatorAdmin"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // General axioms
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDisjointClasses"/>
+        <owl:members rdf:parseType="Collection">
+            <rdf:Description rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Answer"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Chart"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Cohort"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#CopyNumberVariant"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Gene"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Patient"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Question"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Questionnaire"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#User"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/pawamoy/ontologies/2017/5/genida#Visualization"/>
+        </owl:members>
+    </rdf:Description>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.2.8.20170104-2310) https://github.com/owlcs/owlapi -->
