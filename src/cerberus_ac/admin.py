@@ -88,11 +88,11 @@ class RolePrivilegeAdmin(admin.ModelAdmin):
     date_hierarchy = 'creation_date'
 
     def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
         record = PrivilegeHistory(
             user=request.user, action={False: PrivilegeHistory.CREATE}.get(
                 change, PrivilegeHistory.UPDATE))
         record.update_from_privilege(obj)
-        super().save_model(request, obj, form, change)
 
 
 class RoleHierarchyAdmin(admin.ModelAdmin):
