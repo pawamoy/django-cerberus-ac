@@ -2,6 +2,11 @@
 Changelog
 =========
 
+0.2.1 (2017-11-08)
+==================
+
+- Fix ``save() prohibited to prevent data loss due to unsaved related object 'reference'`` error in admin ``save_model``.
+
 0.2.0 (2017-07-03)
 ==================
 
