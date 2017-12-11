@@ -63,10 +63,9 @@ class MainTestCase(TestCase):
         """Add resources to self."""
         self.resources = [FakeResource.objects.create() for _ in range(3)]
 
-    def test_appsettings_instance(self):
-        """Instantiate an AppSettings instance."""
-        appsettings = AppSettings()
-        assert appsettings.mapping
+    def test_mapping(self):
+        """Test the mapping setting."""
+        assert app_settings.mapping
 
     def test_import_classes(self):
         """Test classes imported correctly."""

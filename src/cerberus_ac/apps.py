@@ -130,31 +130,28 @@ class Mapping(object):
 
 
 class MappingSetting(aps.Setting):
-    def check(self):
+    def checker(self, name, value):
         """Check the value of given mapping setting."""
-        value = self.get_raw()
-        if value == self.default:
-            return
         if not isinstance(value, tuple):
-            raise ValueError('%s must be a tuple' % self.full_name)
+            raise ValueError('%s must be a tuple' % name)
         if not all(isinstance(o, tuple) for o in value):
             raise ValueError(
-                '%s must be a tuple of (key, value) tuples' % self.full_name)
+                '%s must be a tuple of (key, value) tuples' % name)
         for k, v in value:
             if not isinstance(k, str):
-                raise ValueError('Keys in %s must be str' % self.full_name)
+                raise ValueError('Keys in %s must be str' % name)
             if not isinstance(v, dict):
-                raise ValueError('Values in %s must be dict' % self.full_name)
+                raise ValueError('Values in %s must be dict' % name)
             if set(v.keys()) != {'name', 'attr'}:
                 raise ValueError('Values in %s must be dict '
-                                 'with name and attr keys' % self.full_name)
+                                 'with name and attr keys' % name)
         _ = [o[1] for o in value]
         if {x['name'] for x in _ if _.count(x['name']) > 1}:
             raise ValueError(
-                'Names in %s values must be unique' % self.full_name)
+                'Names in %s values must be unique' % name)
 
-    def transform(self):
-        return Mapping(self.get_raw())
+    def transform(self, value):
+        return Mapping(value)
 
 
 class AppSettings(aps.AppSettings):
