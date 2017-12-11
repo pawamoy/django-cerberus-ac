@@ -70,7 +70,7 @@ setup(
         'role based access control', 'django access control',
     ],
     install_requires=[
-        'django-app-settings'
+        'django-app-settings', 'django-suit-dashboard'
     ],
     entry_points={
         'archan': [
