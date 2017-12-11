@@ -13,6 +13,8 @@ from cerberus_ac.models import (
     RolePrivilege)
 from cerberus_ac.utils import get_resource_id, get_resource_type
 
+app_settings = AppSettings()
+
 
 class FakeUser(f.FakeModel, RoleMixin):
     """Fake user model."""
@@ -66,29 +68,9 @@ class MainTestCase(TestCase):
         appsettings = AppSettings()
         assert appsettings.mapping
 
-    @override_settings(CERBERUS_DEFAULT_RESPONSE='a',
-                       CERBERUS_SKIP_IMPLICIT=1,
-                       CERBERUS_LOG_ACCESS=[],
-                       CERBERUS_LOG_PRIVILEGES={},
-                       CERBERUS_LOG_HIERARCHY=None,
-                       CERBERUS_ROLES_LIST={},
-                       CERBERUS_RESOURCES_LIST=[1, 2])
-    def test_wrong_settings_trigger_exception(self):
-        """Check that settings with wrong values trigger exceptions."""
-        with pytest.raises(ValueError):
-            AppSettings.default_response.check()
-        with pytest.raises(ValueError):
-            AppSettings.skip_implicit.check()
-        with pytest.raises(ValueError):
-            AppSettings.log_access.check()
-        with pytest.raises(ValueError):
-            AppSettings.log_privileges.check()
-        with pytest.raises(ValueError):
-            AppSettings.log_hierarchy.check()
-
     def test_import_classes(self):
         """Test classes imported correctly."""
-        assert set(AppSettings.mapping.get().role_classes()) == {Role, FakeUser, FakeGroup}  # noqa
+        assert set(app_settings.mapping.role_classes()) == {Role, FakeUser, FakeGroup}  # noqa
 
     def test_getting_resource_type_and_id(self):
         """Test get_resource_type and get_resource_id methods."""

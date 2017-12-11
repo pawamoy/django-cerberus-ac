@@ -11,6 +11,8 @@ from .apps import AppSettings
 from .models import (
     AccessHistory, PrivilegeHistory, Role, RoleHierarchy, RolePrivilege)
 
+app_settings = AppSettings()
+
 
 # class SecurityAdmin(AdminSite):
 #     pass
@@ -35,7 +37,7 @@ def obj_link_generator(type_attr, id_attr, short_description):
     def obj_link(obj):
         obj_type = getattr(obj, type_attr)
         obj_id = getattr(obj, id_attr)
-        instance = AppSettings.mapping.get().get_instance(
+        instance = app_settings.mapping.get_instance(
             obj_type, obj_id)
         if instance is None:
             return '-'
