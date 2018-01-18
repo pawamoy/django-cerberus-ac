@@ -2,10 +2,21 @@
 Changelog
 =========
 
+0.2.4 (2018-01-18)
+==================
+
+- Fix missing ``django-suit-dashboard`` in ``setup.py``.
+- Fix usage of ``django-app-settings`` 0.3.0 in ``urls.py``.
+
+0.2.3 (2017-12-11)
+==================
+
+- Fix mapping setting for ``django-app-settings`` 0.3.0.
+
 0.2.2 (2017-12-11)
 ==================
 
-- Update to support django-app-settings 0.3.0.
+- Update to support ``django-app-settings`` 0.3.0.
 
 0.2.1 (2017-11-08)
 ==================
@@ -81,4 +92,3 @@ Changelog
 ==================
 
 * Alpha release on PyPI.
-
