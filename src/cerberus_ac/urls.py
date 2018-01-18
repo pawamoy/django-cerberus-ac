@@ -63,5 +63,5 @@ def cerberus_urlpatterns(admin_view_func=lambda x: x):
     ]
 
 
-app_name = AppSettings.namespace.get()
+app_name = AppSettings.namespace.get_value()
 urlpatterns = cerberus_urlpatterns()
