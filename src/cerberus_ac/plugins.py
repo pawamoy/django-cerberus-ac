@@ -3,7 +3,7 @@
 """cerberus_ac plugins module."""
 
 try:
-    from archan import Provider, Argument, DSM as ArchanDSM
+    from archan import Provider, Argument, DesignStructureMatrix
 
     class Privileges(Provider):
         """Dependenpy provider for Archan."""
@@ -22,7 +22,7 @@ try:
             """
             data = []
             keys = []
-            return ArchanDSM(data=data, entities=keys)
+            return DesignStructureMatrix(data=data, entities=keys)
 
 except ImportError:
     class Privileges(object):
