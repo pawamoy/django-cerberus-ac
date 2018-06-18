@@ -124,12 +124,6 @@ class MainTestCase(TestCase):
         assert self.roles[2].conveys_role_to(self.users[2])
         assert set(self.users[0].conveyors()) == {
             self.groups[0], self.groups[1], self.roles[0]}
-        assert set(
-            self.users[2].conveyors(search=RoleHierarchy.DEPTH_FIRST)) == set(
-            self.users[2].conveyors(search=RoleHierarchy.BREADTH_FIRST))
-        assert set(
-            self.groups[2].heirs(search=RoleHierarchy.DEPTH_FIRST)) == set(
-            self.groups[2].heirs(search=RoleHierarchy.BREADTH_FIRST))
 
     def test_role_hierarchy_history(self):
         """Test role hierarchy history."""
@@ -176,7 +170,7 @@ class MainTestCase(TestCase):
     def test_role_privileges_history(self):
         """Test role privileges history."""
         for i in (1, 2, 3):
-            assert RolePrivilege.objects.get(
+            assert PrivilegeHistory.objects.get(
                 role_type='FakeUser',
                 role_id=i,
                 access_type='do stuff on',
@@ -184,7 +178,7 @@ class MainTestCase(TestCase):
                 resource_type='FakeResource',
                 resource_id=i)
             j = {1: 2, 2: 3, 3: 1}.get(i)
-            assert RolePrivilege.objects.get(
+            assert PrivilegeHistory.objects.get(
                 role_type='FakeUser',
                 role_id=i,
                 access_type='do stuff on',

@@ -13,7 +13,7 @@ Models and mixins for access control.
 
 from django.conf import settings
 from django.db import models
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Q
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
@@ -31,13 +31,9 @@ class RoleMixin(object):
     privileges granted to a role, be it a custom class or Role instance.
     """
 
-    def heirs(self, search=None):
+    def heirs(self):
         """Return the children of this role."""
         role_type, role_id = get_role_type_and_id(self)
-        if search is not None:
-            return [app_settings.mapping.get_instance(*h)
-                    for h in RoleHierarchy.all_heirs(
-                    role_type, role_id, search)]
         return [app_settings.mapping.get_instance(*h)
                 for h in RoleHierarchy.heirs(role_type, role_id)]
 
@@ -64,9 +60,9 @@ class RoleMixin(object):
             except RoleHierarchy.DoesNotExist:
                 return False
         else:
-            if (role_type_b, role_id_b) in RoleHierarchy.all_conveyors(
-                    role_type_a, role_id_a):
-                return True
+            for layer in RoleHierarchy.all_conveyors(role_type_a, role_id_a):
+                if (role_type_b, role_id_b) in layer:
+                    return True
             return False
 
     def take_role(self, role, role_id=''):
@@ -88,13 +84,9 @@ class RoleMixin(object):
             role_type_a=role_type_a, role_id_a=role_id_a,
             role_type_b=role_type_b, role_id_b=role_id_b)
 
-    def conveyors(self, search=None):
+    def conveyors(self):
         """Return the roles conveying privileges to this role."""
         role_type, role_id = get_role_type_and_id(self)
-        if search is not None:
-            return [app_settings.mapping.get_instance(*c)
-                    for c in RoleHierarchy.all_conveyors(
-                    role_type, role_id, search)]
         return [app_settings.mapping.get_instance(*c)
                 for c in RoleHierarchy.conveyors(role_type, role_id)]
 
@@ -157,7 +149,8 @@ class RoleMixin(object):
 
             self_type, self_id = get_role_type_and_id(self)
             roles = [(self_type, self_id)]
-            roles.extend(RoleHierarchy.all_conveyors(self_type, self_id))
+            for layer in RoleHierarchy.all_conveyors(self_type, self_id):
+                roles.extend(layer)
             resources_id = []
             for role_type, role_id in roles:
                 resources_id.extend(list(RolePrivilege.objects.filter(
@@ -244,9 +237,6 @@ class Role(models.Model, RoleMixin):
 class RoleHierarchy(models.Model):
     """Role hierarchy model."""
 
-    BREADTH_FIRST = 0
-    DEPTH_FIRST = 1
-
     role_type_a = models.CharField(max_length=255)
     role_id_a = models.CharField(max_length=255, blank=True)
     role_type_b = models.CharField(max_length=255)
@@ -284,9 +274,10 @@ class RoleHierarchy(models.Model):
         Returns:
             list: list of (role_type, role_id) conveyors.
         """
-        return [(rh.role_type_b, rh.role_id_b)
-                for rh in RoleHierarchy.objects.filter(
-                role_type_a=role_type, role_id_a=role_id)]
+        return set(
+            RoleHierarchy.objects
+            .filter(role_type_a=role_type, role_id_a=role_id)
+            .values_list('role_type_b', 'role_id_b'))
 
     @staticmethod
     def heirs(role_type, role_id):
@@ -300,12 +291,13 @@ class RoleHierarchy(models.Model):
         Returns:
             list: list of (role_type, role_id) heirs.
         """
-        return [(rh.role_type_a, rh.role_id_a)
-                for rh in RoleHierarchy.objects.filter(
-                role_type_b=role_type, role_id_b=role_id)]
+        return set(
+            RoleHierarchy.objects
+            .filter(role_type_b=role_type, role_id_b=role_id)
+            .values_list('role_type_a', 'role_id_a'))
 
     @staticmethod
-    def all_conveyors(role_type, role_id, search=BREADTH_FIRST):
+    def all_conveyors(role_type, role_id):
         """
         Return every roles conveying privileges to role_type, role_id.
 
@@ -317,20 +309,18 @@ class RoleHierarchy(models.Model):
         Returns:
             list: list of (role_type, role_id) conveyors.
         """
-        result = []
-        if search == RoleHierarchy.BREADTH_FIRST:
-            line = RoleHierarchy.conveyors(role_type, role_id)
-            result.extend(line)
-            for r in line:
-                result.extend(RoleHierarchy.all_conveyors(r[0], r[1], search))
-        else:
-            for r in RoleHierarchy.conveyors(role_type, role_id):
-                result.append(r)
-                result.extend(RoleHierarchy.all_conveyors(r[0], r[1], search))
-        return result
+        layers = []
+        conveyors = RoleHierarchy.objects.filter(role_type_a=role_type, role_id_a=role_id)
+        while conveyors:
+            layers.append(list(conveyors.values_list('role_type_b', 'role_id_b')))
+            next_layer_q_object = Q()
+            for conveyor in conveyors:
+                next_layer_q_object |= Q(role_type_a=conveyor.role_type_b, role_id_a=conveyor.role_id_b)
+            conveyors = RoleHierarchy.objects.filter(next_layer_q_object)
+        return layers
 
     @staticmethod
-    def all_heirs(role_type, role_id, search=BREADTH_FIRST):
+    def all_heirs(role_type, role_id):
         """
         Return every roles inheriting privileges from role_type, role_id.
 
@@ -342,23 +332,21 @@ class RoleHierarchy(models.Model):
         Returns:
             list: list of (role_type, role_id) heirs.
         """
-        result = []
-        if search == RoleHierarchy.DEPTH_FIRST:
-            for r in RoleHierarchy.heirs(role_type, role_id):
-                result.append(r)
-                result.extend(RoleHierarchy.all_heirs(r[0], r[1], search))
-        else:
-            line = RoleHierarchy.heirs(role_type, role_id)
-            result.extend(line)
-            for r in line:
-                result.extend(RoleHierarchy.all_heirs(r[0], r[1], search))
-        return result
+        layers = []
+        heirs = RoleHierarchy.objects.filter(role_type_b=role_type, role_id_b=role_id)
+        while heirs:
+            layers.append(list(heirs.values_list('role_type_a', 'role_id_a')))
+            next_layer_q_object = Q()
+            for heir in heirs:
+                next_layer_q_object |= Q(role_type_b=heir.role_type_a, role_id_b=heir.role_id_a)
+            heirs = RoleHierarchy.objects.filter(next_layer_q_object)
+        return layers
 
     @staticmethod
     def get_roots():
         all_obj = RoleHierarchy.objects.all()
-        b_set = set([(o.role_type_b, o.role_id_b) for o in all_obj])
-        a_set = set([(o.role_type_a, o.role_id_a) for o in all_obj])
+        b_set = set((o.role_type_b, o.role_id_b) for o in all_obj)
+        a_set = set((o.role_type_a, o.role_id_a) for o in all_obj)
         return b_set - a_set
 
 
@@ -447,15 +435,18 @@ class RolePrivilege(models.Model):
         if attempt.response is None:
 
             # Else check inherited explicit perms
-            for above_role_type, above_role_id in RoleHierarchy.all_conveyors(role_type, role_id):  # noqa
-                attempt.response = RolePrivilege.authorize_explicit(
-                    above_role_type, above_role_id, perm,
-                    resource_type, resource_id)
-
+            for layer in RoleHierarchy.all_conveyors(role_type, role_id):
                 if attempt.response is not None:
-                    attempt.conveyor_type = above_role_type
-                    attempt.conveyor_id = above_role_id
                     break
+                for above_role_type, above_role_id in layer:
+                    attempt.response = RolePrivilege.authorize_explicit(
+                        above_role_type, above_role_id, perm,
+                        resource_type, resource_id)
+
+                    if attempt.response is not None:
+                        attempt.conveyor_type = above_role_type
+                        attempt.conveyor_id = above_role_id
+                        break
 
         # Else check role implicit perms
         if attempt.response is None and not skip_implicit:
@@ -468,16 +459,19 @@ class RolePrivilege(models.Model):
             # Else check inherited implicit perms
             else:
 
-                for above_role_type, above_role_id in RoleHierarchy.all_conveyors(role_type, role_id):  # noqa
-                    attempt.response = RolePrivilege.authorize_implicit(
-                        above_role_type, above_role_id, perm,
-                        resource_type, resource_id)
-
+                for layer in RoleHierarchy.all_conveyors(role_type, role_id):
                     if attempt.response is not None:
-                        attempt.response_type = AccessHistory.IMPLICIT
-                        attempt.conveyor_type = above_role_type
-                        attempt.conveyor_id = above_role_id
                         break
+                    for above_role_type, above_role_id in layer:
+                        attempt.response = RolePrivilege.authorize_implicit(
+                            above_role_type, above_role_id, perm,
+                            resource_type, resource_id)
+
+                        if attempt.response is not None:
+                            attempt.response_type = AccessHistory.IMPLICIT
+                            attempt.conveyor_type = above_role_type
+                            attempt.conveyor_id = above_role_id
+                            break
 
         # Else give default response
         if attempt.response is None:
