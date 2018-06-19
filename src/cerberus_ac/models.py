@@ -304,18 +304,20 @@ class RoleHierarchy(models.Model):
         Args:
             role_type (str): string describing the role type.
             role_id (str): unique ID of the role.
-            search (int): 0: breadth-first, 1: depth-first.
 
         Returns:
-            list: list of (role_type, role_id) conveyors.
+            list of lists: list of layers,
+                layers beings lists of (role_type, role_id) conveyors.
         """
         layers = []
-        conveyors = RoleHierarchy.objects.filter(role_type_a=role_type, role_id_a=role_id)
+        conveyors = RoleHierarchy.objects.filter(
+            role_type_a=role_type, role_id_a=role_id)
         while conveyors:
             layers.append(list(conveyors.values_list('role_type_b', 'role_id_b')))
             next_layer_q_object = Q()
             for conveyor in conveyors:
-                next_layer_q_object |= Q(role_type_a=conveyor.role_type_b, role_id_a=conveyor.role_id_b)
+                next_layer_q_object |= Q(role_type_a=conveyor.role_type_b,
+                                         role_id_a=conveyor.role_id_b)
             conveyors = RoleHierarchy.objects.filter(next_layer_q_object)
         return layers
 
@@ -327,18 +329,20 @@ class RoleHierarchy(models.Model):
         Args:
             role_type (str): string describing the role type.
             role_id (str): unique ID of the role.
-            search (int): 0: breadth-first, 1: depth-first.
 
         Returns:
-            list: list of (role_type, role_id) heirs.
+            list of lists: list of layers,
+                layers beings lists of (role_type, role_id) heirs.
         """
         layers = []
-        heirs = RoleHierarchy.objects.filter(role_type_b=role_type, role_id_b=role_id)
+        heirs = RoleHierarchy.objects.filter(
+            role_type_b=role_type, role_id_b=role_id)
         while heirs:
             layers.append(list(heirs.values_list('role_type_a', 'role_id_a')))
             next_layer_q_object = Q()
             for heir in heirs:
-                next_layer_q_object |= Q(role_type_b=heir.role_type_a, role_id_b=heir.role_id_a)
+                next_layer_q_object |= Q(role_type_b=heir.role_type_a,
+                                         role_id_b=heir.role_id_a)
             heirs = RoleHierarchy.objects.filter(next_layer_q_object)
         return layers
 
@@ -361,7 +365,7 @@ class RolePrivilege(models.Model):
     access_type = models.CharField(_('Access type'), max_length=255)
 
     resource_type = models.CharField(_('Resource type'), max_length=255)
-    resource_id = models.CharField(_('Resource ID'), max_length=255, blank=True)  # noqa
+    resource_id = models.CharField(_('Resource ID'), max_length=255, blank=True)
 
     creation_date = models.DateTimeField(_('Created'), auto_now_add=True)
     modification_date = models.DateTimeField(_('Last modified'), auto_now=True)
