@@ -2,6 +2,12 @@
 Changelog
 =========
 
+0.2.5 (2018-06-19)
+==================
+
+- Improve performance by getting conveyors/heirs iteratively instead of recursively
+  (database requests number drastically reduced).
+
 0.2.4 (2018-01-18)
 ==================
 

@@ -6,7 +6,7 @@ try:
     from archan import Provider, Argument, DesignStructureMatrix
 
     class Privileges(Provider):
-        """Dependenpy provider for Archan."""
+        """Cerberus AC provider for Archan."""
 
         identifier = 'cerberus_ac.Privileges'
         name = 'Privileges'
